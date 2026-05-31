@@ -132,21 +132,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
       <div style="font-size:11px;color:var(--text3);margin-top:6px">YouTube and Twitch VOD links supported</div>
     </div>
 
-    <!-- Metadata dropdowns — full operator + map list -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
+    <!-- Auto-detect badge -->
+    <div style="display:flex;align-items:center;gap:8px;background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.2);border-radius:var(--r);padding:10px 14px;margin-bottom:10px">
+      <span style="font-size:16px">🤖</span>
       <div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Side</div>
-        <select id="sel-side" onchange="updateOperators()" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px 10px;color:var(--text2);font-size:12px">
-          <option value="">All</option>
-          <option value="attack">Attack</option>
-          <option value="defend">Defend</option>
-        </select>
-      </div>
-      <div style="grid-column:span 2">
-        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Operator</div>
-        <select id="sel-operator" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px 10px;color:var(--text2);font-size:12px">
-          <option value="">Select operator…</option>
-        </select>
+        <div style="font-size:12px;font-weight:500;color:var(--accent)">Operator auto-detection ON</div>
+        <div style="font-size:11px;color:var(--text3)">Claude identifies all operators visible in the clip — no manual selection needed</div>
       </div>
     </div>
 
@@ -353,21 +344,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
 </div>
 
 <script>
-// ─── Operator data ────────────────────────────
-const ATTACKERS = ['Ace','Ash','Blitz','Brava','Buck','Capitão','Deimos','Dokkaebi','Flores','Finka','Grim','Hibana','Iana','Jackal','Kali','Lion','Maverick','Montagne','Nøkk','Nomad','Rauora','Ram','Sens','Sledge','Solid Snake','Thermite','Thatcher','Twitch','Ying','Zero','Zofia'];
-const DEFENDERS = ['Aruni','Azami','Bandit','Caveira','Clash','Denari','Doc','Echo','Ela','Fenrir','Frost','Goyo','Jäger','Kaid','Kapkan','Lesion','Maestro','Melusi','Mira','Mozzie','Mute','Oryx','Pulse','Rook','Solis','Thorn','Thunderbird','Valkyrie','Vigil','Warden'];
-
-function updateOperators() {
-  const side = document.getElementById('sel-side').value;
-  const sel  = document.getElementById('sel-operator');
-  sel.innerHTML = '<option value="">Select operator…</option>';
-  const list = side === 'attack' ? ATTACKERS : side === 'defend' ? DEFENDERS : [...ATTACKERS, ...DEFENDERS].sort();
-  list.forEach(op => {
-    const o = document.createElement('option');
-    o.value = o.textContent = op;
-    sel.appendChild(o);
-  });
-}
+// ─── Operator auto-detection ─────────────────
+// Operator dropdowns removed — Claude reads operators directly from clip HUD and on-screen elements
+function updateOperators() {} // kept for compatibility, no longer used
 
 // ─── Navigation ───────────────────────────────
 const PAGES = ['landing','upload','dashboard','pricing'];
@@ -416,7 +395,7 @@ function hideError(){document.getElementById('error-box').style.display='none';}
 async function startAnalysis() {
   if(!hasClip) return;
   hideError();
-  const operator=document.getElementById('sel-operator').value;
+  const operator='auto-detect'; // Claude identifies operators from the clip
   const map=document.getElementById('sel-map').value;
   const rank=document.getElementById('sel-rank').value;
   const overlay=document.getElementById('analyzing');
@@ -487,9 +466,12 @@ function setProgress(pct,label){
 const SEV_COL={critical:'#FF4444',warning:'#F59E0B',tip:'#3ECF8E'};
 
 function renderResults(data,operator,map,rank) {
+  // operator may be 'auto-detect' — use detected_operators from report instead
   const report=typeof data.report==='string'?JSON.parse(data.report):data.report;
   if(!report) return;
-  document.getElementById('review-meta').textContent=`${(map||'').toUpperCase()} · ${(operator||'').toUpperCase()} · ${(rank||'').toUpperCase()}`;
+  // Show map + rank + detected operators in header
+  const detectedOps = (report.detected_operators || []).join(', ') || operator || 'Detecting...';
+  document.getElementById('review-meta').textContent = [(map||'').toUpperCase(), detectedOps.toUpperCase(), (rank||'').toUpperCase()].filter(Boolean).join(' · ');
   document.getElementById('review-status-badge').style.display='inline-block';
 
   // Show YouTube link with timestamp navigation instead of embed (avoids error 153)
@@ -536,7 +518,7 @@ function renderResults(data,operator,map,rank) {
   const pips=document.getElementById('timeline-pips');
   pips.innerHTML=obs.map((o,i)=>{const pct=Math.round(((i+1)/(obs.length+1))*100);const col=SEV_COL[o.severity]||'#9B9890';return `<button onclick="scrollToObs(${i})" style="position:absolute;left:${pct}%;top:2px;width:12px;height:12px;border-radius:50%;background:${col};border:2px solid var(--bg);cursor:pointer;transform:translateX(-50%)" title="${o.timestamp}"></button>`;}).join('');
   const list=document.getElementById('obs-list');
-  list.innerHTML=obs.map((o,i)=>{const col=SEV_COL[o.severity]||'#9B9890';return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s"><div style="display:flex;align-items:flex-start;gap:10px"><div style="min-width:36px;margin-top:1px"><button onclick="event.stopPropagation();jumpToTimestamp('${o.timestamp}',${i});speakObservation(${i})" title="Jump to ${o.timestamp} in video" style="font-family:var(--fh);font-size:13px;font-weight:700;color:${col};background:none;border:none;cursor:pointer;padding:0;text-decoration:underline dotted;text-underline-offset:2px">${o.timestamp}</button></div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="tag ${o.severity}">${o.severity}</span><span style="font-size:10px;color:var(--text3)">${(o.category||'').replace('_',' ')}</span></div><div style="font-size:13px;color:var(--text2);line-height:1.5">${o.observation}</div><div id="fix-${i}" style="display:none;margin-top:9px;font-size:12px;color:var(--text);line-height:1.6;padding:9px 11px;background:var(--bg);border-radius:4px;border-left:2px solid ${col}"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}</div></div><span id="chev-${i}" style="font-size:18px;color:var(--text3);transition:transform .15s">›</span></div></div>`}).join('');
+  list.innerHTML=obs.map((o,i)=>{const col=SEV_COL[o.severity]||'#9B9890';return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s"><div style="display:flex;align-items:flex-start;gap:10px"><div style="min-width:36px;margin-top:1px"><button onclick="event.stopPropagation();jumpToTimestamp('${o.timestamp}',${i});speakObservation(${i})" title="Jump to ${o.timestamp} in video" style="font-family:var(--fh);font-size:13px;font-weight:700;color:${col};background:none;border:none;cursor:pointer;padding:0;text-decoration:underline dotted;text-underline-offset:2px">${o.timestamp}</button></div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="tag ${o.severity}">${o.severity}</span><span style="font-size:10px;color:var(--text3)">${(o.category||'').replace('_',' ')}</span>${o.operator ? `<span style="font-size:10px;font-weight:600;color:var(--accent);background:rgba(255,107,53,0.1);padding:1px 6px;border-radius:10px;border:1px solid rgba(255,107,53,0.2)">${o.operator}</span>` : ''}</div><div style="font-size:13px;color:var(--text2);line-height:1.5">${o.observation}</div><div id="fix-${i}" style="display:none;margin-top:9px;font-size:12px;color:var(--text);line-height:1.6;padding:9px 11px;background:var(--bg);border-radius:4px;border-left:2px solid ${col}"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}</div></div><span id="chev-${i}" style="font-size:18px;color:var(--text3);transition:transform .15s">›</span></div></div>`}).join('');
   currentObservations=obs;
   reviewHistory.unshift({map,operator,rank,score:sc,date:'Just now'});
   renderHistory();
@@ -552,7 +534,7 @@ function renderHistory(){const h=document.getElementById('review-history');if(!r
 // Uses ElevenLabs for natural voice if API key set, browser TTS as fallback
 let voiceOn = false;
 let currentObservations = [];
-const ELEVENLABS_API_KEY = 'sk_da1f2247bf87cf3b404ae7bd2f69bb8d7fc4c52215f483b4'; // Paste your ElevenLabs key here: elevenlabs.io
+const ELEVENLABS_API_KEY = ''; // Paste your ElevenLabs key here: elevenlabs.io
 const ELEVENLABS_VOICE_ID = 'pNInz6obpgDQGcFmaJgB'; // Adam - natural coaching voice
 
 function toggleVoice() {
@@ -671,7 +653,8 @@ function populateShareCard(report, operator, map, rank) {
   const sc = report.overall_score || 0;
   const verdict = sc >= 70 ? 'Strong performance' : sc >= 50 ? 'Room to improve' : 'Needs work';
   const col = sc >= 70 ? '#3ECF8E' : sc >= 50 ? '#F59E0B' : '#FF4444';
-  document.getElementById('sc-meta').textContent = (map||'Unknown').toUpperCase() + ' - ' + (operator||'Unknown').toUpperCase() + ' - ' + (rank||'').toUpperCase();
+  const shareOps = (report.detected_operators || []).join(', ') || operator || 'Auto-detected';
+  document.getElementById('sc-meta').textContent = (map||'Unknown').toUpperCase() + ' - ' + shareOps.toUpperCase() + ' - ' + (rank||'').toUpperCase();
   const scoreEl = document.getElementById('sc-score');
   scoreEl.textContent = sc;
   scoreEl.style.color = col;
