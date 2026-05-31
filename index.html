@@ -19,7 +19,6 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
 @keyframes pulseRing{0%{transform:scale(1);opacity:.5}100%{transform:scale(1.8);opacity:0}}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-@keyframes spin{to{transform:rotate(360deg)}}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
 .page{display:none}.page.active{display:block}
 select,input,button{font-family:var(--fb)}
@@ -36,14 +35,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
 .tag.warning{background:rgba(245,158,11,.12);color:#F59E0B;border-color:rgba(245,158,11,.3)}
 .tag.tip{background:rgba(62,207,142,.12);color:#3ECF8E;border-color:rgba(62,207,142,.3)}
 .bar-fill{height:4px;border-radius:2px;width:0%;transition:width 1.2s ease}
+.video-container{position:relative;width:100%;max-width:860px;margin:0 auto 0;border-radius:12px;overflow:hidden;border:1px solid var(--border2);box-shadow:0 0 80px rgba(255,107,53,0.15)}
+.video-container iframe{width:100%;aspect-ratio:16/9;display:block}
 </style>
 </head>
 <body>
 
-<!-- ═══════════════ CONFIG ═══════════════ -->
 <script>
-  // Your Railway backend URL
   const API_URL = 'https://siegeiq-backend-production.up.railway.app';
+  const SITE_URL = 'https://siegeiq-frontend.vercel.app';
 </script>
 
 <!-- NAV -->
@@ -59,11 +59,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
   </div>
 </nav>
 
-<!-- ═══════════════════════════════════════════ -->
-<!-- LANDING PAGE                                -->
-<!-- ═══════════════════════════════════════════ -->
+<!-- ═══════════ LANDING ═══════════ -->
 <div id="page-landing" class="page" style="padding-top:56px">
-  <div style="min-height:90vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(255,107,53,0.09) 0%,transparent 70%);position:relative;overflow:hidden">
+
+  <!-- Hero -->
+  <div style="min-height:88vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 24px 40px;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(255,107,53,0.09) 0%,transparent 70%);position:relative;overflow:hidden">
     <div style="position:absolute;inset:0;opacity:.03;background-image:linear-gradient(rgba(255,255,255,.15) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.15) 1px,transparent 1px);background-size:40px 40px"></div>
     <div style="display:inline-flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--border2);border-radius:40px;padding:4px 14px;margin-bottom:28px;animation:fadeUp .5s ease both">
       <span style="width:6px;height:6px;border-radius:50%;background:var(--success);display:inline-block;animation:blink 2s infinite"></span>
@@ -77,24 +77,52 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
     </p>
     <div style="display:flex;gap:12px;animation:fadeUp .5s .3s ease both">
       <button onclick="show('upload')" style="font-family:var(--fh);font-size:16px;font-weight:700;letter-spacing:.08em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:14px 32px;cursor:pointer">ANALYZE FREE CLIP →</button>
-      <button onclick="show('dashboard')" style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 22px;cursor:pointer">See sample review</button>
+      <button onclick="document.getElementById('demo-section').scrollIntoView({behavior:'smooth'})" style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 22px;cursor:pointer">Watch demo ↓</button>
     </div>
   </div>
-  <div style="border-top:1px solid var(--border);border-bottom:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);background:var(--bg2)">
+
+  <!-- Demo Video Section -->
+  <div id="demo-section" style="padding:60px 24px;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div style="text-align:center;margin-bottom:32px">
+      <div style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">See it in action</div>
+      <h2 style="font-family:var(--fh);font-size:40px;font-weight:700">WATCH A REAL ANALYSIS</h2>
+      <p style="font-size:14px;color:var(--text2);margin-top:8px">Diamond-level Ash gameplay analyzed frame by frame</p>
+    </div>
+    <div class="video-container">
+      <iframe
+        src="https://www.youtube.com/embed/ZZAcmTT2dok?autoplay=1&mute=1&loop=1&playlist=ZZAcmTT2dok&controls=1&rel=0&modestbranding=1"
+        title="Rainbow Six Siege Ash Gameplay — SiegeIQ Demo"
+        frameborder="0"
+        allow="autoplay; encrypted-media; picture-in-picture"
+        allowfullscreen>
+      </iframe>
+    </div>
+    <div style="text-align:center;margin-top:24px">
+      <p style="font-size:13px;color:var(--text3)">SiegeIQ analyzes clips like this one — extracting frames, identifying decision points, and generating timestamped coaching</p>
+      <button onclick="show('upload')" style="font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:11px 28px;cursor:pointer;margin-top:16px">ANALYZE YOUR OWN CLIP →</button>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div style="border-bottom:1px solid var(--border);display:grid;grid-template-columns:repeat(4,1fr);background:var(--bg)">
     <div style="padding:28px;text-align:center;border-right:1px solid var(--border)"><div style="font-family:var(--fh);font-size:38px;font-weight:700;color:var(--accent)">10s</div><div style="font-size:11px;color:var(--text3);margin-top:6px;text-transform:uppercase;letter-spacing:.08em">avg time to insights</div></div>
     <div style="padding:28px;text-align:center;border-right:1px solid var(--border)"><div style="font-family:var(--fh);font-size:38px;font-weight:700;color:var(--accent)">94%</div><div style="font-size:11px;color:var(--text3);margin-top:6px;text-transform:uppercase;letter-spacing:.08em">accuracy vs human coach</div></div>
     <div style="padding:28px;text-align:center;border-right:1px solid var(--border)"><div style="font-family:var(--fh);font-size:38px;font-weight:700;color:var(--accent)">2.3×</div><div style="font-size:11px;color:var(--text3);margin-top:6px;text-transform:uppercase;letter-spacing:.08em">faster rank progression</div></div>
     <div style="padding:28px;text-align:center"><div style="font-family:var(--fh);font-size:38px;font-weight:700;color:var(--accent)">50k+</div><div style="font-size:11px;color:var(--text3);margin-top:6px;text-transform:uppercase;letter-spacing:.08em">rounds analyzed</div></div>
   </div>
+
+  <!-- Features -->
   <div style="padding:70px 32px;max-width:900px;margin:0 auto">
     <h2 style="font-family:var(--fh);font-size:46px;font-weight:700;text-align:center;margin-bottom:40px">HOW IT WORKS</h2>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px">
       <div style="padding:30px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r) 0 0 0"><div style="font-size:28px;color:var(--accent);margin-bottom:14px">⬡</div><div style="font-family:var(--fh);font-size:20px;font-weight:600;margin-bottom:8px">Frame-by-frame breakdown</div><div style="font-size:13px;color:var(--text2);line-height:1.7">Every key decision timestamped and explained. Know exactly what cost you the round.</div></div>
-      <div style="padding:30px;background:var(--bg2);border:1px solid var(--border);border-radius:0 var(--r) 0 0"><div style="font-size:28px;color:var(--accent);margin-bottom:14px">◈</div><div style="font-family:var(--fh);font-size:20px;font-weight:600;margin-bottom:8px">Operator-specific coaching</div><div style="font-size:13px;color:var(--text2);line-height:1.7">Ash advice isn't Thermite advice. Context-aware feedback for your specific role.</div></div>
+      <div style="padding:30px;background:var(--bg2);border:1px solid var(--border);border-radius:0 var(--r) 0 0"><div style="font-size:28px;color:var(--accent);margin-bottom:14px">◈</div><div style="font-family:var(--fh);font-size:20px;font-weight:600;margin-bottom:8px">Operator-specific coaching</div><div style="font-size:13px;color:var(--text2);line-height:1.7">Ash advice isn't Thermite advice. Context-aware feedback for attackers and defenders.</div></div>
       <div style="padding:30px;background:var(--bg2);border:1px solid var(--border);border-radius:0 0 0 var(--r)"><div style="font-size:28px;color:var(--accent);margin-bottom:14px">◉</div><div style="font-family:var(--fh);font-size:20px;font-weight:600;margin-bottom:8px">Scored across 5 dimensions</div><div style="font-size:13px;color:var(--text2);line-height:1.7">Game sense, positioning, utility, decisions, rotation. Know your actual weak points.</div></div>
       <div style="padding:30px;background:var(--bg2);border:1px solid var(--border);border-radius:0 0 var(--r) 0"><div style="font-size:28px;color:var(--accent);margin-bottom:14px">◎</div><div style="font-family:var(--fh);font-size:20px;font-weight:600;margin-bottom:8px">YouTube & clip upload</div><div style="font-size:13px;color:var(--text2);line-height:1.7">Paste a YouTube link or upload directly. MP4, MOV, MKV — up to 500MB, 10 minutes.</div></div>
     </div>
   </div>
+
+  <!-- CTA -->
   <div style="text-align:center;padding:70px 24px;border-top:1px solid var(--border);background:radial-gradient(ellipse 60% 80% at 50% 100%,rgba(255,107,53,0.06) 0%,transparent 70%)">
     <h2 style="font-family:var(--fh);font-size:48px;font-weight:700;margin-bottom:14px">3 FREE REVIEWS.<br><span style="color:var(--accent)">START TODAY.</span></h2>
     <p style="color:var(--text2);margin-bottom:30px">No credit card. No coach to schedule. Results in minutes.</p>
@@ -102,9 +130,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ -->
-<!-- UPLOAD PAGE                                 -->
-<!-- ═══════════════════════════════════════════ -->
+<!-- ═══════════ UPLOAD ═══════════ -->
 <div id="page-upload" class="page" style="padding-top:56px">
   <div style="max-width:620px;margin:0 auto;padding:48px 24px 60px">
     <div style="margin-bottom:36px">
@@ -112,13 +138,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
       <p style="color:var(--text2)">3 free reviews remaining this month.</p>
     </div>
 
-    <!-- Mode toggle -->
     <div style="display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:3px;width:fit-content;margin-bottom:20px">
       <button id="tab-file" onclick="setUpMode('file')" style="font-size:13px;font-weight:500;padding:6px 18px;border-radius:4px;border:none;cursor:pointer;background:var(--bg3);color:var(--text);transition:all .15s">Upload file</button>
       <button id="tab-url" onclick="setUpMode('url')" style="font-size:13px;font-weight:500;padding:6px 18px;border-radius:4px;border:none;cursor:pointer;background:transparent;color:var(--text3);transition:all .15s">YouTube / link</button>
     </div>
 
-    <!-- Drop zone -->
     <div id="drop-zone" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor='var(--border2)'" ondrop="handleDrop(event)" onclick="document.getElementById('file-input').click()" style="border:1px dashed var(--border2);border-radius:var(--r);padding:52px 24px;text-align:center;background:var(--bg2);cursor:pointer;margin-bottom:18px;transition:all .15s">
       <input id="file-input" type="file" accept="video/*" style="display:none" onchange="handleFile(this.files[0])">
       <div id="drop-icon" style="font-size:36px;margin-bottom:14px;color:var(--text3)">↑</div>
@@ -126,41 +150,54 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
       <div id="drop-sub" style="font-size:12px;color:var(--text3)">MP4 · MOV · MKV · up to 500MB · max 10 min</div>
     </div>
 
-    <!-- URL zone -->
     <div id="url-zone" style="display:none;margin-bottom:18px">
       <input id="url-input" placeholder="https://youtube.com/watch?v=..." oninput="checkUrl(this.value)" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:13px 14px;color:var(--text);font-size:14px;outline:none">
       <div style="font-size:11px;color:var(--text3);margin-top:6px">YouTube and Twitch VOD links supported</div>
     </div>
 
-    <!-- Metadata -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:22px">
+    <!-- Metadata dropdowns — full operator + map list -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px">
       <div>
-        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Operator</div>
-        <select id="sel-operator" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px 10px;color:var(--text2);font-size:12px">
-          <option value="">Select…</option>
-          <option>Ash</option><option>Thermite</option><option>Sledge</option><option>Thatcher</option><option>Lion</option><option>Zofia</option><option>Nomad</option><option>Hibana</option><option>Twitch</option><option>Jäger</option><option>Bandit</option><option>Caveira</option><option>Echo</option><option>Lesion</option><option>Ela</option><option>Vigil</option><option>Mozzie</option><option>Ace</option><option>Zero</option><option>Flores</option>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Side</div>
+        <select id="sel-side" onchange="updateOperators()" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px 10px;color:var(--text2);font-size:12px">
+          <option value="">All</option>
+          <option value="attack">Attack</option>
+          <option value="defend">Defend</option>
         </select>
       </div>
+      <div style="grid-column:span 2">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Operator</div>
+        <select id="sel-operator" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px 10px;color:var(--text2);font-size:12px">
+          <option value="">Select operator…</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px">
       <div>
         <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Map</div>
         <select id="sel-map" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px 10px;color:var(--text2);font-size:12px">
-          <option value="">Select…</option>
-          <option>Oregon</option><option>Chalet</option><option>Border</option><option>Coastline</option><option>Clubhouse</option><option>Skyscraper</option><option>Outback</option><option>Consulate</option><option>Bank</option><option>Yacht</option><option>Fortress</option><option>Theme Park</option>
+          <option value="">Select map…</option>
+          <option>Bank</option><option>Border</option><option>Chalet</option><option>Clubhouse</option><option>Coastline</option><option>Consulate</option><option>Emerald Plains</option><option>Favela</option><option>Fortress</option><option>Hereford Base</option><option>House</option><option>Kafe Dostoyevsky</option><option>Kanal</option><option>Lair</option><option>Nighthaven Labs</option><option>Oregon</option><option>Outback</option><option>Plane</option><option>Presidential Plane</option><option>Skyscraper</option><option>Stadium Bravo</option><option>Theme Park</option><option>Tower</option><option>Villa</option><option>Yacht</option>
         </select>
       </div>
       <div>
         <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Your rank</div>
         <select id="sel-rank" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px 10px;color:var(--text2);font-size:12px">
-          <option value="">Select…</option>
-          <option>Copper</option><option>Bronze</option><option>Silver</option><option>Gold</option><option>Platinum</option><option>Diamond</option><option>Champion</option>
+          <option value="">Select rank…</option>
+          <option>Copper V</option><option>Copper IV</option><option>Copper III</option><option>Copper II</option><option>Copper I</option>
+          <option>Bronze V</option><option>Bronze IV</option><option>Bronze III</option><option>Bronze II</option><option>Bronze I</option>
+          <option>Silver V</option><option>Silver IV</option><option>Silver III</option><option>Silver II</option><option>Silver I</option>
+          <option>Gold V</option><option>Gold IV</option><option>Gold III</option><option>Gold II</option><option>Gold I</option>
+          <option>Platinum V</option><option>Platinum IV</option><option>Platinum III</option><option>Platinum II</option><option>Platinum I</option>
+          <option>Diamond V</option><option>Diamond IV</option><option>Diamond III</option><option>Diamond II</option><option>Diamond I</option>
+          <option>Champion</option>
         </select>
       </div>
     </div>
 
     <button id="analyze-btn" onclick="startAnalysis()" style="width:100%;font-family:var(--fh);font-size:17px;font-weight:700;letter-spacing:.08em;color:#fff;background:var(--bg3);border:none;border-radius:var(--r);padding:15px;cursor:not-allowed;opacity:.4;transition:all .15s">ADD A CLIP ABOVE</button>
     <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:10px">Free plan: ~15 min · Pro plan: ~2 min priority</div>
-
-    <!-- Error box -->
     <div id="error-box" style="display:none;margin-top:16px;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.3);border-radius:var(--r);padding:12px 16px;font-size:13px;color:#FF4444"></div>
   </div>
 
@@ -177,72 +214,103 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
       <div id="prog-bar" style="height:3px;background:var(--accent);border-radius:2px;width:0%;transition:width .5s ease"></div>
     </div>
     <div id="prog-pct" style="font-size:12px;color:var(--text3)">0%</div>
-    <div id="review-id-display" style="font-size:11px;color:var(--text3);margin-top:16px"></div>
+    <div id="review-id-display" style="font-size:11px;color:var(--text3);margin-top:12px"></div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ -->
-<!-- DASHBOARD (real results render here)        -->
-<!-- ═══════════════════════════════════════════ -->
+<!-- ═══════════ DASHBOARD ═══════════ -->
 <div id="page-dashboard" class="page" style="padding-top:56px">
   <div style="display:grid;grid-template-columns:1fr 296px;min-height:calc(100vh - 56px)">
     <div style="border-right:1px solid var(--border);overflow-y:auto">
       <div style="padding:24px 26px 0;border-bottom:1px solid var(--border)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
-          <span id="review-meta" style="font-family:var(--fh);font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--accent)">BORDER · ASH · GOLD III · ROUND 4</span>
+          <span id="review-meta" style="font-family:var(--fh);font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--accent)">SUBMIT A CLIP TO SEE YOUR ANALYSIS</span>
           <span style="flex:1"></span>
-          <span id="review-status-badge" style="font-size:11px;background:rgba(62,207,142,.12);color:var(--success);border:1px solid rgba(62,207,142,.2);border-radius:4px;padding:3px 10px">COMPLETE</span>
+          <span id="review-status-badge" style="font-size:11px;background:rgba(62,207,142,.12);color:var(--success);border:1px solid rgba(62,207,142,.2);border-radius:4px;padding:3px 10px;display:none">COMPLETE</span>
         </div>
-        <div style="background:var(--bg3);border-radius:var(--r);height:200px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;position:relative;overflow:hidden">
+        <div id="video-container" style="background:var(--bg3);border-radius:var(--r);height:200px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;position:relative;overflow:hidden">
           <div style="position:absolute;inset:0;opacity:.3;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,var(--border) 39px,var(--border) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,var(--border) 39px,var(--border) 40px)"></div>
-          <div style="text-align:center;position:relative"><div style="font-size:44px;opacity:.35;margin-bottom:6px">▶</div><div id="clip-name" style="font-size:12px;color:var(--text3)">Clip analyzed by SiegeIQ</div></div>
+          <div id="video-placeholder" style="text-align:center;position:relative"><div style="font-size:44px;opacity:.35;margin-bottom:6px">▶</div><div id="clip-name" style="font-size:12px;color:var(--text3)">No clip analyzed yet</div></div>
         </div>
-        <!-- Timeline -->
         <div style="margin-bottom:18px">
-          <div style="display:flex;justify-content:space-between;margin-bottom:5px">
-            <span style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Timeline</span>
-            <span id="obs-count" style="font-size:11px;color:var(--text3)">0 moments flagged</span>
-          </div>
-          <div style="height:3px;background:var(--bg3);border-radius:2px;margin-bottom:8px"><div style="height:3px;width:100%;background:var(--accent);border-radius:2px"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em">Timeline</span><span id="obs-count" style="font-size:11px;color:var(--text3)">0 moments flagged</span></div>
+          <div style="height:3px;background:var(--bg3);border-radius:2px;margin-bottom:8px"><div style="height:3px;width:0%;background:var(--accent);border-radius:2px"></div></div>
           <div id="timeline-pips" style="position:relative;height:16px"></div>
         </div>
       </div>
       <div id="obs-list" style="padding:14px 26px">
-        <div style="text-align:center;padding:40px;color:var(--text3);font-size:13px">Submit a clip to see your coaching report here.</div>
+        <div style="text-align:center;padding:48px 24px;color:var(--text3);font-size:13px;line-height:1.7">
+          Upload a clip on the <button onclick="show('upload')" style="color:var(--accent);background:none;border:none;cursor:pointer;font-size:13px;text-decoration:underline">Upload page</button> to see your AI coaching report here.
+        </div>
       </div>
     </div>
-
-    <!-- Sidebar -->
     <div style="overflow-y:auto;padding:20px 16px;display:flex;flex-direction:column;gap:14px;background:var(--bg)">
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px">
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:18px">
           <div><div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:3px">Round score</div><div id="overall-score" style="font-family:var(--fh);font-size:50px;font-weight:700;line-height:1;color:var(--text3)">—</div></div>
           <div style="text-align:right"><div style="font-size:11px;color:var(--text3)">out of 100</div><div id="score-label" style="font-size:12px;color:var(--text2);margin-top:4px"></div></div>
         </div>
-        <div id="score-bars" style="display:flex;flex-direction:column;gap:9px">
-          <div style="font-size:12px;color:var(--text3)">Submit a clip to see your scores.</div>
-        </div>
+        <div id="score-bars"><div style="font-size:12px;color:var(--text3)">Submit a clip to see your scores.</div></div>
       </div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px">
         <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Top 3 things to fix</div>
-        <div id="top-fixes"><div style="font-size:12px;color:var(--text3)">Your top coaching priorities will appear here.</div></div>
+        <div id="top-fixes"><div style="font-size:12px;color:var(--text3)">Your coaching priorities will appear here.</div></div>
       </div>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div>
+            <div style="font-size:13px;font-weight:500;margin-bottom:2px">🎙 AI Voice Coaching</div>
+            <div style="font-size:11px;color:var(--text3)">Toggle ON, then click any observation</div>
+          </div>
+          <div id="voice-toggle" onclick="toggleVoice()" style="width:38px;height:20px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0">
+            <div id="voice-thumb" style="position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s"></div>
+          </div>
+        </div>
+        <div id="voice-status" style="display:none;margin-top:6px">
+          <div style="font-size:11px;color:var(--success);margin-bottom:3px">✓ Voice ON — click any observation card to hear it</div>
+          <div id="voice-reading" style="font-size:11px;color:var(--text3);font-style:italic"></div>
+          <button onclick="stopVoice()" style="margin-top:4px;font-size:10px;color:var(--danger);background:none;border:none;cursor:pointer;text-decoration:underline">Stop speaking</button>
+        </div>
+      </div>
+
+      <!-- Share card -->
+      <div id="share-section" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;display:none">
+        <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px">Share your result</div>
+        <div id="share-card" style="background:#0A0C0F;border:1px solid rgba(255,107,53,0.3);border-radius:8px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden">
+          <div style="position:absolute;inset:0;opacity:.04;background-image:linear-gradient(rgba(255,255,255,.2) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.2) 1px,transparent 1px);background-size:24px 24px"></div>
+          <div style="position:relative">
+            <div style="font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:700;color:#F0EEE8;margin-bottom:8px">SIEGE<span style="color:#FF6B35">IQ</span></div>
+            <div id="sc-meta" style="font-size:10px;color:#9B9890;letter-spacing:.06em;text-transform:uppercase;margin-bottom:10px"></div>
+            <div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:10px">
+              <div id="sc-score" style="font-family:'Barlow Condensed',sans-serif;font-size:48px;font-weight:700;line-height:1;color:#FF6B35">—</div>
+              <div style="padding-bottom:6px"><div style="font-size:10px;color:#5C5A55">ROUND SCORE</div><div id="sc-verdict" style="font-size:11px;color:#9B9890;margin-top:1px"></div></div>
+            </div>
+            <div id="sc-bars" style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px"></div>
+            <div id="sc-fix1" style="font-size:10px;color:#9B9890;line-height:1.5;border-top:1px solid rgba(255,255,255,0.07);padding-top:8px"></div>
+            <div style="margin-top:8px;font-size:9px;color:#5C5A55;text-align:right">siegeiq-frontend.vercel.app</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="copyShareText()" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.05em;color:var(--text);background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:8px;cursor:pointer">📋 COPY TEXT</button>
+          <button onclick="saveCard()" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.05em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:8px;cursor:pointer">📸 SAVE IMAGE</button>
+        </div>
+        <div id="share-copied" style="display:none;text-align:center;font-size:11px;color:var(--success);margin-top:6px">✓ Copied to clipboard!</div>
+      </div>
+
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px">
         <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Recent reviews</div>
         <div id="review-history"><div style="font-size:12px;color:var(--text3)">No reviews yet.</div></div>
       </div>
       <div style="background:rgba(255,107,53,.07);border:1px solid rgba(255,107,53,.22);border-radius:var(--r);padding:16px">
-        <div style="font-family:var(--fh);font-size:18px;font-weight:700;margin-bottom:5px">2 free reviews left</div>
-        <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px">Go Pro for unlimited reviews, priority processing, and weekly trend reports.</div>
+        <div style="font-family:var(--fh);font-size:18px;font-weight:700;margin-bottom:5px">Unlock unlimited reviews</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px">Go Pro for unlimited reviews, priority processing, operator coaching, and weekly trend reports.</div>
         <button onclick="show('pricing')" style="width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:10px;cursor:pointer">GO PRO — $9.99/MO →</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════════════════ -->
-<!-- PRICING PAGE                                -->
-<!-- ═══════════════════════════════════════════ -->
+<!-- ═══════════ PRICING ═══════════ -->
 <div id="page-pricing" class="page" style="padding-top:56px">
   <div style="max-width:860px;margin:0 auto;padding:64px 24px 60px;text-align:center">
     <h1 style="font-family:var(--fh);font-size:52px;font-weight:700;line-height:1;margin-bottom:12px">SIMPLE,<br><span style="color:var(--accent)">HONEST</span> PRICING</h1>
@@ -285,7 +353,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
           <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>YouTube links</div>
           <div style="display:flex;gap:7px;color:var(--text3)"><span>✕</span>Team features</div>
         </div>
-        <button onclick="startCheckout('pro')" style="width:100%;font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:10px;cursor:pointer">START 7-DAY TRIAL</button>
+        <button id="pro-cta-btn" onclick="startCheckout(annualOn ? 'pro_annual' : 'pro_monthly')" style="width:100%;font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:10px;cursor:pointer">START 7-DAY TRIAL</button>
       </div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:22px 18px">
         <div style="font-family:var(--fh);font-size:13px;font-weight:600;color:var(--gold);letter-spacing:.08em;margin-bottom:3px">Team</div>
@@ -300,7 +368,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
           <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>Monthly PDF report</div>
           <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>IGL strategy notes</div>
         </div>
-        <button onclick="startCheckout('team')" style="width:100%;font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--text);background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:10px;cursor:pointer">GET SQUAD PLAN</button>
+        <button id="team-cta-btn" onclick="startCheckout(annualOn ? 'team_annual' : 'team_monthly')" style="width:100%;font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--text);background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:10px;cursor:pointer">GET SQUAD PLAN</button>
       </div>
     </div>
     <div style="font-size:12px;color:var(--text3);margin-top:18px">7-day free trial on all paid plans. No credit card for free tier. Cancel anytime.</div>
@@ -308,6 +376,22 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
 </div>
 
 <script>
+// ─── Operator data ────────────────────────────
+const ATTACKERS = ['Ace','Ash','Blitz','Brava','Buck','Capitão','Deimos','Dokkaebi','Flores','Finka','Grim','Hibana','Iana','Jackal','Kali','Lion','Maverick','Montagne','Nøkk','Nomad','Rauora','Ram','Sens','Sledge','Solid Snake','Thermite','Thatcher','Twitch','Ying','Zero','Zofia'];
+const DEFENDERS = ['Aruni','Azami','Bandit','Caveira','Clash','Denari','Doc','Echo','Ela','Fenrir','Frost','Goyo','Jäger','Kaid','Kapkan','Lesion','Maestro','Melusi','Mira','Mozzie','Mute','Oryx','Pulse','Rook','Solis','Thorn','Thunderbird','Valkyrie','Vigil','Warden'];
+
+function updateOperators() {
+  const side = document.getElementById('sel-side').value;
+  const sel  = document.getElementById('sel-operator');
+  sel.innerHTML = '<option value="">Select operator…</option>';
+  const list = side === 'attack' ? ATTACKERS : side === 'defend' ? DEFENDERS : [...ATTACKERS, ...DEFENDERS].sort();
+  list.forEach(op => {
+    const o = document.createElement('option');
+    o.value = o.textContent = op;
+    sel.appendChild(o);
+  });
+}
+
 // ─── Navigation ───────────────────────────────
 const PAGES = ['landing','upload','dashboard','pricing'];
 function show(p) {
@@ -322,353 +406,277 @@ function show(p) {
   window.scrollTo(0,0);
 }
 
-// ─── Upload logic ─────────────────────────────
-let hasClip = false;
-let upMode = 'file';
-let selectedFile = null;
-let currentReviewId = null;
-let pollInterval = null;
-let reviewHistory = [];
+// ─── Upload ───────────────────────────────────
+let hasClip=false, upMode='file', selectedFile=null, pollInterval=null, reviewHistory=[];
 
 function setUpMode(m) {
-  upMode = m;
-  document.getElementById('drop-zone').style.display = m==='file' ? 'block' : 'none';
-  document.getElementById('url-zone').style.display  = m==='url'  ? 'block' : 'none';
-  document.getElementById('tab-file').style.background = m==='file' ? 'var(--bg3)' : 'transparent';
-  document.getElementById('tab-file').style.color      = m==='file' ? 'var(--text)' : 'var(--text3)';
-  document.getElementById('tab-url').style.background  = m==='url'  ? 'var(--bg3)' : 'transparent';
-  document.getElementById('tab-url').style.color       = m==='url'  ? 'var(--text)' : 'var(--text3)';
+  upMode=m;
+  document.getElementById('drop-zone').style.display=m==='file'?'block':'none';
+  document.getElementById('url-zone').style.display=m==='url'?'block':'none';
+  document.getElementById('tab-file').style.background=m==='file'?'var(--bg3)':'transparent';
+  document.getElementById('tab-file').style.color=m==='file'?'var(--text)':'var(--text3)';
+  document.getElementById('tab-url').style.background=m==='url'?'var(--bg3)':'transparent';
+  document.getElementById('tab-url').style.color=m==='url'?'var(--text)':'var(--text3)';
 }
 
 function handleFile(f) {
-  if (!f) return;
-  selectedFile = f;
-  hasClip = true;
-  document.getElementById('drop-icon').textContent  = '✓';
-  document.getElementById('drop-icon').style.color  = 'var(--success)';
-  document.getElementById('drop-title').textContent = f.name;
-  document.getElementById('drop-sub').textContent   = (f.size/1024/1024).toFixed(1) + ' MB';
-  document.getElementById('drop-zone').style.borderColor = 'var(--success)';
+  if(!f) return;
+  selectedFile=f; hasClip=true;
+  document.getElementById('drop-icon').textContent='✓';
+  document.getElementById('drop-icon').style.color='var(--success)';
+  document.getElementById('drop-title').textContent=f.name;
+  document.getElementById('drop-sub').textContent=(f.size/1024/1024).toFixed(1)+' MB';
+  document.getElementById('drop-zone').style.borderColor='var(--success)';
   enableAnalyze();
 }
+function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').style.borderColor='var(--border2)';handleFile(e.dataTransfer.files[0]);}
+function checkUrl(v){hasClip=v.length>8;hasClip?enableAnalyze():disableAnalyze();}
+function enableAnalyze(){const b=document.getElementById('analyze-btn');b.textContent='ANALYZE CLIP →';b.style.background='var(--accent)';b.style.opacity='1';b.style.cursor='pointer';}
+function disableAnalyze(){const b=document.getElementById('analyze-btn');b.textContent='ADD A CLIP ABOVE';b.style.background='var(--bg3)';b.style.opacity='.4';b.style.cursor='not-allowed';}
+function showError(msg){const b=document.getElementById('error-box');b.textContent=msg;b.style.display='block';}
+function hideError(){document.getElementById('error-box').style.display='none';}
 
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('drop-zone').style.borderColor = 'var(--border2)';
-  handleFile(e.dataTransfer.files[0]);
-}
-
-function checkUrl(v) {
-  hasClip = v.length > 8;
-  hasClip ? enableAnalyze() : disableAnalyze();
-}
-
-function enableAnalyze() {
-  const b = document.getElementById('analyze-btn');
-  b.textContent       = 'ANALYZE CLIP →';
-  b.style.background  = 'var(--accent)';
-  b.style.opacity     = '1';
-  b.style.cursor      = 'pointer';
-}
-
-function disableAnalyze() {
-  const b = document.getElementById('analyze-btn');
-  b.textContent       = 'ADD A CLIP ABOVE';
-  b.style.background  = 'var(--bg3)';
-  b.style.opacity     = '.4';
-  b.style.cursor      = 'not-allowed';
-}
-
-function showError(msg) {
-  const box = document.getElementById('error-box');
-  box.textContent = msg;
-  box.style.display = 'block';
-}
-
-function hideError() {
-  document.getElementById('error-box').style.display = 'none';
-}
-
-// ─── Real API submission ──────────────────────
 async function startAnalysis() {
-  if (!hasClip) return;
+  if(!hasClip) return;
   hideError();
-
-  const operator = document.getElementById('sel-operator').value;
-  const map      = document.getElementById('sel-map').value;
-  const rank     = document.getElementById('sel-rank').value;
-
-  // Show overlay
-  const overlay = document.getElementById('analyzing');
-  overlay.style.display = 'flex';
-  setProgress(5, 'Submitting to AI pipeline...');
+  const operator=document.getElementById('sel-operator').value;
+  const map=document.getElementById('sel-map').value;
+  const rank=document.getElementById('sel-rank').value;
+  const overlay=document.getElementById('analyzing');
+  overlay.style.display='flex';
+  setProgress(5,'Submitting to AI pipeline...');
 
   try {
     let reviewId;
-
-    if (upMode === 'url') {
-      // YouTube / URL submission
-      const url = document.getElementById('url-input').value.trim();
-      setProgress(15, 'Sending YouTube link to backend...');
-
-      const resp = await fetch(`${API_URL}/review/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id:  'demo-user',
-          source:   url,
-          operator: operator,
-          map_name: map,
-          rank:     rank,
-          round_num: 1
-        })
-      });
-
-      if (!resp.ok) {
-        const err = await resp.json();
-        throw new Error(err.detail || 'Submission failed');
-      }
-
-      const data = await resp.json();
-      reviewId = data.review_id;
-
+    if(upMode==='url') {
+      const url=document.getElementById('url-input').value.trim();
+      setProgress(15,'Sending to backend...');
+      const resp=await fetch(`${API_URL}/review/submit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:'demo-user',source:url,operator,map_name:map,rank,round_num:1})});
+      if(!resp.ok){const err=await resp.json();throw new Error(err.detail||'Submission failed');}
+      const data=await resp.json();
+      reviewId=data.review_id;
     } else {
-      // File upload — upload to R2 first, then submit
-      setProgress(15, 'Uploading video file...');
-
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      formData.append('user_id', 'demo-user');
-      formData.append('operator', operator);
-      formData.append('map_name', map);
-      formData.append('rank', rank);
-
-      const resp = await fetch(`${API_URL}/review/upload`, {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!resp.ok) {
-        const err = await resp.json();
-        throw new Error(err.detail || 'Upload failed');
-      }
-
-      const data = await resp.json();
-      reviewId = data.review_id;
+      setProgress(15,'Uploading video...');
+      const formData=new FormData();
+      formData.append('file',selectedFile);
+      formData.append('user_id','demo-user');
+      formData.append('operator',operator);
+      formData.append('map_name',map);
+      formData.append('rank',rank);
+      const resp=await fetch(`${API_URL}/review/upload`,{method:'POST',body:formData});
+      if(!resp.ok){const err=await resp.json();throw new Error(err.detail||'Upload failed');}
+      const data=await resp.json();
+      reviewId=data.review_id;
     }
-
-    currentReviewId = reviewId;
-    document.getElementById('review-id-display').textContent = `Review ID: ${reviewId}`;
-    setProgress(30, 'Analysis queued — extracting frames...');
-
-    // Poll for completion
-    pollForResult(reviewId, operator, map, rank);
-
-  } catch (err) {
-    overlay.style.display = 'none';
-    showError('Error: ' + err.message + '. Check that your Railway backend is running.');
+    document.getElementById('review-id-display').textContent=`Review ID: ${reviewId}`;
+    setProgress(30,'Analysis queued — extracting frames...');
+    pollForResult(reviewId,operator,map,rank);
+  } catch(err) {
+    overlay.style.display='none';
+    showError('Error: '+err.message);
   }
 }
 
-// ─── Poll backend for result ──────────────────
-function pollForResult(reviewId, operator, map, rank) {
-  let pct = 30;
-  const labels = [
-    'Extracting key frames...',
-    'Analyzing tactical decisions...',
-    'Scoring your positioning...',
-    'Evaluating utility usage...',
-    'Building coaching report...'
-  ];
-  let labelIdx = 0;
-
-  pollInterval = setInterval(async () => {
-    // Increment progress bar visually
-    pct = Math.min(90, pct + Math.random() * 3);
-    labelIdx = Math.min(4, Math.floor((pct - 30) / 12));
-    setProgress(pct, labels[labelIdx]);
-
+function pollForResult(reviewId,operator,map,rank) {
+  let pct=30;
+  const labels=['Extracting key frames...','Analyzing tactical decisions...','Scoring positioning...','Evaluating utility usage...','Building coaching report...'];
+  pollInterval=setInterval(async()=>{
+    pct=Math.min(90,pct+Math.random()*3);
+    setProgress(pct,labels[Math.min(4,Math.floor((pct-30)/12))]);
     try {
-      const resp = await fetch(`${API_URL}/review/${reviewId}?user_id=demo-user`);
-      if (!resp.ok) return;
-
-      const data = await resp.json();
-
-      if (data.status === 'complete') {
+      const resp=await fetch(`${API_URL}/review/${reviewId}?user_id=demo-user`);
+      if(!resp.ok) return;
+      const data=await resp.json();
+      if(data.status==='complete'){
         clearInterval(pollInterval);
-        setProgress(100, 'Analysis complete!');
-        setTimeout(() => {
-          document.getElementById('analyzing').style.display = 'none';
-          renderResults(data, operator, map, rank);
-          show('dashboard');
-        }, 600);
-
-      } else if (data.status === 'failed') {
+        setProgress(100,'Analysis complete!');
+        setTimeout(()=>{document.getElementById('analyzing').style.display='none';renderResults(data,operator,map,rank);show('dashboard');},600);
+      } else if(data.status==='failed'){
         clearInterval(pollInterval);
-        document.getElementById('analyzing').style.display = 'none';
-        showError('Analysis failed: ' + (data.error || 'Unknown error. Check Railway logs.'));
+        document.getElementById('analyzing').style.display='none';
+        showError('Analysis failed: '+(data.error||'Unknown error. Check Railway logs.'));
       }
-      // If queued or processing, keep polling
-
-    } catch (e) {
-      // Network error during poll — keep trying
-    }
-  }, 8000); // Poll every 8 seconds
+    } catch(e){}
+  },8000);
 }
 
-function setProgress(pct, label) {
-  document.getElementById('prog-bar').style.width  = pct + '%';
-  document.getElementById('prog-pct').textContent  = Math.round(pct) + '%';
-  document.getElementById('prog-label').textContent = label;
+function setProgress(pct,label){
+  document.getElementById('prog-bar').style.width=pct+'%';
+  document.getElementById('prog-pct').textContent=Math.round(pct)+'%';
+  document.getElementById('prog-label').textContent=label;
 }
 
-// ─── Render real results ──────────────────────
-const SEV_COL = { critical:'#FF4444', warning:'#F59E0B', tip:'#3ECF8E' };
+// ─── Render results ───────────────────────────
+const SEV_COL={critical:'#FF4444',warning:'#F59E0B',tip:'#3ECF8E'};
 
-function renderResults(data, operator, map, rank) {
-  const report = typeof data.report === 'string' ? JSON.parse(data.report) : data.report;
-  if (!report) return;
+function renderResults(data,operator,map,rank) {
+  const report=typeof data.report==='string'?JSON.parse(data.report):data.report;
+  if(!report) return;
+  document.getElementById('review-meta').textContent=`${(map||'').toUpperCase()} · ${(operator||'').toUpperCase()} · ${(rank||'').toUpperCase()}`;
+  document.getElementById('review-status-badge').style.display='inline-block';
 
-  // Update meta header
-  document.getElementById('review-meta').textContent =
-    `${(map||'').toUpperCase()} · ${(operator||'').toUpperCase()} · ${(rank||'').toUpperCase()}`;
-  document.getElementById('clip-name').textContent = 'Analyzed by SiegeIQ AI';
-
-  // Overall score
-  const sc = report.overall_score || 0;
-  const scoreEl = document.getElementById('overall-score');
-  scoreEl.textContent = sc;
-  scoreEl.style.color = sc >= 70 ? 'var(--success)' : sc >= 50 ? 'var(--warn)' : 'var(--danger)';
-  document.getElementById('score-label').textContent =
-    sc >= 70 ? 'Strong' : sc >= 50 ? 'Needs work' : 'Struggling';
-
-  // Score bars
-  const sb = document.getElementById('score-bars');
-  const cats = report.category_scores || {};
-  sb.innerHTML = Object.entries(cats).map(([cat, val]) => {
-    const col = val >= 70 ? 'var(--success)' : val >= 50 ? 'var(--warn)' : 'var(--danger)';
-    return `<div>
-      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px">
-        <span style="color:var(--text2)">${cat}</span>
-        <span style="color:${col};font-weight:600">${val}</span>
-      </div>
-      <div style="height:4px;background:var(--bg3);border-radius:2px">
-        <div class="bar-fill" data-w="${val}" style="background:${col}"></div>
-      </div>
-    </div>`;
+  // Embed YouTube video if source URL is a YouTube link
+  const vc = document.getElementById('video-container');
+  const yt = (data.source || '').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+  if (yt) {
+    vc.style.height = 'auto';
+    vc.innerHTML = '<iframe width="100%" style="aspect-ratio:16/9;display:block;border-radius:var(--r)" src="https://www.youtube.com/embed/' + yt[1] + '?controls=1&rel=0&modestbranding=1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+  } else {
+    vc.style.height = '200px';
+    const cn = document.getElementById('clip-name');
+    if (cn) cn.textContent = 'Clip analyzed by SiegeIQ AI';
+  }
+  const sc=report.overall_score||0;
+  const el=document.getElementById('overall-score');
+  el.textContent=sc;
+  el.style.color=sc>=70?'var(--success)':sc>=50?'var(--warn)':'var(--danger)';
+  document.getElementById('score-label').textContent=sc>=70?'Strong':sc>=50?'Needs work':'Struggling';
+  const sb=document.getElementById('score-bars');
+  sb.innerHTML=Object.entries(report.category_scores||{}).map(([cat,val])=>{
+    const col=val>=70?'var(--success)':val>=50?'var(--warn)':'var(--danger)';
+    return `<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">${cat}</span><span style="color:${col};font-weight:600">${val}</span></div><div style="height:4px;background:var(--bg3);border-radius:2px"><div class="bar-fill" data-w="${val}" style="background:${col}"></div></div></div>`;
   }).join('');
-  setTimeout(() => document.querySelectorAll('.bar-fill').forEach(b => b.style.width = b.dataset.w + '%'), 80);
-
-  // Top fixes
-  const tf = document.getElementById('top-fixes');
-  const fixes = report.top_fixes || [];
-  tf.innerHTML = fixes.slice(0,3).map((fix, i) => `
-    <div style="display:flex;gap:8px;${i<2?'margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)':''}">
-      <span style="font-family:var(--fh);font-size:18px;font-weight:700;color:var(--accent);min-width:18px">${i+1}</span>
-      <span style="font-size:12px;color:var(--text2);line-height:1.5">${fix}</span>
-    </div>`).join('');
-
-  // Observations
-  const obs = report.observations || [];
-  document.getElementById('obs-count').textContent = `${obs.length} moments flagged`;
-
-  // Timeline pips
-  const pips = document.getElementById('timeline-pips');
-  pips.innerHTML = obs.map((o, i) => {
-    const pct = Math.round(((i+1) / (obs.length+1)) * 100);
-    const col = SEV_COL[o.severity] || '#9B9890';
-    return `<button onclick="scrollToObs(${i})" style="position:absolute;left:${pct}%;top:2px;width:12px;height:12px;border-radius:50%;background:${col};border:2px solid var(--bg);cursor:pointer;transform:translateX(-50%)" title="${o.timestamp}"></button>`;
-  }).join('');
-
-  // Observation cards
-  const list = document.getElementById('obs-list');
-  let activeObs = 0;
-  list.innerHTML = obs.map((o, i) => {
-    const col = SEV_COL[o.severity] || '#9B9890';
-    return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s">
-      <div style="display:flex;align-items:flex-start;gap:10px">
-        <div style="font-family:var(--fh);font-size:13px;font-weight:700;color:${col};min-width:36px;margin-top:1px">${o.timestamp}</div>
-        <div style="flex:1">
-          <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
-            <span class="tag ${o.severity}">${o.severity}</span>
-            <span style="font-size:10px;color:var(--text3)">${(o.category||'').replace('_',' ')}</span>
-          </div>
-          <div style="font-size:13px;color:var(--text2);line-height:1.5">${o.observation}</div>
-          <div id="fix-${i}" style="display:none;margin-top:9px;font-size:12px;color:var(--text);line-height:1.6;padding:9px 11px;background:var(--bg);border-radius:4px;border-left:2px solid ${col}">
-            <span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}
-          </div>
-        </div>
-        <span id="chev-${i}" style="font-size:18px;color:var(--text3);transition:transform .15s">›</span>
-      </div>
-    </div>`;
-  }).join('');
-
-  // Save to history
-  reviewHistory.unshift({ map, operator, rank, score: sc, date: 'Just now' });
+  setTimeout(()=>document.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.w+'%'),80);
+  const tf=document.getElementById('top-fixes');
+  tf.innerHTML=(report.top_fixes||[]).slice(0,3).map((fix,i)=>`<div style="display:flex;gap:8px;${i<2?'margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--border)':''}"><span style="font-family:var(--fh);font-size:18px;font-weight:700;color:var(--accent);min-width:18px">${i+1}</span><span style="font-size:12px;color:var(--text2);line-height:1.5">${fix}</span></div>`).join('');
+  const obs=report.observations||[];
+  document.getElementById('obs-count').textContent=`${obs.length} moments flagged`;
+  const pips=document.getElementById('timeline-pips');
+  pips.innerHTML=obs.map((o,i)=>{const pct=Math.round(((i+1)/(obs.length+1))*100);const col=SEV_COL[o.severity]||'#9B9890';return `<button onclick="scrollToObs(${i})" style="position:absolute;left:${pct}%;top:2px;width:12px;height:12px;border-radius:50%;background:${col};border:2px solid var(--bg);cursor:pointer;transform:translateX(-50%)" title="${o.timestamp}"></button>`;}).join('');
+  const list=document.getElementById('obs-list');
+  list.innerHTML=obs.map((o,i)=>{const col=SEV_COL[o.severity]||'#9B9890';return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s"><div style="display:flex;align-items:flex-start;gap:10px"><div style="font-family:var(--fh);font-size:13px;font-weight:700;color:${col};min-width:36px;margin-top:1px">${o.timestamp}</div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="tag ${o.severity}">${o.severity}</span><span style="font-size:10px;color:var(--text3)">${(o.category||'').replace('_',' ')}</span></div><div style="font-size:13px;color:var(--text2);line-height:1.5">${o.observation}</div><div id="fix-${i}" style="display:none;margin-top:9px;font-size:12px;color:var(--text);line-height:1.6;padding:9px 11px;background:var(--bg);border-radius:4px;border-left:2px solid ${col}"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}</div></div><span id="chev-${i}" style="font-size:18px;color:var(--text3);transition:transform .15s">›</span></div></div>`;}).join('');
+  currentObservations=obs;
+  reviewHistory.unshift({map,operator,rank,score:sc,date:'Just now'});
   renderHistory();
+  populateShareCard(report,operator,map,rank);
 }
 
-function toggleObs(i, sev) {
-  const fix  = document.getElementById('fix-'+i);
-  const chev = document.getElementById('chev-'+i);
-  const card = document.getElementById('obs-'+i);
-  const open = fix.style.display !== 'none';
-  fix.style.display = open ? 'none' : 'block';
-  chev.style.transform = open ? 'rotate(0)' : 'rotate(90deg)';
-  const clsMap = {critical:'open-critical',warning:'open-warning',tip:'open-tip'};
-  if (clsMap[sev]) card.classList.toggle(clsMap[sev], !open);
+function toggleObs(i,sev){const fix=document.getElementById('fix-'+i);const chev=document.getElementById('chev-'+i);const card=document.getElementById('obs-'+i);const open=fix.style.display!=='none';fix.style.display=open?'none':'block';chev.style.transform=open?'rotate(0)':'rotate(90deg)';const clsMap={critical:'open-critical',warning:'open-warning',tip:'open-tip'};if(clsMap[sev])card.classList.toggle(clsMap[sev],!open);if(!open)speakObservation(i);}
+function scrollToObs(i){const el=document.getElementById('obs-'+i);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});}
+function renderHistory(){const h=document.getElementById('review-history');if(!reviewHistory.length){h.innerHTML='<div style="font-size:12px;color:var(--text3)">No reviews yet.</div>';return;}h.innerHTML=reviewHistory.slice(0,5).map((r,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;${i<reviewHistory.length-1?'border-bottom:1px solid var(--border)':''}"><div><div style="font-size:13px;font-weight:500">${r.map||'Unknown'} · ${r.operator||'Unknown'}</div><div style="font-size:11px;color:var(--text3)">${r.date}</div></div><div style="font-family:var(--fh);font-size:22px;font-weight:700;color:${r.score>=70?'var(--success)':r.score>=50?'var(--warn)':'var(--danger)'}">${r.score}</div></div>`).join('');}
+
+
+// --- AI Voice Coaching ---
+let voiceOn = false;
+let currentObservations = [];
+
+function toggleVoice() {
+  voiceOn = !voiceOn;
+  document.getElementById('voice-toggle').style.background = voiceOn ? 'var(--accent)' : 'var(--bg3)';
+  document.getElementById('voice-thumb').style.left = voiceOn ? '22px' : '2px';
+  document.getElementById('voice-status').style.display = voiceOn ? 'block' : 'none';
+  if (!voiceOn) stopVoice();
+  else if (currentObservations.length)
+    document.getElementById('voice-reading').textContent = 'Click any observation card to hear it read aloud.';
 }
 
-function scrollToObs(i) {
-  const el = document.getElementById('obs-'+i);
-  if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+function speakObservation(index) {
+  if (!voiceOn) return;
+  if (!currentObservations[index]) return;
+  stopVoice();
+  const obs = currentObservations[index];
+  const sevLabel = obs.severity === 'critical' ? 'Critical mistake' : obs.severity === 'warning' ? 'Warning' : 'Good play';
+  const cat = (obs.category || '').replace(/_/g, ' ');
+  const text = sevLabel + ' at ' + obs.timestamp + '. ' + cat + '. ' + obs.observation + ' The fix is: ' + obs.fix;
+  document.getElementById('voice-reading').textContent = 'Reading: ' + obs.timestamp + ' - ' + cat;
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 0.92;
+  utterance.pitch = 1.0;
+  const voices = window.speechSynthesis.getVoices();
+  const preferred = voices.find(v => v.lang === 'en-US' && v.name.includes('Google')) || voices.find(v => v.lang === 'en-US') || voices[0];
+  if (preferred) utterance.voice = preferred;
+  utterance.onend = () => { document.getElementById('voice-reading').textContent = 'Done. Click another observation to continue.'; };
+  utterance.onerror = () => {};
+  window.speechSynthesis.speak(utterance);
 }
 
-function renderHistory() {
-  const h = document.getElementById('review-history');
-  if (!reviewHistory.length) { h.innerHTML = '<div style="font-size:12px;color:var(--text3)">No reviews yet.</div>'; return; }
-  h.innerHTML = reviewHistory.slice(0,5).map((r,i) => `
-    <div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;${i<reviewHistory.length-1?'border-bottom:1px solid var(--border)':''}">
-      <div>
-        <div style="font-size:13px;font-weight:500">${r.map} · ${r.operator}</div>
-        <div style="font-size:11px;color:var(--text3)">${r.date}</div>
-      </div>
-      <div style="font-family:var(--fh);font-size:22px;font-weight:700;color:${r.score>=70?'var(--success)':r.score>=50?'var(--warn)':'var(--danger)'}">${r.score}</div>
-    </div>`).join('');
+function stopVoice() {
+  window.speechSynthesis.cancel();
+  const el = document.getElementById('voice-reading');
+  if (el) el.textContent = 'Ready to read observations...';
+}
+
+if (window.speechSynthesis) {
+  window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+}
+
+// --- Share card ---
+let currentReport = null;
+let currentReportMeta = {};
+
+function populateShareCard(report, operator, map, rank) {
+  currentReport = report;
+  currentReportMeta = { operator, map, rank };
+  const sc = report.overall_score || 0;
+  const verdict = sc >= 70 ? 'Strong performance' : sc >= 50 ? 'Room to improve' : 'Needs work';
+  const col = sc >= 70 ? '#3ECF8E' : sc >= 50 ? '#F59E0B' : '#FF4444';
+  document.getElementById('sc-meta').textContent = (map||'Unknown').toUpperCase() + ' - ' + (operator||'Unknown').toUpperCase() + ' - ' + (rank||'').toUpperCase();
+  const scoreEl = document.getElementById('sc-score');
+  scoreEl.textContent = sc;
+  scoreEl.style.color = col;
+  document.getElementById('sc-verdict').textContent = verdict;
+  const bars = document.getElementById('sc-bars');
+  bars.innerHTML = Object.entries(report.category_scores || {}).map(([cat, val]) => {
+    const c = val >= 70 ? '#3ECF8E' : val >= 50 ? '#F59E0B' : '#FF4444';
+    return '<div style="display:flex;align-items:center;gap:6px"><div style="font-size:9px;color:#5C5A55;width:70px;flex-shrink:0">' + cat + '</div><div style="flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:2px"><div style="height:3px;width:' + val + '%;background:' + c + ';border-radius:2px"></div></div><div style="font-size:9px;color:' + c + ';width:22px;text-align:right">' + val + '</div></div>';
+  }).join('');
+  const fixes = report.top_fixes || [];
+  document.getElementById('sc-fix1').textContent = fixes[0] ? 'Tip: ' + fixes[0] : '';
+  document.getElementById('share-section').style.display = 'block';
+}
+
+function copyShareText() {
+  if (!currentReport) return;
+  const sc = currentReport.overall_score || 0;
+  const op = currentReportMeta.operator || '';
+  const mp = currentReportMeta.map || '';
+  const rk = currentReportMeta.rank || '';
+  const fixes = (currentReport.top_fixes || []).slice(0,2);
+  const parts = ['My SiegeIQ Analysis','', mp.toUpperCase() + ' - ' + op + ' - ' + rk, 'Round Score: ' + sc + '/100',''].concat(fixes.map((f,i)=>(i+1)+'. '+f)).concat(['','Get your own AI coaching -> siegeiq-frontend.vercel.app']);
+  navigator.clipboard.writeText(parts.join('\n')).then(()=>{
+    document.getElementById('share-copied').style.display='block';
+    setTimeout(()=>{document.getElementById('share-copied').style.display='none';},3000);
+  }).catch(()=>alert('Copy failed.'));
+}
+
+function saveCard() {
+  const card = document.getElementById('share-card');
+  if (typeof html2canvas === 'undefined') {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js';
+    s.onload = () => doSaveCard(card);
+    document.head.appendChild(s);
+  } else { doSaveCard(card); }
+}
+
+function doSaveCard(card) {
+  html2canvas(card, {backgroundColor:'#0A0C0F',scale:2,useCORS:true,logging:false})
+    .then(canvas=>{
+      const link = document.createElement('a');
+      link.download = 'siegeiq-score-' + Date.now() + '.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    })
+    .catch(()=>alert('Screenshot failed. Right-click the card to save instead.'));
 }
 
 // ─── Stripe checkout ──────────────────────────
-async function startCheckout(planType) {
+async function startCheckout(plan) {
   try {
-    const plan = planType === 'pro' ? 'pro_monthly' : 'team_monthly';
-    const resp = await fetch(`${API_URL}/billing/checkout`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ user_id: 'demo-user', email: 'user@example.com', plan })
-    });
-    const data = await resp.json();
-    if (data.checkout_url) window.location.href = data.checkout_url;
+    const resp=await fetch(`${API_URL}/billing/checkout`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:'demo-user',email:'user@siegeiq.com',plan})});
+    const data=await resp.json();
+    if(data.checkout_url) window.location.href=data.checkout_url;
     else alert('Checkout unavailable — make sure Stripe keys are set in Railway.');
-  } catch (e) {
-    alert('Could not connect to billing server. Check Railway is running.');
-  }
+  } catch(e){alert('Could not connect to billing server.');}
 }
 
 // ─── Pricing toggle ───────────────────────────
-let annualOn = false;
-function toggleAnnual() {
-  annualOn = !annualOn;
-  document.getElementById('ann-toggle').style.background = annualOn ? 'var(--accent)' : 'var(--bg3)';
-  document.getElementById('ann-thumb').style.left        = annualOn ? '22px' : '2px';
-  document.getElementById('ml').style.color              = annualOn ? 'var(--text3)' : 'var(--text)';
-  document.getElementById('al').style.color              = annualOn ? 'var(--text)' : 'var(--text3)';
-  document.getElementById('save-badge').style.display    = annualOn ? 'inline-block' : 'none';
-  document.getElementById('pro-price').textContent       = annualOn ? '$7.99' : '$9.99';
-  document.getElementById('team-price').textContent      = annualOn ? '$23.99' : '$29.99';
-}
+let annualOn=false;
+function toggleAnnual(){annualOn=!annualOn;document.getElementById('ann-toggle').style.background=annualOn?'var(--accent)':'var(--bg3)';document.getElementById('ann-thumb').style.left=annualOn?'22px':'2px';document.getElementById('ml').style.color=annualOn?'var(--text3)':'var(--text)';document.getElementById('al').style.color=annualOn?'var(--text)':'var(--text3)';document.getElementById('save-badge').style.display=annualOn?'inline-block':'none';document.getElementById('pro-price').textContent=annualOn?'$7.99':'$9.99';document.getElementById('team-price').textContent=annualOn?'$23.99':'$29.99';document.getElementById('pro-cta-btn').textContent=annualOn?'START ANNUAL TRIAL':'START 7-DAY TRIAL';document.getElementById('team-cta-btn').textContent=annualOn?'GET SQUAD ANNUAL':'GET SQUAD PLAN';}
 
 // ─── Init ─────────────────────────────────────
 show('landing');
+updateOperators();
 </script>
 </body>
 </html>
