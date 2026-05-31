@@ -145,7 +145,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
       <div>
         <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Operator <span style="color:var(--text3);font-weight:400">(optional)</span></div>
         <select id="sel-operator" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px 10px;color:var(--text2);font-size:12px">
-          <option value="">Auto-detect from clip</option>
+          <option value="">Auto-detect (less accurate)</option>
         </select>
       </div>
     </div>
@@ -175,6 +175,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
 
     <button id="analyze-btn" onclick="startAnalysis()" style="width:100%;font-family:var(--fh);font-size:17px;font-weight:700;letter-spacing:.08em;color:#fff;background:var(--bg3);border:none;border-radius:var(--r);padding:15px;cursor:not-allowed;opacity:.4;transition:all .15s">ADD A CLIP ABOVE</button>
     <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:10px">Free plan: ~15 min · Pro plan: ~2 min priority</div>
+    <div style="display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:10px 14px;margin-top:12px">
+      <span style="font-size:15px">💡</span>
+      <span style="font-size:12px;color:var(--text2);line-height:1.5">For best results, submit clips showing a <strong style="color:var(--text)">single operator and map</strong>. Multi-operator or montage clips will receive less accurate coaching.</span>
+    </div>
     <div id="error-box" style="display:none;margin-top:16px;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.3);border-radius:var(--r);padding:12px 16px;font-size:13px;color:#FF4444"></div>
   </div>
 
@@ -360,7 +364,7 @@ const DEFENDERS = ['Aruni','Azami','Bandit','Caveira','Clash','Denari','Doc','Ec
 function updateOperators() {
   const side = document.getElementById('sel-side').value;
   const sel  = document.getElementById('sel-operator');
-  sel.innerHTML = '<option value="">Auto-detect from clip</option>';
+  sel.innerHTML = '<option value="">Auto-detect (less accurate)</option>';
   const list = side === 'attack' ? ATTACKERS : side === 'defend' ? DEFENDERS : [...ATTACKERS, ...DEFENDERS].sort();
   list.forEach(op => {
     const o = document.createElement('option');
@@ -646,7 +650,12 @@ async function speakObservation(index) {
         source.connect(audioCtx.destination);
         window._siegeSource = source;
         window._siegeCtx    = audioCtx;
+        // Mute video while voice plays
+        const lp = document.getElementById('local-player');
+        const lv = lp ? lp.volume : null;
+        if (lp) lp.volume = 0;
         source.onended = () => {
+          if (lp && lv !== null) lp.volume = lv;
           document.getElementById('voice-reading').textContent = 'Done. Click another observation to hear it.';
         };
         source.start(0);
@@ -671,8 +680,15 @@ async function speakObservation(index) {
                  || voices.find(v => v.lang === 'en-US')
                  || voices[0];
   if (preferred) utter.voice = preferred;
-  utter.onend  = () => { document.getElementById('voice-reading').textContent = 'Done. Click another observation.'; };
-  utter.onerror = () => {};
+  // Mute video while speaking
+  const _lp = document.getElementById('local-player');
+  const _lv = _lp ? _lp.volume : null;
+  if (_lp) _lp.volume = 0;
+  utter.onend = () => {
+    if (_lp && _lv !== null) _lp.volume = _lv;
+    document.getElementById('voice-reading').textContent = 'Done. Click another observation.';
+  };
+  utter.onerror = () => { if (_lp && _lv !== null) _lp.volume = _lv; };
   window.speechSynthesis.speak(utter);
 }
 
@@ -681,6 +697,9 @@ function stopVoice() {
   if (window._siegeSource) { try { window._siegeSource.stop(); } catch(e){} window._siegeSource = null; }
   if (window._siegeCtx)    { try { window._siegeCtx.close();  } catch(e){} window._siegeCtx    = null; }
   if (window._siegeAudio)  { try { window._siegeAudio.pause(); } catch(e){} window._siegeAudio  = null; }
+  // Restore video volume
+  const _rlp = document.getElementById('local-player');
+  if (_rlp) _rlp.volume = 1;
   const el = document.getElementById('voice-reading');
   if (el && voiceOn) el.textContent = 'Ready — click any timestamp or observation.';
 }
