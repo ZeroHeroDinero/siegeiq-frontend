@@ -378,6 +378,10 @@ function setUpMode(m) {
 function handleFile(f) {
   if(!f) return;
   selectedFile=f; hasClip=true;
+  // Store local object URL so we can play the video in the dashboard after analysis
+  if(window.localVideoURL) URL.revokeObjectURL(window.localVideoURL);
+  window.localVideoURL = URL.createObjectURL(f);
+  window.localVideoName = f.name;
   document.getElementById('drop-icon').textContent='✓';
   document.getElementById('drop-icon').style.color='var(--success)';
   document.getElementById('drop-title').textContent=f.name;
@@ -474,12 +478,25 @@ function renderResults(data,operator,map,rank) {
   document.getElementById('review-meta').textContent = [(map||'').toUpperCase(), detectedOps.toUpperCase(), (rank||'').toUpperCase()].filter(Boolean).join(' · ');
   document.getElementById('review-status-badge').style.display='inline-block';
 
-  // Show YouTube link with timestamp navigation instead of embed (avoids error 153)
+  // Display video — local uploaded file takes priority over YouTube
   const vc = document.getElementById('video-container');
   const yt = (data.source || '').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
-  if (yt) {
+
+  if (window.localVideoURL && upMode === 'file') {
+    // LOCAL FILE — play directly from browser memory, no server needed
+    window.currentYouTubeId = null;
+    vc.style.minHeight = '0';
+    vc.style.display = 'block';
+    vc.innerHTML = '<div style="background:#000;border-radius:var(--r);overflow:hidden">'
+      + '<video id="local-player" controls playsinline style="width:100%;display:block;border-radius:var(--r);max-height:380px" src="' + window.localVideoURL + '"></video>'
+      + '<div style="padding:8px 14px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--border);background:var(--bg3)">'
+      + '<span style="font-size:11px;color:var(--text3)">Click any timestamp below to jump to that moment + hear voice coaching</span>'
+      + '<span style="font-size:11px;color:var(--text3);margin-left:auto">' + (window.localVideoName||'Uploaded clip') + '</span>'
+      + '</div></div>';
+
+  } else if (yt) {
+    // YOUTUBE LINK
     const videoId = yt[1];
-    // Store for timestamp clicking
     window.currentYouTubeId = videoId;
     vc.style.minHeight = '0';
     vc.style.display = 'block';
@@ -492,14 +509,16 @@ function renderResults(data,operator,map,rank) {
       + ' allowfullscreen></iframe>'
       + '</div>'
       + '<div style="padding:8px 14px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--border)">'
-      + '<span style="font-size:11px;color:var(--text3)">Click any timestamp below to jump to that moment + hear voice coaching</span>'
-      + '<a href="https://www.youtube.com/watch?v=' + videoId + '" target="_blank" style="font-size:11px;color:var(--accent);text-decoration:none;margin-left:auto;white-space:nowrap">YouTube &#x2197;</a>'
+      + '<span style="font-size:11px;color:var(--text3)">Click any timestamp to jump + hear coaching</span>'
+      + '<a href="https://www.youtube.com/watch?v=' + videoId + '" target="_blank" style="font-size:11px;color:var(--accent);text-decoration:none;margin-left:auto">YouTube &#x2197;</a>'
       + '</div></div>';
+
   } else {
-    vc.style.height = '200px';
+    vc.style.minHeight = '200px';
     const cn = document.getElementById('clip-name');
     if (cn) cn.textContent = 'Clip analyzed by SiegeIQ AI';
   }
+
   const sc=report.overall_score||0;
   const el=document.getElementById('overall-score');
   el.textContent=sc;
@@ -534,7 +553,7 @@ function renderHistory(){const h=document.getElementById('review-history');if(!r
 // Uses ElevenLabs for natural voice if API key set, browser TTS as fallback
 let voiceOn = false;
 let currentObservations = [];
-const ELEVENLABS_API_KEY = ''; // Paste your ElevenLabs key here: elevenlabs.io
+const ELEVENLABS_API_KEY = 'sk_da1f2247bf87cf3b404ae7bd2f69bb8d7fc4c52215f483b4';
 const ELEVENLABS_VOICE_ID = 'pNInz6obpgDQGcFmaJgB'; // Adam - natural coaching voice
 
 function toggleVoice() {
@@ -617,9 +636,18 @@ if (window.speechSynthesis) {
 // --- YouTube timestamp navigation ---
 // Clicking a timestamp BOTH seeks the video AND reads the observation aloud
 function jumpToTimestamp(timeStr, obsIndex) {
-  // Seek video to timestamp
+  // Convert M:SS to seconds
   const parts = timeStr.split(':').map(Number);
   const secs  = parts.length === 2 ? parts[0]*60 + parts[1] : parts[0];
+
+  // Seek local video player if file was uploaded
+  const localPlayer = document.getElementById('local-player');
+  if (localPlayer) {
+    localPlayer.currentTime = secs;
+    localPlayer.play();
+  }
+
+  // Seek YouTube player if YouTube link was used
   const videoId = window.currentYouTubeId;
   if (videoId) {
     const iframe = document.getElementById('yt-player');
@@ -628,7 +656,8 @@ function jumpToTimestamp(timeStr, obsIndex) {
         + '?enablejsapi=1&controls=1&rel=0&modestbranding=1&start=' + secs + '&autoplay=1';
     }
   }
-  // Scroll to that observation card
+
+  // Scroll observation card into view
   const card = document.getElementById('obs-' + obsIndex);
   if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
