@@ -77,29 +77,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
     </p>
     <div style="display:flex;gap:12px;animation:fadeUp .5s .3s ease both">
       <button onclick="show('upload')" style="font-family:var(--fh);font-size:16px;font-weight:700;letter-spacing:.08em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:14px 32px;cursor:pointer">ANALYZE FREE CLIP →</button>
-      <button onclick="document.getElementById('demo-section').scrollIntoView({behavior:'smooth'})" style="font-size:13px;color:var(--text2);background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 22px;cursor:pointer">Watch demo ↓</button>
-    </div>
-  </div>
-
-  <!-- Demo Video Section -->
-  <div id="demo-section" style="padding:60px 24px;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
-    <div style="text-align:center;margin-bottom:32px">
-      <div style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">See it in action</div>
-      <h2 style="font-family:var(--fh);font-size:40px;font-weight:700">WATCH A REAL ANALYSIS</h2>
-      <p style="font-size:14px;color:var(--text2);margin-top:8px">Diamond-level Ash gameplay analyzed frame by frame</p>
-    </div>
-    <div class="video-container">
-      <iframe
-        src="https://www.youtube.com/embed/ZZAcmTT2dok?autoplay=1&mute=1&loop=1&playlist=ZZAcmTT2dok&controls=1&rel=0&modestbranding=1"
-        title="Rainbow Six Siege Ash Gameplay — SiegeIQ Demo"
-        frameborder="0"
-        allow="autoplay; encrypted-media; picture-in-picture"
-        allowfullscreen>
-      </iframe>
-    </div>
-    <div style="text-align:center;margin-top:24px">
-      <p style="font-size:13px;color:var(--text3)">SiegeIQ analyzes clips like this one — extracting frames, identifying decision points, and generating timestamped coaching</p>
-      <button onclick="show('upload')" style="font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:11px 28px;cursor:pointer;margin-top:16px">ANALYZE YOUR OWN CLIP →</button>
     </div>
   </div>
 
@@ -228,7 +205,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
           <span style="flex:1"></span>
           <span id="review-status-badge" style="font-size:11px;background:rgba(62,207,142,.12);color:var(--success);border:1px solid rgba(62,207,142,.2);border-radius:4px;padding:3px 10px;display:none">COMPLETE</span>
         </div>
-        <div id="video-container" style="background:var(--bg3);border-radius:var(--r);height:200px;display:flex;align-items:center;justify-content:center;margin-bottom:16px;position:relative;overflow:hidden">
+        <div id="video-container" style="background:var(--bg3);border-radius:var(--r);margin-bottom:16px;position:relative;overflow:hidden;min-height:240px">
           <div style="position:absolute;inset:0;opacity:.3;background-image:repeating-linear-gradient(0deg,transparent,transparent 39px,var(--border) 39px,var(--border) 40px),repeating-linear-gradient(90deg,transparent,transparent 39px,var(--border) 39px,var(--border) 40px)"></div>
           <div id="video-placeholder" style="text-align:center;position:relative"><div style="font-size:44px;opacity:.35;margin-bottom:6px">▶</div><div id="clip-name" style="font-size:12px;color:var(--text3)">No clip analyzed yet</div></div>
         </div>
@@ -522,26 +499,20 @@ function renderResults(data,operator,map,rank) {
     const videoId = yt[1];
     // Store for timestamp clicking
     window.currentYouTubeId = videoId;
-    vc.style.height = 'auto';
-    vc.innerHTML = `
-      <div style="background:var(--bg3);border-radius:var(--r);overflow:hidden">
-        <div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden">
-          <iframe
-            id="yt-player"
-            width="100%" height="100%"
-            style="position:absolute;top:0;left:0;border-radius:var(--r)"
-            src="https://www.youtube-nocookie.com/embed/${videoId}?enablejsapi=1&controls=1&rel=0&modestbranding=1"
-            frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowfullscreen
-            onerror="showYouTubeFallback('${videoId}')">
-          </iframe>
-        </div>
-        <div style="padding:10px 14px;display:flex;align-items:center;gap:10px;border-top:1px solid var(--border)">
-          <span style="font-size:11px;color:var(--text3)">Click any timestamp below to jump to that moment</span>
-          <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" style="font-size:11px;color:var(--accent);text-decoration:none;margin-left:auto">Open in YouTube ↗</a>
-        </div>
-      </div>`;
+    vc.style.minHeight = '0';
+    vc.style.display = 'block';
+    vc.innerHTML = '<div style="background:var(--bg3);border-radius:var(--r);overflow:hidden">'
+      + '<div style="position:relative;width:100%;padding-bottom:56.25%;height:0;overflow:hidden">'
+      + '<iframe id="yt-player" width="100%" height="100%"'
+      + ' style="position:absolute;top:0;left:0;width:100%;height:100%"'
+      + ' src="https://www.youtube-nocookie.com/embed/' + videoId + '?enablejsapi=1&controls=1&rel=0&modestbranding=1"'
+      + ' frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"'
+      + ' allowfullscreen></iframe>'
+      + '</div>'
+      + '<div style="padding:8px 14px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--border)">'
+      + '<span style="font-size:11px;color:var(--text3)">Click any timestamp below to jump to that moment + hear voice coaching</span>'
+      + '<a href="https://www.youtube.com/watch?v=' + videoId + '" target="_blank" style="font-size:11px;color:var(--accent);text-decoration:none;margin-left:auto;white-space:nowrap">YouTube &#x2197;</a>'
+      + '</div></div>';
   } else {
     vc.style.height = '200px';
     const cn = document.getElementById('clip-name');
@@ -565,7 +536,7 @@ function renderResults(data,operator,map,rank) {
   const pips=document.getElementById('timeline-pips');
   pips.innerHTML=obs.map((o,i)=>{const pct=Math.round(((i+1)/(obs.length+1))*100);const col=SEV_COL[o.severity]||'#9B9890';return `<button onclick="scrollToObs(${i})" style="position:absolute;left:${pct}%;top:2px;width:12px;height:12px;border-radius:50%;background:${col};border:2px solid var(--bg);cursor:pointer;transform:translateX(-50%)" title="${o.timestamp}"></button>`;}).join('');
   const list=document.getElementById('obs-list');
-  list.innerHTML=obs.map((o,i)=>{const col=SEV_COL[o.severity]||'#9B9890';return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s"><div style="display:flex;align-items:flex-start;gap:10px"><div style="min-width:36px;margin-top:1px"><button onclick="event.stopPropagation();jumpToTimestamp('${o.timestamp}')" title="Jump to ${o.timestamp} in video" style="font-family:var(--fh);font-size:13px;font-weight:700;color:${col};background:none;border:none;cursor:pointer;padding:0;text-decoration:underline dotted;text-underline-offset:2px">${o.timestamp}</button></div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="tag ${o.severity}">${o.severity}</span><span style="font-size:10px;color:var(--text3)">${(o.category||'').replace('_',' ')}</span></div><div style="font-size:13px;color:var(--text2);line-height:1.5">${o.observation}</div><div id="fix-${i}" style="display:none;margin-top:9px;font-size:12px;color:var(--text);line-height:1.6;padding:9px 11px;background:var(--bg);border-radius:4px;border-left:2px solid ${col}"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}</div></div><span id="chev-${i}" style="font-size:18px;color:var(--text3);transition:transform .15s">›</span></div></div>`}).join('');
+  list.innerHTML=obs.map((o,i)=>{const col=SEV_COL[o.severity]||'#9B9890';return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s"><div style="display:flex;align-items:flex-start;gap:10px"><div style="min-width:36px;margin-top:1px"><button onclick="event.stopPropagation();jumpToTimestamp('${o.timestamp}',${i});speakObservation(${i})" title="Jump to ${o.timestamp} in video" style="font-family:var(--fh);font-size:13px;font-weight:700;color:${col};background:none;border:none;cursor:pointer;padding:0;text-decoration:underline dotted;text-underline-offset:2px">${o.timestamp}</button></div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="tag ${o.severity}">${o.severity}</span><span style="font-size:10px;color:var(--text3)">${(o.category||'').replace('_',' ')}</span></div><div style="font-size:13px;color:var(--text2);line-height:1.5">${o.observation}</div><div id="fix-${i}" style="display:none;margin-top:9px;font-size:12px;color:var(--text);line-height:1.6;padding:9px 11px;background:var(--bg);border-radius:4px;border-left:2px solid ${col}"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}</div></div><span id="chev-${i}" style="font-size:18px;color:var(--text3);transition:transform .15s">›</span></div></div>`}).join('');
   currentObservations=obs;
   reviewHistory.unshift({map,operator,rank,score:sc,date:'Just now'});
   renderHistory();
@@ -577,113 +548,117 @@ function scrollToObs(i){const el=document.getElementById('obs-'+i);if(el)el.scro
 function renderHistory(){const h=document.getElementById('review-history');if(!reviewHistory.length){h.innerHTML='<div style="font-size:12px;color:var(--text3)">No reviews yet.</div>';return;}h.innerHTML=reviewHistory.slice(0,5).map((r,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;${i<reviewHistory.length-1?'border-bottom:1px solid var(--border)':''}"><div><div style="font-size:13px;font-weight:500">${r.map||'Unknown'} · ${r.operator||'Unknown'}</div><div style="font-size:11px;color:var(--text3)">${r.date}</div></div><div style="font-family:var(--fh);font-size:22px;font-weight:700;color:${r.score>=70?'var(--success)':r.score>=50?'var(--warn)':'var(--danger)'}">${r.score}</div></div>`).join('');}
 
 
-// --- AI Voice Coaching (ElevenLabs + browser fallback) ---
+// --- AI Voice Coaching ---
+// Uses ElevenLabs for natural voice if API key set, browser TTS as fallback
 let voiceOn = false;
 let currentObservations = [];
-const ELEVENLABS_API_KEY = ''; // Add your ElevenLabs API key here to enable premium voice
-const ELEVENLABS_VOICE_ID = 'pNInz6obpgDQGcFmaJgB'; // Adam voice - natural male coaching voice
+const ELEVENLABS_API_KEY = ''; // Paste your ElevenLabs key here: elevenlabs.io
+const ELEVENLABS_VOICE_ID = 'pNInz6obpgDQGcFmaJgB'; // Adam - natural coaching voice
 
 function toggleVoice() {
   voiceOn = !voiceOn;
   document.getElementById('voice-toggle').style.background = voiceOn ? 'var(--accent)' : 'var(--bg3)';
   document.getElementById('voice-thumb').style.left = voiceOn ? '22px' : '2px';
   document.getElementById('voice-status').style.display = voiceOn ? 'block' : 'none';
-  if (!voiceOn) stopVoice();
-  else if (currentObservations.length)
-    document.getElementById('voice-reading').textContent = ELEVENLABS_API_KEY ? 'Premium voice ready — click any observation' : 'Voice ready — click any observation card';
+  if (!voiceOn) { stopVoice(); return; }
+  const msg = ELEVENLABS_API_KEY ? 'Premium voice ON — click any observation to hear it' : 'Voice ON — click any observation to hear it';
+  document.getElementById('voice-reading').textContent = msg;
 }
 
 async function speakObservation(index) {
+  // Only speaks when voice is toggled ON and user clicks an observation
   if (!voiceOn) return;
-  if (!currentObservations[index]) return;
-  stopVoice();
   const obs = currentObservations[index];
-  const sevLabel = obs.severity === 'critical' ? 'Critical mistake' : obs.severity === 'warning' ? 'Warning' : 'Good play';
-  const cat = (obs.category || '').replace(/_/g, ' ');
-  const text = sevLabel + ' at ' + obs.timestamp + '. ' + obs.observation + ' Here is the fix: ' + obs.fix;
-  document.getElementById('voice-reading').textContent = 'Reading: ' + obs.timestamp + '...';
+  if (!obs) return;
+  stopVoice();
+
+  const sevLabel = obs.severity === 'critical' ? 'Critical mistake'
+                 : obs.severity === 'warning'  ? 'Warning'
+                 : 'Good play';
+  const cat  = (obs.category || '').replace(/_/g, ' ');
+  const text = sevLabel + ' at ' + obs.timestamp + '. ' + obs.observation + '. Fix: ' + obs.fix;
+
+  document.getElementById('voice-reading').textContent = 'Speaking: ' + obs.timestamp + ' — ' + cat + '...';
 
   if (ELEVENLABS_API_KEY) {
-    // ElevenLabs — natural human voice
     try {
       const resp = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + ELEVENLABS_VOICE_ID + '/stream', {
         method: 'POST',
-        headers: {
-          'xi-api-key': ELEVENLABS_API_KEY,
-          'Content-Type': 'application/json',
-        },
+        headers: { 'xi-api-key': ELEVENLABS_API_KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           text: text,
           model_id: 'eleven_turbo_v2',
-          voice_settings: { stability: 0.5, similarity_boost: 0.75, style: 0.3, use_speaker_boost: true }
+          voice_settings: { stability: 0.45, similarity_boost: 0.80, style: 0.25, use_speaker_boost: true }
         })
       });
       if (resp.ok) {
-        const blob = await resp.blob();
-        const url  = URL.createObjectURL(blob);
+        const blob  = await resp.blob();
+        const url   = URL.createObjectURL(blob);
         const audio = new Audio(url);
         window._siegeAudio = audio;
         audio.onended = () => {
           URL.revokeObjectURL(url);
-          document.getElementById('voice-reading').textContent = 'Done. Click another observation to continue.';
+          document.getElementById('voice-reading').textContent = 'Done. Click another observation to hear it.';
         };
         audio.play();
-        document.getElementById('voice-reading').textContent = 'Speaking: ' + obs.timestamp + ' — ' + cat;
         return;
       }
-    } catch(e) {
-      // Fall through to browser TTS
-    }
+    } catch(e) { /* fall through to browser TTS */ }
   }
 
-  // Browser TTS fallback (free, built-in)
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.rate  = 0.88;
-  utterance.pitch = 0.95;
+  // Browser TTS fallback
+  const utter = new SpeechSynthesisUtterance(text);
+  utter.rate  = 0.88;
+  utter.pitch = 0.9;
   const voices    = window.speechSynthesis.getVoices();
-  const preferred = voices.find(v => v.lang === 'en-US' && v.name.includes('Google')) ||
-                    voices.find(v => v.lang === 'en-GB') ||
-                    voices.find(v => v.lang.startsWith('en')) || voices[0];
-  if (preferred) utterance.voice = preferred;
-  utterance.onend  = () => { document.getElementById('voice-reading').textContent = 'Done. Click another observation to continue.'; };
-  utterance.onerror = () => {};
-  window.speechSynthesis.speak(utterance);
+  const preferred = voices.find(v => v.lang === 'en-GB' && v.name.includes('Daniel'))
+                 || voices.find(v => v.lang === 'en-US' && v.name.includes('Google'))
+                 || voices.find(v => v.lang === 'en-US')
+                 || voices[0];
+  if (preferred) utter.voice = preferred;
+  utter.onend  = () => { document.getElementById('voice-reading').textContent = 'Done. Click another observation.'; };
+  utter.onerror = () => {};
+  window.speechSynthesis.speak(utter);
 }
 
 function stopVoice() {
   window.speechSynthesis.cancel();
-  if (window._siegeAudio) { window._siegeAudio.pause(); window._siegeAudio = null; }
+  if (window._siegeAudio) { try { window._siegeAudio.pause(); } catch(e){} window._siegeAudio = null; }
   const el = document.getElementById('voice-reading');
-  if (el) el.textContent = '';
+  if (el && voiceOn) el.textContent = 'Ready — click any observation.';
 }
 
 if (window.speechSynthesis) {
-  window.speechSynthesis.onvoiceschanged = () => { window.speechSynthesis.getVoices(); };
+  window.speechSynthesis.onvoiceschanged = () => window.speechSynthesis.getVoices();
 }
 
 // --- YouTube timestamp navigation ---
-function jumpToTimestamp(timeStr) {
-  // Convert M:SS to seconds
+// Clicking a timestamp BOTH seeks the video AND reads the observation aloud
+function jumpToTimestamp(timeStr, obsIndex) {
+  // Seek video to timestamp
   const parts = timeStr.split(':').map(Number);
-  const secs = parts.length === 2 ? parts[0]*60 + parts[1] : parts[0];
+  const secs  = parts.length === 2 ? parts[0]*60 + parts[1] : parts[0];
   const videoId = window.currentYouTubeId;
   if (videoId) {
-    // Try to seek the embedded player
     const iframe = document.getElementById('yt-player');
     if (iframe) {
-      iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId + '?enablejsapi=1&controls=1&rel=0&modestbranding=1&start=' + secs + '&autoplay=1';
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId
+        + '?enablejsapi=1&controls=1&rel=0&modestbranding=1&start=' + secs + '&autoplay=1';
     }
   }
+  // Scroll to that observation card
+  const card = document.getElementById('obs-' + obsIndex);
+  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
 function showYouTubeFallback(videoId) {
   const vc = document.getElementById('video-container');
   if (!vc) return;
-  vc.innerHTML = `<div style="padding:16px;background:var(--bg3);border-radius:var(--r);text-align:center">
-    <div style="font-size:13px;color:var(--text2);margin-bottom:10px">This video cannot be embedded directly.</div>
-    <a href="https://www.youtube.com/watch?v=${videoId}" target="_blank" style="font-family:var(--fh);font-size:14px;font-weight:700;color:#fff;background:var(--accent);padding:8px 20px;border-radius:var(--r);text-decoration:none;letter-spacing:.05em">WATCH ON YOUTUBE ↗</a>
-    <div style="font-size:11px;color:var(--text3);margin-top:10px">Click any timestamp below — it will open the video at that exact moment</div>
-  </div>`;
+  vc.style.minHeight = '0';
+  vc.innerHTML = '<div style="padding:20px;background:var(--bg3);border-radius:var(--r);text-align:center">'
+    + '<div style="font-size:13px;color:var(--text2);margin-bottom:12px">This video cannot be embedded — click a timestamp below to open it at that exact moment on YouTube.</div>'
+    + '<a href="https://www.youtube.com/watch?v=' + videoId + '" target="_blank" style="font-family:var(--fh);font-size:14px;font-weight:700;color:#fff;background:var(--accent);padding:8px 20px;border-radius:var(--r);text-decoration:none;letter-spacing:.05em">OPEN VIDEO ON YOUTUBE ↗</a>'
+    + '</div>';
 }
 
 // --- Share card ---
