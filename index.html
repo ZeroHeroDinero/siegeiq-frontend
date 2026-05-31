@@ -132,12 +132,21 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
       <div style="font-size:11px;color:var(--text3);margin-top:6px">YouTube and Twitch VOD links supported</div>
     </div>
 
-    <!-- Auto-detect badge -->
-    <div style="display:flex;align-items:center;gap:8px;background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.2);border-radius:var(--r);padding:10px 14px;margin-bottom:10px">
-      <span style="font-size:16px">🤖</span>
+    <!-- Operator selection -->
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
       <div>
-        <div style="font-size:12px;font-weight:500;color:var(--accent)">Operator auto-detection ON</div>
-        <div style="font-size:11px;color:var(--text3)">Claude identifies all operators visible in the clip — no manual selection needed</div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Side</div>
+        <select id="sel-side" onchange="updateOperators()" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px 10px;color:var(--text2);font-size:12px">
+          <option value="">All operators</option>
+          <option value="attack">Attack</option>
+          <option value="defend">Defend</option>
+        </select>
+      </div>
+      <div>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Operator <span style="color:var(--text3);font-weight:400">(optional)</span></div>
+        <select id="sel-operator" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px 10px;color:var(--text2);font-size:12px">
+          <option value="">Auto-detect from clip</option>
+        </select>
       </div>
     </div>
 
@@ -344,9 +353,21 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
 </div>
 
 <script>
-// ─── Operator auto-detection ─────────────────
-// Operator dropdowns removed — Claude reads operators directly from clip HUD and on-screen elements
-function updateOperators() {} // kept for compatibility, no longer used
+// ─── Operator data ────────────────────────────
+const ATTACKERS = ['Ace','Ash','Blitz','Brava','Buck','Capitão','Deimos','Dokkaebi','Flores','Finka','Grim','Hibana','Iana','Jackal','Kali','Lion','Maverick','Montagne','Nøkk','Nomad','Rauora','Ram','Sens','Sledge','Solid Snake','Thermite','Thatcher','Twitch','Ying','Zero','Zofia'];
+const DEFENDERS = ['Aruni','Azami','Bandit','Caveira','Clash','Denari','Doc','Echo','Ela','Fenrir','Frost','Goyo','Jäger','Kaid','Kapkan','Lesion','Maestro','Melusi','Mira','Mozzie','Mute','Oryx','Pulse','Rook','Solis','Thorn','Thunderbird','Valkyrie','Vigil','Warden'];
+
+function updateOperators() {
+  const side = document.getElementById('sel-side').value;
+  const sel  = document.getElementById('sel-operator');
+  sel.innerHTML = '<option value="">Auto-detect from clip</option>';
+  const list = side === 'attack' ? ATTACKERS : side === 'defend' ? DEFENDERS : [...ATTACKERS, ...DEFENDERS].sort();
+  list.forEach(op => {
+    const o = document.createElement('option');
+    o.value = o.textContent = op;
+    sel.appendChild(o);
+  });
+}
 
 // ─── Navigation ───────────────────────────────
 const PAGES = ['landing','upload','dashboard','pricing'];
@@ -363,15 +384,16 @@ function show(p) {
 }
 
 // ─── Upload ───────────────────────────────────
-let hasClip=false, upMode='file', selectedFile=null, pollInterval=null, reviewHistory=[];
+let hasClip=false, selectedFile=null, pollInterval=null, reviewHistory=[];
+window.upMode='file'; // global so dashboard can read it
 
 function setUpMode(m) {
-  upMode=m;
+  window.upMode=m;
   document.getElementById('drop-zone').style.display=m==='file'?'block':'none';
   document.getElementById('url-zone').style.display=m==='url'?'block':'none';
-  document.getElementById('tab-file').style.background=m==='file'?'var(--bg3)':'transparent';
+  document.getElementById('tab-file').style.background=window.upMode==='file'?'var(--bg3)':'transparent';
   document.getElementById('tab-file').style.color=m==='file'?'var(--text)':'var(--text3)';
-  document.getElementById('tab-url').style.background=m==='url'?'var(--bg3)':'transparent';
+  document.getElementById('tab-url').style.background=window.upMode==='url'?'var(--bg3)':'transparent';
   document.getElementById('tab-url').style.color=m==='url'?'var(--text)':'var(--text3)';
 }
 
@@ -399,7 +421,7 @@ function hideError(){document.getElementById('error-box').style.display='none';}
 async function startAnalysis() {
   if(!hasClip) return;
   hideError();
-  const operator='auto-detect'; // Claude identifies operators from the clip
+  const operator=document.getElementById('sel-operator').value || 'auto-detect';
   const map=document.getElementById('sel-map').value;
   const rank=document.getElementById('sel-rank').value;
   const overlay=document.getElementById('analyzing');
@@ -408,7 +430,7 @@ async function startAnalysis() {
 
   try {
     let reviewId;
-    if(upMode==='url') {
+    if(window.upMode==='url') {
       const url=document.getElementById('url-input').value.trim();
       setProgress(15,'Sending to backend...');
       const resp=await fetch(`${API_URL}/review/submit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:'demo-user',source:url,operator,map_name:map,rank,round_num:1})});
@@ -482,7 +504,7 @@ function renderResults(data,operator,map,rank) {
   const vc = document.getElementById('video-container');
   const yt = (data.source || '').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
 
-  if (window.localVideoURL && upMode === 'file') {
+  if (window.localVideoURL && window.upMode === 'file') {
     // LOCAL FILE — play directly from browser memory, no server needed
     window.currentYouTubeId = null;
     vc.style.minHeight = '0';
@@ -544,7 +566,22 @@ function renderResults(data,operator,map,rank) {
   populateShareCard(report,operator,map,rank);
 }
 
-function toggleObs(i,sev){const fix=document.getElementById('fix-'+i);const chev=document.getElementById('chev-'+i);const card=document.getElementById('obs-'+i);const open=fix.style.display!=='none';fix.style.display=open?'none':'block';chev.style.transform=open?'rotate(0)':'rotate(90deg)';const clsMap={critical:'open-critical',warning:'open-warning',tip:'open-tip'};if(clsMap[sev])card.classList.toggle(clsMap[sev],!open);if(!open)speakObservation(i);}
+function toggleObs(i,sev){
+  const fix=document.getElementById('fix-'+i);
+  const chev=document.getElementById('chev-'+i);
+  const card=document.getElementById('obs-'+i);
+  const open=fix.style.display!=='none';
+  fix.style.display=open?'none':'block';
+  chev.style.transform=open?'rotate(0)':'rotate(90deg)';
+  const clsMap={critical:'open-critical',warning:'open-warning',tip:'open-tip'};
+  if(clsMap[sev])card.classList.toggle(clsMap[sev],!open);
+  if(!open){
+    // Jump to timestamp in video AND speak the observation
+    const obs=currentObservations[i];
+    if(obs && obs.timestamp) jumpToTimestamp(obs.timestamp, i);
+    speakObservation(i);
+  }
+}
 function scrollToObs(i){const el=document.getElementById('obs-'+i);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});}
 function renderHistory(){const h=document.getElementById('review-history');if(!reviewHistory.length){h.innerHTML='<div style="font-size:12px;color:var(--text3)">No reviews yet.</div>';return;}h.innerHTML=reviewHistory.slice(0,5).map((r,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;${i<reviewHistory.length-1?'border-bottom:1px solid var(--border)':''}"><div><div style="font-size:13px;font-weight:500">${r.map||'Unknown'} · ${r.operator||'Unknown'}</div><div style="font-size:11px;color:var(--text3)">${r.date}</div></div><div style="font-family:var(--fh);font-size:22px;font-weight:700;color:${r.score>=70?'var(--success)':r.score>=50?'var(--warn)':'var(--danger)'}">${r.score}</div></div>`).join('');}
 
@@ -583,28 +620,45 @@ async function speakObservation(index) {
 
   if (ELEVENLABS_API_KEY) {
     try {
-      const resp = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + ELEVENLABS_VOICE_ID + '/stream', {
+      // Using standard endpoint — works on all ElevenLabs tiers including Starter
+      const resp = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + ELEVENLABS_VOICE_ID, {
         method: 'POST',
-        headers: { 'xi-api-key': ELEVENLABS_API_KEY, 'Content-Type': 'application/json' },
+        headers: {
+          'xi-api-key': ELEVENLABS_API_KEY,
+          'Content-Type': 'application/json',
+          'Accept': 'audio/mpeg'
+        },
         body: JSON.stringify({
           text: text,
-          model_id: 'eleven_turbo_v2',
-          voice_settings: { stability: 0.45, similarity_boost: 0.80, style: 0.25, use_speaker_boost: true }
+          model_id: 'eleven_monolingual_v1',
+          voice_settings: {
+            stability: 0.5,
+            similarity_boost: 0.85
+          }
         })
       });
       if (resp.ok) {
-        const blob  = await resp.blob();
-        const url   = URL.createObjectURL(blob);
-        const audio = new Audio(url);
-        window._siegeAudio = audio;
-        audio.onended = () => {
-          URL.revokeObjectURL(url);
+        const arrayBuffer = await resp.arrayBuffer();
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const decoded  = await audioCtx.decodeAudioData(arrayBuffer);
+        const source   = audioCtx.createBufferSource();
+        source.buffer  = decoded;
+        source.connect(audioCtx.destination);
+        window._siegeSource = source;
+        window._siegeCtx    = audioCtx;
+        source.onended = () => {
           document.getElementById('voice-reading').textContent = 'Done. Click another observation to hear it.';
         };
-        audio.play();
+        source.start(0);
         return;
+      } else {
+        const errText = await resp.text();
+        console.warn('ElevenLabs error:', resp.status, errText);
       }
-    } catch(e) { /* fall through to browser TTS */ }
+    } catch(e) {
+      console.warn('ElevenLabs failed:', e);
+      /* fall through to browser TTS */
+    }
   }
 
   // Browser TTS fallback
@@ -624,9 +678,11 @@ async function speakObservation(index) {
 
 function stopVoice() {
   window.speechSynthesis.cancel();
-  if (window._siegeAudio) { try { window._siegeAudio.pause(); } catch(e){} window._siegeAudio = null; }
+  if (window._siegeSource) { try { window._siegeSource.stop(); } catch(e){} window._siegeSource = null; }
+  if (window._siegeCtx)    { try { window._siegeCtx.close();  } catch(e){} window._siegeCtx    = null; }
+  if (window._siegeAudio)  { try { window._siegeAudio.pause(); } catch(e){} window._siegeAudio  = null; }
   const el = document.getElementById('voice-reading');
-  if (el && voiceOn) el.textContent = 'Ready — click any observation.';
+  if (el && voiceOn) el.textContent = 'Ready — click any timestamp or observation.';
 }
 
 if (window.speechSynthesis) {
