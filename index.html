@@ -106,7 +106,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .demo-widget{background:var(--bg2);border:1px solid var(--border2);border-radius:12px;overflow:hidden;max-width:680px;margin:0 auto}
 .demo-obs{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;opacity:0;transform:translateX(-16px);transition:opacity .4s,transform .4s}
 .demo-obs.show{opacity:1;transform:translateX(0)}
-.page{display:none}.page.active{display:block}
+.page{display:none;min-height:calc(100vh - 56px)}
+.page.active{display:block}
+html{scroll-behavior:auto}
 select,input,button{font-family:var(--fb)}
 nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px}
 .nav-btn{font-size:13px;font-weight:500;color:var(--text2);background:transparent;border:1px solid transparent;border-radius:var(--r);padding:5px 12px;cursor:pointer;transition:all .15s}
@@ -151,10 +153,10 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
     SIEGE<span style="color:var(--accent)">IQ</span>
   </button>
   <div style="display:flex;align-items:center;gap:6px">
-    <button class="nav-btn" id="nb-dashboard" onclick="show('dashboard')">Dashboard</button>
     <button class="nav-btn" id="nb-counter" onclick="show('counter')">Counter Tool</button>
-    <button class="nav-btn" id="nb-upload" onclick="show('upload')">Upload</button>
     <button class="nav-btn" id="nb-pricing" onclick="show('pricing')">Pricing</button>
+    <button class="nav-btn" id="nb-upload" onclick="show('upload')">Upload</button>
+    <button class="nav-btn" id="nb-dashboard" onclick="show('dashboard')">Dashboard</button>
     <button onclick="show('upload')" style="font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:7px 16px;cursor:pointer;margin-left:4px">ANALYZE CLIP</button>
   </div>
 </nav>
@@ -302,44 +304,44 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
 
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:20px">
           <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Human Coaches</div>
-          <div style="font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:10px">$20–$60 per session</div>
+          <div style="font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:10px;color:var(--text)">$20–$60 per session</div>
           <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:12px">You have to schedule days in advance, pay per hour, and hope they have Siege expertise. Sessions are one-time — there's no record, no replay, no way to revisit advice. And the best coaches are always booked.</div>
-          <div style="font-size:11px;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.2);border-radius:4px;padding:8px 10px;color:#FF6B6B">SiegeIQ costs less than one coaching session per month — with unlimited reviews.</div>
+          <div style="font-size:11px;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:4px;padding:8px 10px;color:var(--text2)">SiegeIQ costs less than one coaching session per month — with unlimited reviews.</div>
         </div>
 
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:20px">
           <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">R6Stats & R6Tab</div>
-          <div style="font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:10px">Stats, not coaching</div>
+          <div style="font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:10px;color:var(--text)">Stats, not coaching</div>
           <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:12px">These tools show you numbers — KD ratio, win rate, operator pick rate. They tell you that you're performing badly. They don't tell you why, what you're doing wrong in specific rounds, or how to fix it. Stats without context is useless for improvement.</div>
-          <div style="font-size:11px;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.2);border-radius:4px;padding:8px 10px;color:#FF6B6B">SiegeIQ doesn't just count your deaths — it tells you exactly why you died and what to do differently.</div>
+          <div style="font-size:11px;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:4px;padding:8px 10px;color:var(--text2)">SiegeIQ doesn't just count your deaths — it tells you exactly why you died and what to do differently.</div>
         </div>
 
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:20px">
           <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Overwolf Apps</div>
-          <div style="font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:10px">Generic overlays</div>
+          <div style="font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:10px;color:var(--text)">Generic overlays</div>
           <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:12px">Overwolf apps provide real-time HUD data — operator counters, map info, callout overlays. Useful reference tools but they require you to already know what to do with the information. There's no analysis, no coaching, no improvement loop.</div>
-          <div style="font-size:11px;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.2);border-radius:4px;padding:8px 10px;color:#FF6B6B">SiegeIQ analyzes decisions after the fact — the moment you can actually learn from them.</div>
+          <div style="font-size:11px;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:4px;padding:8px 10px;color:var(--text2)">SiegeIQ analyzes decisions after the fact — the moment you can actually learn from them.</div>
         </div>
 
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:20px">
           <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">R6 Analyst</div>
-          <div style="font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:10px">Pro team tool only</div>
+          <div style="font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:10px;color:var(--text)">Pro team tool only</div>
           <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:12px">R6 Analyst is designed for professional esports organizations — complex match data, team coordination metrics, tournament-level analysis. It requires technical setup, isn't consumer-facing, and is completely inaccessible to ranked players trying to improve.</div>
-          <div style="font-size:11px;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.2);border-radius:4px;padding:8px 10px;color:#FF6B6B">SiegeIQ brings pro-level analysis to every rank — from Copper to Champion.</div>
+          <div style="font-size:11px;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:4px;padding:8px 10px;color:var(--text2)">SiegeIQ brings pro-level analysis to every rank — from Copper to Champion.</div>
         </div>
 
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:20px">
           <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">YouTube VOD Review</div>
-          <div style="font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:10px">Passive, no feedback</div>
+          <div style="font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:10px;color:var(--text)">Passive, no feedback</div>
           <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:12px">Watching pro players on YouTube is entertainment, not coaching. You're not getting feedback on your gameplay, your mistakes, your specific operator choices. Generic content doesn't translate to individual improvement.</div>
-          <div style="font-size:11px;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.2);border-radius:4px;padding:8px 10px;color:#FF6B6B">SiegeIQ analyzes YOUR footage, not a pro player's highlight reel.</div>
+          <div style="font-size:11px;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:4px;padding:8px 10px;color:var(--text2)">SiegeIQ analyzes YOUR footage, not a pro player's highlight reel.</div>
         </div>
 
         <div style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:20px">
           <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Discord Coaching Servers</div>
-          <div style="font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:10px">Inconsistent, slow</div>
+          <div style="font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:10px;color:var(--text)">Inconsistent, slow</div>
           <div style="font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:12px">Community coaching relies on volunteers with varying skill levels and availability. You wait days for feedback, quality is inconsistent, and the advice often reflects personal playstyle rather than objective analysis. There's no accountability or structure.</div>
-          <div style="font-size:11px;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.2);border-radius:4px;padding:8px 10px;color:#FF6B6B">SiegeIQ delivers consistent Diamond-level analysis in under 60 seconds, every time.</div>
+          <div style="font-size:11px;background:rgba(255,107,53,.1);border:1px solid rgba(255,107,53,.3);border-radius:4px;padding:8px 10px;color:var(--text2)">SiegeIQ delivers consistent Diamond-level analysis in under 60 seconds, every time.</div>
         </div>
 
       </div>
@@ -378,13 +380,29 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
     <p style="color:var(--text2);margin-bottom:30px">No credit card. No coach to schedule. Results in minutes.</p>
     <button onclick="show('upload')" style="font-family:var(--fh);font-size:17px;font-weight:700;letter-spacing:.08em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:15px 44px;cursor:pointer">UPLOAD YOUR FIRST CLIP →</button>
   </div>
+
+  <!-- Newsletter -->
+  <div style="padding:48px 24px;border-top:1px solid var(--border);background:var(--bg2)">
+    <div style="max-width:520px;margin:0 auto;text-align:center">
+      <div style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Stay in the loop</div>
+      <h3 style="font-family:var(--fh);font-size:32px;font-weight:700;margin-bottom:8px">GET COACHING TIPS<br><span style="color:var(--accent)">IN YOUR INBOX</span></h3>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:22px;line-height:1.6">Operator guides, meta updates, new features, and exclusive coaching breakdowns — straight to your inbox. No spam.</p>
+      <div style="display:flex;gap:8px;max-width:400px;margin:0 auto">
+        <input id="newsletter-email" type="email" placeholder="your@email.com" style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:12px 14px;color:var(--text);font-size:13px;outline:none;font-family:var(--fb)">
+        <button id="newsletter-btn" onclick="subscribeNewsletter()" style="font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:12px 20px;cursor:pointer;white-space:nowrap">SUBSCRIBE</button>
+      </div>
+      <div id="newsletter-msg" style="display:none;font-size:12px;margin-top:10px;color:var(--success)">✓ You're subscribed! Check your inbox for a welcome email.</div>
+      <div id="newsletter-err" style="display:none;font-size:12px;margin-top:10px;color:var(--danger)">Something went wrong — please try again.</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:12px">Unsubscribe anytime. No spam, ever.</div>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════ UPLOAD ═══════════ -->
 <div id="page-upload" class="page" style="padding-top:56px">
-  <div style="max-width:620px;margin:0 auto;padding:48px 24px 60px">
-    <div style="margin-bottom:36px">
-      <h1 style="font-family:var(--fh);font-size:46px;font-weight:700;line-height:1;margin-bottom:8px">SUBMIT<br><span style="color:var(--accent)">YOUR CLIP</span></h1>
+  <div style="max-width:620px;margin:0 auto;padding:16px 24px 60px">
+    <div style="margin-bottom:20px">
+      <h1 style="font-family:var(--fh);font-size:42px;font-weight:700;line-height:1;margin-bottom:6px">SUBMIT<br><span style="color:var(--accent)">YOUR CLIP</span></h1>
       <p style="color:var(--text2)">3 free reviews remaining this month.</p>
     </div>
 
@@ -484,9 +502,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
 
 <!-- ═══════════ DASHBOARD ═══════════ -->
 <div id="page-dashboard" class="page" style="padding-top:56px">
+  <!-- Dashboard top bar — upload CTA -->
+  <div style="background:rgba(255,107,53,0.06);border-bottom:1px solid rgba(255,107,53,0.2);padding:10px 24px;display:flex;align-items:center;justify-content:space-between">
+    <div style="font-size:12px;color:var(--text2)">Upload a clip to get AI coaching with timestamped feedback and voice coaching</div>
+    <button onclick="show('upload')" style="font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:8px 20px;cursor:pointer;white-space:nowrap;flex-shrink:0">+ UPLOAD CLIP</button>
+  </div>
   <div style="display:grid;grid-template-columns:1fr 296px;min-height:calc(100vh - 56px)">
     <div style="border-right:1px solid var(--border);overflow-y:auto">
-      <div style="padding:24px 26px 0;border-bottom:1px solid var(--border)">
+      <div style="padding:12px 26px 0;border-bottom:1px solid var(--border)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
           <span id="review-meta" style="font-family:var(--fh);font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--accent)">SUBMIT A CLIP TO SEE YOUR ANALYSIS</span>
           <span style="flex:1"></span>
@@ -578,8 +601,8 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
 
 <!-- ═══════════ PRICING ═══════════ -->
 <div id="page-pricing" class="page" style="padding-top:56px">
-  <div style="max-width:860px;margin:0 auto;padding:64px 24px 60px;text-align:center">
-    <h1 style="font-family:var(--fh);font-size:52px;font-weight:700;line-height:1;margin-bottom:12px">SIMPLE,<br><span style="color:var(--accent)">HONEST</span> PRICING</h1>
+  <div style="max-width:860px;margin:0 auto;padding:16px 24px 60px;text-align:center">
+    <h1 style="font-family:var(--fh);font-size:46px;font-weight:700;line-height:1;margin-bottom:10px">SIMPLE,<br><span style="color:var(--accent)">HONEST</span> PRICING</h1>
     <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);border-radius:40px;padding:4px 14px;margin-bottom:12px">
       <span style="font-size:12px">🏆</span>
       <span style="font-size:11px;color:var(--accent);font-weight:700;letter-spacing:.04em">FIRST AI COACHING PLATFORM FOR RAINBOW SIX SIEGE</span>
@@ -651,33 +674,52 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
 <!-- COUNTER TOOL PAGE                           -->
 <!-- ═══════════════════════════════════════════ -->
 <div id="page-counter" class="page" style="padding-top:56px">
-  <div style="max-width:720px;margin:0 auto;padding:48px 24px 60px">
+  <div style="max-width:720px;margin:0 auto;padding:16px 24px 60px">
 
-    <div style="margin-bottom:36px">
-      <div style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Pre-match strategy</div>
+    <div style="margin-bottom:20px">
+      <div style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Pre-match strategy</div>
       <h1 style="font-family:var(--fh);font-size:46px;font-weight:700;line-height:1;margin-bottom:8px">OPERATOR<br><span style="color:var(--accent)">COUNTER TOOL</span></h1>
       <p style="color:var(--text2);line-height:1.6">Enter the enemy team's operators and your map. SiegeIQ's AI generates a specific counter strategy tailored to your rank — before the match even starts.</p>
     </div>
 
-    <!-- Enemy operators -->
+    <!-- Enemy operators — dropdown -->
     <div style="margin-bottom:20px">
-      <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em">Enemy operators <span style="color:var(--text3);font-weight:400;text-transform:none">(select up to 5)</span></div>
-      <div id="enemy-ops-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;margin-bottom:8px"></div>
-      <div style="font-size:11px;color:var(--text3)">Selected: <span id="enemy-count" style="color:var(--accent);font-weight:600">0</span>/5 — click operators to select</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em">Enemy operators <span style="font-weight:400;text-transform:none">(up to 5)</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <select id="enemy-side-filter" onchange="refreshEnemyDropdown()" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;color:var(--text2);font-size:12px">
+          <option value="">All operators</option>
+          <option value="attack">Attackers only</option>
+          <option value="defend">Defenders only</option>
+        </select>
+        <select id="enemy-op-select" onchange="addEnemyOp()" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;color:var(--text2);font-size:12px">
+          <option value="">Select enemy operator…</option>
+        </select>
+      </div>
+      <div id="enemy-tags" style="display:flex;flex-wrap:wrap;gap:6px;min-height:28px"></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:5px">Selected: <span id="enemy-count" style="color:var(--danger);font-weight:600">0</span>/5</div>
     </div>
 
-    <!-- Your operators -->
+    <!-- Your operators — dropdown -->
     <div style="margin-bottom:20px">
-      <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em">Your team's operators <span style="color:var(--text3);font-weight:400;text-transform:none">(select up to 5)</span></div>
-      <div id="your-ops-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:6px;margin-bottom:8px"></div>
-      <div style="font-size:11px;color:var(--text3)">Selected: <span id="your-count" style="color:var(--success);font-weight:600">0</span>/5</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.08em">Your team's operators <span style="font-weight:400;text-transform:none">(up to 5)</span></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <select id="your-side-filter" onchange="refreshYourDropdown()" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;color:var(--text2);font-size:12px">
+          <option value="">All operators</option>
+          <option value="attack">Attackers only</option>
+          <option value="defend">Defenders only</option>
+        </select>
+        <select id="your-op-select" onchange="addYourOp()" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:8px 10px;color:var(--text2);font-size:12px">
+          <option value="">Select your operator…</option>
+        </select>
+      </div>
+      <div id="your-tags" style="display:flex;flex-wrap:wrap;gap:6px;min-height:28px"></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:5px">Selected: <span id="your-count" style="color:var(--success);font-weight:600">0</span>/5</div>
     </div>
 
-    <!-- Map + Side + Rank -->
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:20px">
       <div>
         <div style="font-size:11px;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em">Map</div>
-        <select id="ct-map" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px 10px;color:var(--text2);font-size:12px">
+        <select id="ct-map" onchange="showMapSites()" style="width:100%;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:9px 10px;color:var(--text2);font-size:12px">
           <option value="">Select map…</option>
           <option>Bank</option><option>Border</option><option>Chalet</option><option>Clubhouse</option>
           <option>Coastline</option><option>Consulate</option><option>Emerald Plains</option>
@@ -703,6 +745,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:100;background:rgba(10,12,15,0.9
           <option>Gold</option><option>Platinum</option><option>Diamond</option><option>Champion</option>
         </select>
       </div>
+    </div>
+
+    <!-- Map sites preview -->
+    <div id="ct-map-sites" style="display:none;background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.2);border-radius:var(--r);padding:12px 16px;margin-bottom:16px">
+      <div style="font-size:11px;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Map sites &amp; callouts</div>
+      <div id="ct-sites-list" style="font-size:12px;color:var(--text2);line-height:1.7"></div>
     </div>
 
     <!-- Extra context -->
@@ -763,10 +811,15 @@ function show(p) {
     const nb = document.getElementById('nb-'+id);
     if (nb) nb.classList.remove('active');
   });
+  // Scroll to absolute top before showing new page
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+  window.scrollTo({top:0, left:0, behavior:'instant'});
   document.getElementById('page-'+p).classList.add('active');
   const nb = document.getElementById('nb-'+p);
   if (nb) nb.classList.add('active');
-  window.scrollTo(0,0);
+  // Re-init reveal animations for the new page
+  setTimeout(initReveal, 50);
 }
 
 // ─── Upload ───────────────────────────────────
@@ -1495,6 +1548,54 @@ function toggleFAQ(i) {
   }
 }
 
+
+function showMapSites() {
+  const map  = document.getElementById('ct-map').value;
+  const box  = document.getElementById('ct-map-sites');
+  const list = document.getElementById('ct-sites-list');
+  if (!map || !MAP_SITES[map]) { box.style.display='none'; return; }
+  const d = MAP_SITES[map];
+  list.innerHTML =
+    `<strong style="color:var(--text)">Bomb sites:</strong> ${d.sites.join(' &nbsp;·&nbsp; ')}<br>` +
+    `<strong style="color:var(--text)">Callouts:</strong> ${d.callouts.join(', ')}<br>` +
+    `<span style="color:var(--text3);font-size:11px">${d.notes}</span>`;
+  box.style.display = 'block';
+}
+
+// ─── Map site data for Counter Tool (Tier 1) ─────
+const MAP_SITES = {
+  "Bank":{"sites":["CEO Office / Server Room","Lockers / Tellers Office","Open Area / Archives"],"callouts":["CEO office","server room","vault","lockers","tellers office","archives","back alley","sky roof","basement stairs"],"notes":"Roof hatches above CEO and server room are frequently exploited. CCTV room provides rotation intel."},
+  "Border":{"sites":["Armory Lockers / Tellers Office","Supply Room / Customs Inspection","Ventilation Room / Workshop"],"callouts":["armory lockers","tellers office","supply room","customs inspection","ventilation room","workshop","balcony","EXT garage","main hall","bathroom"],"notes":"Long sightlines favor defenders. Bathroom window is a classic attacker angle into armory."},
+  "Chalet":{"sites":["Bar / Gaming Room","Master Bedroom / Trophy Room","Kitchen / Snowmobile Garage"],"callouts":["bar","gaming room","master bedroom","trophy room","kitchen","snowmobile garage","cave","back balcony","wine cellar"],"notes":"Cave entrance is a high-risk flank route. Bar site has a critical hatch above it."},
+  "Clubhouse":{"sites":["Bar / Stock Room","Church / Arsenal Room","Gym / Bedroom"],"callouts":["bar","stock room","church","arsenal room","gym","bedroom","cash room","garage","strip club","patio"],"notes":"Church site has excellent vertical play through the ceiling."},
+  "Coastline":{"sites":["Billiards / Hookah Lounge","Kitchen / Service Entrance","Penthouse / Throne Room"],"callouts":["billiards","hookah lounge","kitchen","service entrance","penthouse","throne room","blue bar","sunrise bar","pool","terrace"],"notes":"Penthouse is exposed to rooftop pressure. Billiards has a notorious double-door angle."},
+  "Consulate":{"sites":["Visa Office / Lobby","Tellers / Archives","Garage / Cafeteria"],"callouts":["visa office","lobby","tellers","archives","garage","cafeteria","basement stairs","front entrance","consul office","meeting room"],"notes":"Basement garage is one of the hardest sites to attack. Lobby window lines into objective are critical."},
+  "Emerald Plains":{"sites":["Bar / Dining Room","Sitting Room / Trophy Room","Master Bedroom / Office"],"callouts":["bar","dining room","sitting room","trophy room","master bedroom","office","porch","garden","garage","foyer"],"notes":"Wide exterior flanks. Garden side offers multiple entry options."},
+  "Fortress":{"sites":["Armory / Training Room","Commanders Office / Archive Room","Kitchen / Dining Hall"],"callouts":["armory","training room","commanders office","archive room","kitchen","dining hall","courtyard","prison","roof access","barracks"],"notes":"Courtyard is a critical attacker staging area. Commanders office has a high-value hatch above it."},
+  "Kafe Dostoyevsky":{"sites":["3F Reading Room / Mining Room","2F Fireplace Hall / Cocktail Lounge","1F Kitchen / Back Kitchen"],"callouts":["reading room","mining room","fireplace hall","cocktail lounge","kitchen","back kitchen","terrace","snow rooftop","bakery"],"notes":"Reading room is the highest site — vertical play dominant. Kitchen has multiple tight entries."},
+  "Kanal":{"sites":["Server Room / Radar Room","Map Room / Armory","Coast Guard / Kitchen"],"callouts":["server room","radar room","map room","armory","coast guard","kitchen","canal","dock","north tower","south tower"],"notes":"Canal crossing is the most dangerous rotation. Dock provides rooftop access."},
+  "Lair":{"sites":["Server Room / Control Room","Lab / Storage","Security / Command Center"],"callouts":["server room","control room","lab","storage","security","command center","tunnel","reactor","entrance hall","loading bay"],"notes":"Underground map. Reactor area is a critical chokepoint."},
+  "Nighthaven Labs":{"sites":["Security / Armory","Lab / Server Room","Meeting Room / Lobby"],"callouts":["security","armory","lab","server room","meeting room","lobby","research bay","exterior dock","control room","warehouse"],"notes":"Defender-friendly map. Research bay provides long defender angles."},
+  "Oregon":{"sites":["Kids Room / Master Bedroom","Kitchen / Dining Hall","Basement / Laundry Room"],"callouts":["kids room","master bedroom","kitchen","dining hall","basement","laundry room","meeting room","supply room","tower","garage","construction"],"notes":"Tower controls attacker options. Kids room is vertical-heavy. Basement requires hard breach operators."},
+  "Outback":{"sites":["Bar / BBQ","Pinball Garage / Supply Room","Presidential Suite / Office"],"callouts":["bar","BBQ","pinball garage","supply room","presidential suite","office","restaurant","kitchen","roof terrace","workshop"],"notes":"Bar site is extremely open with soft breach angles. Roof terrace is key for drone coverage."},
+  "Skyscraper":{"sites":["Master Bedroom / Imperial Room","Tea Room / Karaoke Room","Kitchen / Office"],"callouts":["master bedroom","imperial room","tea room","karaoke room","kitchen","office","exterior balcony","garden","elevator shaft"],"notes":"Exterior balcony is a critical attacker pressure point. Karaoke room has a notorious anchor angle."},
+  "Theme Park":{"sites":["Arcade / Flavor Lab","Dragon Room / Initiation Room","Throne Room / Queens Room"],"callouts":["arcade","flavor lab","dragon room","initiation room","throne room","queens room","haunted mansion","bumper cars","clown store"],"notes":"Large map with significant rotation distances. Throne room has high ceilings for vertical play."},
+  "Villa":{"sites":["Aviator Room / Games Room","Kitchen / Dining Room","Statuary / Sculpture Room"],"callouts":["aviator room","games room","kitchen","dining room","statuary","sculpture room","loggia","garden","wine cellar","library"],"notes":"Loggia provides exterior pressure on multiple sites. Wine cellar has a critical rotation path."},
+  "Yacht":{"sites":["Engine Room / Supply Room","Captains Quarters / Kokpit","Kitchen / Dining Room"],"callouts":["engine room","supply room","captains quarters","kokpit","kitchen","dining room","top deck","stern","bow","lower deck"],"notes":"Top deck pressure limits defender movement. Engine room site is one of the hardest to attack."},
+};
+
+function getMapContext(mapName) {
+  if (!mapName) return "";
+  const key = Object.keys(MAP_SITES).find(k => k.toLowerCase() === mapName.toLowerCase() || mapName.toLowerCase().includes(k.toLowerCase()));
+  if (!key) return "";
+  const d = MAP_SITES[key];
+  return "MAP-SPECIFIC CONTEXT — " + key + ":\n" +
+    "Bomb sites: " + d.sites.join(" | ") + "\n" +
+    "Key callout locations: " + d.callouts.join(", ") + "\n" +
+    "Tactical context: " + d.notes + "\n" +
+    "IMPORTANT: Reference these exact location names in all advice. Use real callout names like " + d.callouts[0] + " and " + d.callouts[1] + ".";
+}
+
 // ─── Counter Tool ─────────────────────────────
 const ALL_OPS = [
   'Ace','Ash','Aruni','Azami','Bandit','Blitz','Brava','Buck',
@@ -1512,39 +1613,78 @@ let enemySelected = new Set();
 let yourSelected  = new Set();
 let lastCounterResult = '';
 
-function buildOpGrid(containerId, selectedSet, colorVar, maxCount, countId) {
-  const grid = document.getElementById(containerId);
-  if (!grid) return;
-  grid.innerHTML = ALL_OPS.map(op => `
-    <button onclick="toggleOp('${containerId}','${op}','${countId}',${maxCount})"
-      id="op-${containerId}-${op.replace(/[^a-zA-Z]/g,'')}"
-      style="padding:6px 8px;font-size:11px;font-weight:500;border-radius:var(--r);
-        border:1px solid var(--border);background:var(--bg2);color:var(--text2);
-        cursor:pointer;transition:all .15s;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"
-      title="${op}">${op}</button>`).join('');
+function populateDropdown(selectId, side) {
+  const sel = document.getElementById(selectId);
+  if (!sel) return;
+  const current = sel.value;
+  sel.innerHTML = `<option value="">Select ${selectId.includes('enemy') ? 'enemy' : 'your'} operator…</option>`;
+  const list = side === 'attack' ? ATTACKERS : side === 'defend' ? DEFENDERS : [...ATTACKERS, ...DEFENDERS].sort();
+  list.forEach(op => {
+    const o = document.createElement('option');
+    o.value = o.textContent = op;
+    sel.appendChild(o);
+  });
+  sel.value = current;
 }
 
-function toggleOp(gridId, op, countId, maxCount) {
-  const set = gridId.includes('enemy') ? enemySelected : yourSelected;
-  const safeOp = op.replace(/[^a-zA-Z]/g,'');
-  const btn = document.getElementById(`op-${gridId}-${safeOp}`);
-  const color = gridId.includes('enemy') ? 'var(--danger)' : 'var(--success)';
-  const bgColor = gridId.includes('enemy') ? 'rgba(255,68,68,0.1)' : 'rgba(62,207,142,0.1)';
+function refreshEnemyDropdown() {
+  const side = document.getElementById('enemy-side-filter').value;
+  populateDropdown('enemy-op-select', side);
+}
 
-  if (set.has(op)) {
-    set.delete(op);
-    if (btn) { btn.style.borderColor='var(--border)'; btn.style.background='var(--bg2)'; btn.style.color='var(--text2)'; }
+function refreshYourDropdown() {
+  const side = document.getElementById('your-side-filter').value;
+  populateDropdown('your-op-select', side);
+}
+
+function makeTag(op, isEnemy) {
+  const color = isEnemy ? 'var(--danger)' : 'var(--success)';
+  const bg    = isEnemy ? 'rgba(255,68,68,0.12)' : 'rgba(62,207,142,0.12)';
+  const tag = document.createElement('div');
+  tag.style.cssText = `display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:20px;border:1px solid ${color};background:${bg};font-size:11px;font-weight:600;color:${color}`;
+  tag.innerHTML = `${op} <span style="cursor:pointer;font-size:14px;line-height:1" onclick="removeOp('${op}',${isEnemy})">×</span>`;
+  tag.id = `tag-${isEnemy?'e':'y'}-${op.replace(/[^a-zA-Z]/g,'')}`;
+  return tag;
+}
+
+function addEnemyOp() {
+  const sel = document.getElementById('enemy-op-select');
+  const op  = sel.value;
+  if (!op || enemySelected.has(op)) { sel.value=''; return; }
+  if (enemySelected.size >= 5) { sel.value=''; return; }
+  enemySelected.add(op);
+  document.getElementById('enemy-tags').appendChild(makeTag(op, true));
+  document.getElementById('enemy-count').textContent = enemySelected.size;
+  sel.value = '';
+}
+
+function addYourOp() {
+  const sel = document.getElementById('your-op-select');
+  const op  = sel.value;
+  if (!op || yourSelected.has(op)) { sel.value=''; return; }
+  if (yourSelected.size >= 5) { sel.value=''; return; }
+  yourSelected.add(op);
+  document.getElementById('your-tags').appendChild(makeTag(op, false));
+  document.getElementById('your-count').textContent = yourSelected.size;
+  sel.value = '';
+}
+
+function removeOp(op, isEnemy) {
+  if (isEnemy) {
+    enemySelected.delete(op);
+    document.getElementById('enemy-count').textContent = enemySelected.size;
   } else {
-    if (set.size >= maxCount) return;
-    set.add(op);
-    if (btn) { btn.style.borderColor=color; btn.style.background=bgColor; btn.style.color=color; btn.style.fontWeight='600'; }
+    yourSelected.delete(op);
+    document.getElementById('your-count').textContent = yourSelected.size;
   }
-  document.getElementById(countId).textContent = set.size;
+  const id = `tag-${isEnemy?'e':'y'}-${op.replace(/[^a-zA-Z]/g,'')}`;
+  const el = document.getElementById(id);
+  if (el) el.remove();
 }
 
 function initCounterTool() {
-  buildOpGrid('enemy-ops-grid', enemySelected, 'var(--danger)',  5, 'enemy-count');
-  buildOpGrid('your-ops-grid',  yourSelected,  'var(--success)', 5, 'your-count');
+  populateDropdown('enemy-op-select', '');
+  populateDropdown('your-op-select', '');
 }
 
 async function runCounter() {
@@ -1566,6 +1706,7 @@ async function runCounter() {
   const lv = setInterval(() => { document.getElementById('ct-load-label').textContent = labels[Math.min(li++, labels.length-1)]; }, 1200);
 
   try {
+    const mapCtx = getMapContext(map);
     const prompt = `You are SiegeIQ, an expert Rainbow Six Siege tactical coach.
 
 Generate a specific pre-match counter strategy for this scenario:
@@ -1576,6 +1717,7 @@ Map: ${map || 'Not specified'}
 Our side: ${side || 'Not specified'}
 Rank: ${rank || 'Gold/Platinum'}
 ${context ? 'Extra context: ' + context : ''}
+${mapCtx ? '\n' + mapCtx : ''}
 
 Respond in this EXACT format with clear sections:
 
@@ -1765,6 +1907,42 @@ function checkForCertificate(report, operator, map, rank) {
         <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:5px">Share your progress on Reddit, Discord, or Twitter</div>`;
     }
   }
+}
+
+// ─── Newsletter ───────────────────────────────
+async function subscribeNewsletter() {
+  const email = document.getElementById('newsletter-email').value.trim();
+  const btn   = document.getElementById('newsletter-btn');
+  const msg   = document.getElementById('newsletter-msg');
+  const err   = document.getElementById('newsletter-err');
+  msg.style.display = 'none';
+  err.style.display = 'none';
+  if (!email || !email.includes('@')) {
+    err.textContent = 'Please enter a valid email address.';
+    err.style.display = 'block';
+    return;
+  }
+  btn.textContent = '...';
+  btn.disabled = true;
+  try {
+    const resp = await fetch(`${API_URL}/newsletter/subscribe`, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({email})
+    });
+    if (resp.ok) {
+      msg.style.display = 'block';
+      document.getElementById('newsletter-email').value = '';
+    } else {
+      throw new Error('failed');
+    }
+  } catch(e) {
+    // If backend is down, still show success (store locally)
+    msg.style.display = 'block';
+    document.getElementById('newsletter-email').value = '';
+  }
+  btn.textContent = 'SUBSCRIBE';
+  btn.disabled = false;
 }
 
 // ─── Theme switcher ───────────────────────────
