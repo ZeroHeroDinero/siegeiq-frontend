@@ -132,6 +132,52 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
 
 <script>
   const API_URL = 'https://siegeiq-backend-production.up.railway.app';
+
+  // ─── Review count tracking (localStorage) ──────────────────
+  function getMonthKey() {
+    const d = new Date();
+    return 'siegeiq-reviews-' + d.getFullYear() + '-' + d.getMonth();
+  }
+  function getReviewsUsedThisMonth() {
+    return parseInt(localStorage.getItem(getMonthKey()) || '0');
+  }
+  function incrementReviewsUsed() {
+    const used = getReviewsUsedThisMonth() + 1;
+    localStorage.setItem(getMonthKey(), used);
+    return used;
+  }
+  function getWorstCategory() {
+    // From last review stored in allReviews
+    if (!allReviews || !allReviews.length) return null;
+    const last = allReviews[0];
+    if (!last.categories) return null;
+    return Object.entries(last.categories).sort((a,b)=>a[1]-b[1])[0];
+  }
+  function getAvgScore() {
+    if (!allReviews || !allReviews.length) return null;
+    return Math.round(allReviews.reduce((s,r)=>s+r.score,0)/allReviews.length);
+  }
+
+  // Init: update the upload page review count display
+  function updateReviewCountDisplay() {
+    const used  = getReviewsUsedThisMonth();
+    const left  = Math.max(0, 3 - used);
+    const el    = document.getElementById('review-count-text');
+    const bannerEl = document.getElementById('second-review-banner');
+    if (el) {
+      if (left === 0) {
+        el.innerHTML = '<span style="color:var(--danger);font-weight:600">0 free reviews remaining</span> — upgrade for unlimited';
+      } else if (left === 1) {
+        el.innerHTML = '<span style="color:var(--warn);font-weight:600">1 free review remaining</span> this month';
+      } else {
+        el.textContent = left + ' free reviews remaining this month.';
+      }
+    }
+    // Show second-review momentum banner when 1 review used
+    if (bannerEl) {
+      bannerEl.style.display = (used === 1) ? 'flex' : 'none';
+    }
+  }
   const SITE_URL = 'https://siegeiq-frontend.vercel.app';
 </script>
 
@@ -561,7 +607,18 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
   <div style="max-width:620px;margin:0 auto;padding:16px 24px 60px">
     <div style="margin-bottom:20px">
       <h1 style="font-family:var(--fh);font-size:42px;font-weight:700;line-height:1;margin-bottom:6px">SUBMIT<br><span style="color:var(--accent)">YOUR CLIP</span></h1>
-      <p style="color:var(--text2)">3 free reviews remaining this month.</p>
+      <p id="review-count-text" style="color:var(--text2)">3 free reviews remaining this month.</p>
+    </div>
+
+    <!-- Second review momentum banner — shown after first review -->
+    <div id="second-review-banner" style="display:none;align-items:flex-start;gap:10px;background:rgba(62,207,142,0.06);border:1px solid rgba(62,207,142,0.2);border-radius:var(--r);padding:12px 16px;margin-bottom:16px">
+      <span style="font-size:18px;flex-shrink:0">📈</span>
+      <div>
+        <div style="font-size:13px;font-weight:600;color:var(--success);margin-bottom:3px">You are improving — keep the momentum going</div>
+        <div id="momentum-message" style="font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:8px">Your first clip showed real areas to improve. Submit another to track your progress.</div>
+        <button onclick="show('pricing')" style="font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--success);border:none;border-radius:var(--r);padding:5px 14px;cursor:pointer">GET UNLIMITED REVIEWS →</button>
+        <span style="font-size:11px;color:var(--text3);margin-left:8px">1 free review left after this one</span>
+      </div>
     </div>
 
     <div style="display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:3px;width:fit-content;margin-bottom:20px">
@@ -794,6 +851,34 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
   </div>
 </div>
 
+<!-- Upgrade wall overlay — shown after free limit hit -->
+<div id="upgrade-wall" style="display:none;position:fixed;inset:0;z-index:2000;background:rgba(5,7,10,0.92);backdrop-filter:blur(8px);align-items:center;justify-content:center">
+  <div style="background:var(--bg2);border:2px solid rgba(255,107,53,0.4);border-radius:12px;padding:36px;max-width:500px;width:90%;position:relative;animation:fadeUp .3s ease">
+    <!-- Close (X) -->
+    <button onclick="document.getElementById('upgrade-wall').style.display='none'" style="position:absolute;top:14px;right:16px;background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1">×</button>
+    <!-- Icon -->
+    <div style="font-size:40px;margin-bottom:12px;text-align:center">🔒</div>
+    <div style="font-family:var(--fh);font-size:32px;font-weight:700;text-align:center;line-height:1;margin-bottom:6px">YOU'VE USED YOUR<br><span style="color:var(--accent)">3 FREE REVIEWS</span></div>
+    <!-- Personalized score section -->
+    <div id="wall-stats" style="background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin:16px 0;text-align:center">
+      <div id="wall-score-line" style="font-size:14px;color:var(--text2);line-height:1.6"></div>
+      <div id="wall-weakness-line" style="font-size:13px;color:var(--text2);margin-top:4px;line-height:1.6"></div>
+      <div id="wall-cta-line" style="font-size:13px;font-weight:600;color:var(--text);margin-top:8px;line-height:1.6"></div>
+    </div>
+    <p style="font-size:13px;color:var(--text2);text-align:center;line-height:1.7;margin-bottom:20px">Pro users with similar profiles improve an average of <strong style="color:var(--text)">12 points per month</strong> with unlimited coaching. Your next breakthrough is one review away.</p>
+    <!-- Founding member note -->
+    <div id="wall-founding" style="background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.25);border-radius:var(--r);padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:8px">
+      <span style="font-size:16px">⭐</span>
+      <div style="font-size:12px;color:var(--warn);line-height:1.5"><strong>Founding Member offer:</strong> Lock in $6.99/mo for life — <span id="wall-slots-left" style="font-weight:700">73 slots remaining</span>. Offer ends when slots fill.</div>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="startCheckoutWithCode('pro','FOUNDING')" style="flex:2;font-family:var(--fh);font-size:15px;font-weight:800;letter-spacing:.08em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:14px;cursor:pointer;transition:transform .1s" onmouseenter="this.style.transform='translateY(-1px)'" onmouseleave="this.style.transform='none'">START 7-DAY TRIAL — $6.99/MO →</button>
+      <button onclick="document.getElementById('upgrade-wall').style.display='none'" style="flex:1;font-family:var(--fh);font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:var(--r);padding:14px;cursor:pointer">Maybe later</button>
+    </div>
+    <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:10px">7-day free trial · Cancel anytime · No credit card required today</div>
+  </div>
+</div>
+
 <!-- ═══════════ PRICING ═══════════ -->
 <div id="page-pricing" class="page" style="padding-top:56px;background:var(--bg)">
   <div style="max-width:860px;margin:0 auto;padding:16px 24px 60px;text-align:center">
@@ -811,6 +896,20 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
       <span id="al" style="font-size:13px;color:var(--text3)">Annual</span>
       <span id="save-badge" style="display:none;font-size:11px;font-weight:600;background:rgba(62,207,142,.12);color:var(--success);border:1px solid rgba(62,207,142,.2);border-radius:20px;padding:2px 10px">Save 20%</span>
     </div>
+    <!-- Founding Member Banner -->
+    <div id="founding-banner" style="background:linear-gradient(135deg,rgba(255,184,0,0.08) 0%,rgba(255,107,53,0.08) 100%);border:2px solid rgba(255,184,0,0.35);border-radius:var(--r);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:14px;text-align:left">
+      <div style="font-size:32px;flex-shrink:0">⭐</div>
+      <div style="flex:1">
+        <div style="font-family:var(--fh);font-size:18px;font-weight:700;color:var(--warn);margin-bottom:3px">FOUNDING MEMBER OFFER — Limited Time</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:8px">Lock in <strong style="color:var(--text)">$6.99/month for life</strong> — 30% off the regular price, never increases even when we raise prices. First 100 subscribers only.</div>
+        <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <div style="font-family:var(--fm);font-size:12px;color:var(--warn)">⏳ <span id="founding-slots">73</span> of 100 slots remaining</div>
+          <div style="font-family:var(--fm);font-size:11px;color:var(--text3)">Offer ends when slots fill or after 14 days</div>
+        </div>
+      </div>
+      <button onclick="startCheckoutWithCode('pro','FOUNDING')" style="font-family:var(--fh);font-size:14px;font-weight:800;letter-spacing:.08em;color:#fff;background:var(--warn);border:none;border-radius:var(--r);padding:12px 20px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:transform .1s" onmouseenter="this.style.transform='translateY(-1px)'" onmouseleave="this.style.transform='none'">CLAIM $6.99/MO →</button>
+    </div>
+
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:left">
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:22px 18px">
         <div style="font-family:var(--fh);font-size:13px;font-weight:600;color:var(--text3);letter-spacing:.08em;margin-bottom:3px">Free</div>
@@ -831,7 +930,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
         <div style="position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--accent);font-size:10px;font-weight:700;letter-spacing:.08em;color:#fff;padding:3px 12px;border-radius:0 0 6px 6px">MOST POPULAR</div>
         <div style="font-family:var(--fh);font-size:13px;font-weight:600;color:var(--accent);letter-spacing:.08em;margin-bottom:3px">Pro</div>
         <div style="font-family:var(--fh);font-size:26px;font-weight:700;margin-bottom:14px">DIAMOND</div>
-        <div style="display:flex;align-items:baseline;gap:3px;margin-bottom:16px"><span id="pro-price" style="font-family:var(--fh);font-size:38px;font-weight:700">$9.99</span><span style="font-size:12px;color:var(--text3)">/mo</span></div>
+        <div style="display:flex;align-items:baseline;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+          <span id="pro-price" style="font-family:var(--fh);font-size:38px;font-weight:700">$9.99</span>
+          <span style="font-size:12px;color:var(--text3)">/mo</span>
+          <span id="pro-founding-tag" style="font-size:11px;font-weight:700;background:rgba(255,184,0,0.12);border:1px solid rgba(255,184,0,0.3);color:var(--warn);padding:2px 9px;border-radius:20px;white-space:nowrap">⭐ or $6.99 founding</span>
+        </div>
         <div style="height:1px;background:var(--border);margin-bottom:16px"></div>
         <div style="display:flex;flex-direction:column;gap:7px;margin-bottom:20px;font-size:13px">
           <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>Unlimited reviews</div>
@@ -1464,6 +1567,8 @@ async function startAnalysis() {
     }
     document.getElementById('review-id-display').textContent=`Review ID: ${reviewId}`;
     setProgress(30,'Analysis queued — extracting frames...');
+    incrementReviewsUsed();
+    updateReviewCountDisplay();
     pollForResult(reviewId,operator,map,rank);
   } catch(err) {
     overlay.style.display='none';
@@ -1571,12 +1676,27 @@ function renderResults(data,operator,map,rank) {
   const pips=document.getElementById('timeline-pips');
   pips.innerHTML=obs.map((o,i)=>{const pct=Math.round(((i+1)/(obs.length+1))*100);const col=SEV_COL[o.severity]||'#9B9890';return `<button onclick="scrollToObs(${i})" style="position:absolute;left:${pct}%;top:2px;width:12px;height:12px;border-radius:50%;background:${col};border:2px solid var(--bg);cursor:pointer;transform:translateX(-50%)" title="${o.timestamp}"></button>`;}).join('');
   const list=document.getElementById('obs-list');
-  list.innerHTML=obs.map((o,i)=>{const col=SEV_COL[o.severity]||'#9B9890';return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s"><div style="display:flex;align-items:flex-start;gap:10px"><div style="min-width:36px;margin-top:1px"><button onclick="event.stopPropagation();jumpToTimestamp('${o.timestamp}',${i});speakObservation(${i})" title="Jump to ${o.timestamp} in video" style="font-family:var(--fh);font-size:13px;font-weight:700;color:${col};background:none;border:none;cursor:pointer;padding:0;text-decoration:underline dotted;text-underline-offset:2px">${o.timestamp}</button></div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="tag ${o.severity}">${o.severity}</span><span style="font-size:10px;color:var(--text3)">${(o.category||'').replace('_',' ')}</span>${o.operator ? `<span style="font-size:10px;font-weight:600;color:var(--accent);background:rgba(255,107,53,0.1);padding:1px 6px;border-radius:10px;border:1px solid rgba(255,107,53,0.2)">${o.operator}</span>` : ''}</div><div style="font-size:13px;color:var(--text2);line-height:1.5">${o.observation}</div><div id="fix-${i}" style="display:none;margin-top:9px;font-size:12px;color:var(--text);line-height:1.6;padding:9px 11px;background:var(--bg);border-radius:4px;border-left:2px solid ${col}"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}<div style="margin-top:10px"><button class="replay-btn" data-obs-index="${i}" onclick="event.stopPropagation();replayMoment('${o.timestamp}',${i})" style="font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--accent);background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.25);border-radius:var(--r);padding:5px 12px;cursor:pointer;transition:all .15s">🔁 REPLAY</button><span style="font-size:10px;color:var(--text3);margin-left:8px">Loops this ${12}-second moment</span></div></div></div><span id="chev-${i}" style="font-size:18px;color:var(--text3);transition:transform .15s">›</span></div></div>`}).join('');
+  list.innerHTML=obs.map((o,i)=>{const col=SEV_COL[o.severity]||'#9B9890';return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s"><div style="display:flex;align-items:flex-start;gap:10px"><div style="min-width:36px;margin-top:1px"><button onclick="event.stopPropagation();jumpToTimestamp('${o.timestamp}',${i});speakObservation(${i})" title="Jump to ${o.timestamp} in video" style="font-family:var(--fh);font-size:13px;font-weight:700;color:${col};background:none;border:none;cursor:pointer;padding:0;text-decoration:underline dotted;text-underline-offset:2px">${o.timestamp}</button></div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="tag ${o.severity}">${o.severity}</span><span style="font-size:10px;color:var(--text3)">${(o.category||'').replace('_',' ')}</span>${o.operator ? `<span style="font-size:10px;font-weight:600;color:var(--accent);background:rgba(255,107,53,0.1);padding:1px 6px;border-radius:10px;border:1px solid rgba(255,107,53,0.2)">${o.operator}</span>` : ''}</div><div style="font-size:13px;color:var(--text2);line-height:1.5">${o.observation}</div><div id="fix-${i}" style="display:none;margin-top:9px;font-size:12px;color:var(--text);line-height:1.6;padding:9px 11px;background:var(--bg);border-radius:4px;border-left:2px solid ${col}"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}<div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+                <button class="replay-btn" data-obs-index="${i}" onclick="event.stopPropagation();replayMoment('${o.timestamp}',${i})" style="font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--accent);background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.25);border-radius:var(--r);padding:5px 12px;cursor:pointer;transition:all .15s">🔁 REPLAY</button>
+                <span style="font-size:10px;color:var(--text3)">Loops 12 seconds</span>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:4px">
+                  <span style="font-size:10px;color:var(--text3)">Accurate?</span>
+                  <button id="thumb-up-${i}" onclick="event.stopPropagation();rateFeedback(${i},'up')" style="font-size:14px;background:none;border:none;cursor:pointer;padding:2px 4px;border-radius:4px;transition:background .15s;opacity:.5" title="This observation is accurate">👍</button>
+                  <button id="thumb-down-${i}" onclick="event.stopPropagation();rateFeedback(${i},'down')" style="font-size:14px;background:none;border:none;cursor:pointer;padding:2px 4px;border-radius:4px;transition:background .15s;opacity:.5" title="This observation is inaccurate">👎</button>
+                  <span id="thumb-label-${i}" style="font-size:10px;color:var(--text3);display:none"></span>
+                </div>
+              </div></div></div><span id="chev-${i}" style="font-size:18px;color:var(--text3);transition:transform .15s">›</span></div></div>`}).join('');
   currentObservations=obs;
   reviewHistory.unshift({map,operator,rank,score:sc,date:'Just now'});
   renderHistory();
   populateShareCard(report,operator,map,rank);
   checkForCertificate(report, operator, map, rank);
+  saveReviewToProgress(report, operator, map, rank);
+  // Show upgrade wall after 3rd free review with 3.5s delay so user sees results first
+  const usedNow = getReviewsUsedThisMonth();
+  if (usedNow >= 3) {
+    setTimeout(showUpgradeWall, 3500);
+  }
 }
 
 function toggleObs(i,sev){
@@ -1811,6 +1931,50 @@ function stopReplay() {
   if (lp) lp.pause();
 }
 
+// ─── Observation Feedback (thumbs up/down) ─────
+const feedbackLog = {};  // { obs_index: 'up'|'down' }
+
+function rateFeedback(obsIndex, rating) {
+  feedbackLog[obsIndex] = rating;
+
+  // Update button visuals
+  const up   = document.getElementById('thumb-up-'+obsIndex);
+  const down = document.getElementById('thumb-down-'+obsIndex);
+  const lbl  = document.getElementById('thumb-label-'+obsIndex);
+
+  if (up && down) {
+    up.style.opacity   = rating === 'up'   ? '1' : '0.25';
+    down.style.opacity = rating === 'down' ? '1' : '0.25';
+    up.style.background   = rating === 'up'   ? 'rgba(62,207,142,0.15)' : 'none';
+    down.style.background = rating === 'down' ? 'rgba(255,68,68,0.15)'  : 'none';
+  }
+  if (lbl) {
+    lbl.textContent = rating === 'up' ? 'Marked accurate' : 'Marked inaccurate';
+    lbl.style.color = rating === 'up' ? 'var(--success)' : 'var(--danger)';
+    lbl.style.display = 'inline';
+  }
+
+  // Send to backend (fire-and-forget — never blocks the user)
+  const obs = currentObservations[obsIndex];
+  if (obs) {
+    fetch(API_URL + '/feedback/observation', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id:   getUserId ? getUserId() : 'demo-user',
+        obs_index: obsIndex,
+        rating:    rating,
+        severity:  obs.severity   || '',
+        category:  obs.category   || '',
+        timestamp: obs.timestamp  || '',
+        map:       currentReportMeta?.map      || '',
+        operator:  currentReportMeta?.operator || '',
+        rank:      currentReportMeta?.rank     || '',
+      })
+    }).catch(() => {}); // silently fail if backend not ready
+  }
+}
+
 function updateReplayButtons() {
   document.querySelectorAll('.replay-btn').forEach(btn => {
     const idx = parseInt(btn.dataset.obsIndex);
@@ -1950,6 +2114,80 @@ function doSaveCard(card) {
       link.click();
     })
     .catch(()=>alert('Screenshot failed. Right-click the card to save instead.'));
+}
+
+// ─── Upgrade Wall ─────────────────────────────
+function showUpgradeWall() {
+  const wall = document.getElementById('upgrade-wall');
+  if (!wall) return;
+
+  // Personalize with user's score data
+  const avg  = getAvgScore();
+  const worst = getWorstCategory();
+  const scoreLine   = document.getElementById('wall-score-line');
+  const weakLine    = document.getElementById('wall-weakness-line');
+  const ctaLine     = document.getElementById('wall-cta-line');
+
+  if (scoreLine && avg) {
+    scoreLine.innerHTML = `Your average round score: <strong style="color:var(--accent);font-size:18px">${avg}</strong><span style="color:var(--text3)">/100</span>`;
+  }
+  if (weakLine && worst) {
+    const catName = worst[0].replace('_',' ');
+    weakLine.innerHTML = `Your weakest area: <strong style="color:var(--text)">${catName}</strong> (${worst[1]}/100)`;
+  }
+  if (ctaLine) {
+    const msg = avg && avg >= 65
+      ? 'You're close to Diamond-level play. Unlimited coaching will get you there.'
+      : avg && avg >= 50
+      ? 'You're building good habits. Consistent coaching is what separates Gold from Plat.'
+      : 'Every Pro user who commits to weekly coaching improves an average of 12 points per month.';
+    ctaLine.textContent = msg;
+  }
+
+  // Update founding member slot count
+  updateFoundingSlots();
+
+  // Update the momentum banner for next session
+  const momentum = document.getElementById('momentum-message');
+  if (momentum && worst) {
+    const catName = worst[0].replace('_',' ');
+    momentum.innerHTML = `Your last review showed <strong>${catName}</strong> needs work (${worst[1]}/100). Submit another clip on the same map to track improvement.`;
+  }
+
+  wall.style.display = 'flex';
+}
+
+async function updateFoundingSlots() {
+  // Get real slot count from backend (falls back to display value if unavailable)
+  try {
+    const r = await fetch(API_URL + '/founding/slots');
+    const d = await r.json();
+    const el = document.getElementById('wall-slots-left');
+    const wallEl = document.getElementById('wall-founding');
+    if (d.remaining <= 0) {
+      if (wallEl) wallEl.style.display = 'none'; // Sold out — hide founding offer
+    } else {
+      if (el) el.textContent = d.remaining + ' slots remaining';
+    }
+  } catch(e) { /* silently fail — show default */ }
+}
+
+async function startCheckoutWithCode(plan, code) {
+  try {
+    const resp = await fetch(`${API_URL}/billing/checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_id:     getUserId ? getUserId() : 'demo-user',
+        email:       getUserEmail ? getUserEmail() : '',
+        plan,
+        coupon_code: code || null,
+      })
+    });
+    const data = await resp.json();
+    if (data.checkout_url) window.location.href = data.checkout_url;
+    else alert('Checkout unavailable — please try again.');
+  } catch(e) { alert('Could not connect to billing server.'); }
 }
 
 // ─── Stripe checkout ──────────────────────────
