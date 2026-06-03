@@ -1410,13 +1410,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
         <div style="font-size:28px;margin-bottom:12px">🏆</div>
         <div style="font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:8px">Esports Teams</div>
         <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px">Custom Squad plans for competitive teams and organisations. Shared review feed, IGL strategy tools, and team analytics dashboards. Volume pricing for 5+ seat teams.</p>
-        <a href="mailto:partnerships@siegeiq.gg?subject=Esports%20Team%20Partnership" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600">Get in touch →</a>
+        <a onclick="show('contact')" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600;cursor:pointer">Get in touch →</a>
       </div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:24px">
         <div style="font-size:28px;margin-bottom:12px">🏢</div>
         <div style="font-family:var(--fh);font-size:20px;font-weight:700;margin-bottom:8px">Organisations</div>
         <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px">Gaming cafes, coaching academies, and university esports programs. Custom licensing for organisations with 10+ players. White-label options available on request.</p>
-        <a href="mailto:partnerships@siegeiq.gg?subject=Organisation%20Partnership" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600">Get in touch →</a>
+        <a onclick="show('contact')" style="font-size:12px;color:var(--accent);text-decoration:none;font-weight:600;cursor:pointer">Get in touch →</a>
       </div>
     </div>
 
@@ -2137,9 +2137,9 @@ function showUpgradeWall() {
   }
   if (ctaLine) {
     const msg = avg && avg >= 65
-      ? 'You're close to Diamond-level play. Unlimited coaching will get you there.'
+      ? "You're close to Diamond-level play. Unlimited coaching will get you there."
       : avg && avg >= 50
-      ? 'You're building good habits. Consistent coaching is what separates Gold from Plat.'
+      ? "You're building good habits. Consistent coaching is what separates Gold from Plat."
       : 'Every Pro user who commits to weekly coaching improves an average of 12 points per month.';
     ctaLine.textContent = msg;
   }
@@ -2173,31 +2173,50 @@ async function updateFoundingSlots() {
 }
 
 async function startCheckoutWithCode(plan, code) {
+  // Show loading state on any button that triggered this
+  const btns = document.querySelectorAll('[onclick*="startCheckoutWithCode"]');
+  btns.forEach(b => { b._origText = b.textContent; b.textContent = 'Connecting...'; b.disabled = true; });
+
+  const restore = () => btns.forEach(b => { if(b._origText) b.textContent = b._origText; b.disabled = false; });
+
   try {
     const resp = await fetch(`${API_URL}/billing/checkout`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        user_id:     getUserId ? getUserId() : 'demo-user',
-        email:       getUserEmail ? getUserEmail() : '',
+        user_id:     (typeof getUserId !== 'undefined' && getUserId()) ? getUserId() : 'demo-user',
+        email:       (typeof getUserEmail !== 'undefined' && getUserEmail()) ? getUserEmail() : '',
         plan,
         coupon_code: code || null,
       })
     });
+    if (!resp.ok) throw new Error('Server error ' + resp.status);
     const data = await resp.json();
-    if (data.checkout_url) window.location.href = data.checkout_url;
-    else alert('Checkout unavailable — please try again.');
-  } catch(e) { alert('Could not connect to billing server.'); }
+    restore();
+    if (data.checkout_url) {
+      window.location.href = data.checkout_url;
+    } else {
+      throw new Error('No checkout URL returned');
+    }
+  } catch(e) {
+    restore();
+    // Backend offline or error — show helpful message with direct Stripe fallback
+    const msg = document.createElement('div');
+    msg.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1a1e25;border:1px solid rgba(255,107,53,0.4);border-radius:8px;padding:20px 28px;z-index:9999;max-width:400px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.6)';
+    msg.innerHTML = `
+      <div style="font-size:16px;font-weight:700;color:#F0EEE8;margin-bottom:8px">Backend loading...</div>
+      <div style="font-size:13px;color:#9B9890;margin-bottom:14px;line-height:1.6">The server is starting up (Railway cold start can take ~30 seconds). Please try again in a moment.</div>
+      <button onclick="this.parentNode.remove();startCheckoutWithCode('${plan}','${code||''}')" style="font-family:var(--fh);font-size:13px;font-weight:700;color:#fff;background:var(--accent);border:none;padding:10px 24px;border-radius:4px;cursor:pointer;margin-right:8px">TRY AGAIN</button>
+      <button onclick="this.parentNode.remove()" style="font-size:13px;color:#9B9890;background:none;border:1px solid rgba(255,255,255,0.15);padding:10px 16px;border-radius:4px;cursor:pointer">Cancel</button>
+    `;
+    document.body.appendChild(msg);
+    setTimeout(() => msg.remove(), 15000);
+  }
 }
 
 // ─── Stripe checkout ──────────────────────────
 async function startCheckout(plan) {
-  try {
-    const resp=await fetch(`${API_URL}/billing/checkout`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:'demo-user',email:'user@siegeiq.com',plan})});
-    const data=await resp.json();
-    if(data.checkout_url) window.location.href=data.checkout_url;
-    else alert('Checkout unavailable — make sure Stripe keys are set in Railway.');
-  } catch(e){alert('Could not connect to billing server.');}
+  startCheckoutWithCode(plan, '');
 }
 
 // ─── Pricing toggle ───────────────────────────
