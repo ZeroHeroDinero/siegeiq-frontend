@@ -1648,22 +1648,27 @@ async function startAnalysis() {
   const rank=document.getElementById('sel-rank').value;
   const description=document.getElementById('clip-description').value.trim();
 
-  // Navigate to dashboard immediately and show loading state there
+  // Show the full animated overlay IMMEDIATELY — before any async work
+  const overlay = document.getElementById('analyzing');
+  if (overlay) overlay.style.display = 'flex';
+  setProgress(5, 'Preparing your clip...');
+
+  // Navigate to dashboard in background so it's ready when overlay closes
   show('dashboard');
-  setDashboardLoading(true);
 
   try {
     let reviewId;
     if(window.upMode==='url') {
+      setProgress(15, 'Sending to AI pipeline...');
       const url=document.getElementById('url-input').value.trim();
       const resp=await fetch(`${API_URL}/review/submit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:'demo-user',source:url,operator,map_name:map,rank,description,round_num:1})});
       if(!resp.ok){const err=await resp.json();throw new Error(err.detail||'Submission failed');}
       const data=await resp.json();
       reviewId=data.review_id;
+      setProgress(28, 'Clip received — loading operator intelligence...');
     } else {
-      // FILE MODE — show upload progress overlay on dashboard
-      const dashOverlay=document.getElementById('dash-upload-overlay');
-      if(dashOverlay) dashOverlay.style.display='flex';
+      // FILE MODE — animate progress during actual upload
+      setProgress(10, 'Uploading video to server...');
       const formData=new FormData();
       formData.append('file',selectedFile);
       formData.append('user_id','demo-user');
@@ -1671,19 +1676,42 @@ async function startAnalysis() {
       formData.append('map_name',map);
       formData.append('rank',rank);
       formData.append('description',description);
-      const resp=await fetch(`${API_URL}/review/upload`,{method:'POST',body:formData});
-      if(dashOverlay) dashOverlay.style.display='none';
-      if(!resp.ok){const err=await resp.json();throw new Error(err.detail||'Upload failed');}
+
+      // Simulate upload progress while fetch is running
+      let uploadPct = 10;
+      // Use XHR for real upload progress percentage
+      const resp = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('POST', `${API_URL}/review/upload`);
+        xhr.upload.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const pct = Math.round((e.loaded / e.total) * 22) + 5; // 5–27%
+            setProgress(pct, `Uploading ${Math.round(e.loaded/1024/1024*10)/10}MB of ${Math.round(e.total/1024/1024*10)/10}MB...`);
+          }
+        };
+        xhr.onload = () => resolve({ ok: xhr.status < 400, status: xhr.status,
+          json: async () => JSON.parse(xhr.responseText) });
+        xhr.onerror = () => reject(new Error('Network error during upload'));
+        xhr.send(formData);
+      });
+      if(!resp.ok){
+        if(overlay) overlay.style.display='none';
+        const err=await resp.json();
+        throw new Error(err.detail||'Upload failed');
+      }
       const data=await resp.json();
       reviewId=data.review_id;
+      setProgress(28, 'Upload complete — loading operator intelligence...');
     }
+
     document.getElementById('review-id-display').textContent=`Review ID: ${reviewId}`;
     incrementReviewsUsed();
     updateReviewCountDisplay();
     playSound('submit');
+    setProgress(32, 'Extracting frames from clip...');
     pollForResult(reviewId,operator,map,rank);
   } catch(err) {
-    setDashboardLoading(false);
+    if(overlay) overlay.style.display='none';
     showError('Error: '+err.message);
   }
 }
@@ -1762,7 +1790,7 @@ function pollForResult(reviewId,operator,map,rank) {
   let pct=30;
   const labels=['Extracting key frames...','Analyzing tactical decisions...','Scoring positioning...','Evaluating utility usage...','Building coaching report...'];
   pollInterval=setInterval(async()=>{
-    pct=Math.min(90,pct+Math.random()*3);
+    pct=Math.min(90,pct+Math.random()*6+1); // faster visual progress
     setProgress(pct,labels[Math.min(4,Math.floor((pct-30)/12))]);
     try {
       const resp=await fetch(`${API_URL}/review/${reviewId}?user_id=demo-user`);
@@ -1772,14 +1800,19 @@ function pollForResult(reviewId,operator,map,rank) {
         clearInterval(pollInterval);
         setProgress(100,'Analysis complete!');
         playSound('loaded');
-        setTimeout(()=>{document.getElementById('analyzing').style.display='none';setDashboardLoading(false);renderResults(data,operator,map,rank);},600);
+        setTimeout(()=>{
+          const ov=document.getElementById('analyzing');
+          if(ov) ov.style.display='none';
+          setDashboardLoading(false);
+          renderResults(data,operator,map,rank);
+        },600);
       } else if(data.status==='failed'){
         clearInterval(pollInterval);
         document.getElementById('analyzing').style.display='none';
         showError('Analysis failed: '+(data.error||'Unknown error. Check Railway logs.'));
       }
     } catch(e){}
-  },8000);
+  },3000); // Poll every 3s — faster feedback
 }
 
 function setProgress(pct,label){
