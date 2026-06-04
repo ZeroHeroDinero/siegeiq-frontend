@@ -1690,12 +1690,27 @@ async function startAnalysis() {
   show('dashboard');
   setDashboardLoading(true);
 
-  // Show full-screen animated overlay (position:fixed — covers everything)
-  const overlay = document.getElementById('analyzing');
-  if (overlay) overlay.style.display = 'flex';
-  setProgress(0, 'Starting...');
-  // Small delay so browser renders the 0% bar before animating
-  await new Promise(r => setTimeout(r, 80));
+  // Show analyzing overlay — bulletproof version
+  let overlay = document.getElementById('analyzing');
+  if (!overlay) {
+    // Create it dynamically if somehow missing from DOM
+    overlay = createAnalyzingOverlay();
+    document.body.appendChild(overlay);
+  }
+  overlay.style.cssText = overlay.style.cssText.replace('display:none','display:flex');
+  overlay.style.display = 'flex';
+  overlay.style.zIndex = '99999';
+  // Reset progress bar visually before starting
+  const pb = document.getElementById('prog-bar');
+  const pp = document.getElementById('prog-pct');
+  const pl = document.getElementById('prog-label');
+  if (pb) { pb.style.transition = 'none'; pb.style.width = '0%'; }
+  if (pp) pp.textContent = '0%';
+  if (pl) pl.textContent = 'Starting...';
+  // Force browser repaint so 0% renders before transition re-enables
+  if (pb) pb.getBoundingClientRect();
+  await new Promise(r => setTimeout(r, 50));
+  if (pb) pb.style.transition = 'width .6s ease';
   setProgress(5, 'Preparing your clip...');
 
   try {
@@ -1860,9 +1875,9 @@ function setProgress(pct,label){
   const bar = document.getElementById('prog-bar');
   const pctEl = document.getElementById('prog-pct');
   const lblEl = document.getElementById('prog-label');
-  if (bar) bar.style.width = pct + '%';
+  if (bar) { bar.style.width = Math.round(pct) + '%'; }
   if (pctEl) pctEl.textContent = Math.round(pct) + '%';
-  if (lblEl) lblEl.textContent = label;
+  if (lblEl && label) lblEl.textContent = label;
 
   // Animate step indicators based on progress
   // Step 0: 0-25% | Step 1: 25-55% | Step 2: 55-85% | Step 3: 85-100%
@@ -3321,6 +3336,20 @@ function loadTheme() {
   let t = 'dark';
   try { t = localStorage.getItem('siegeiq-theme') || 'dark'; } catch(e) {}
   setTheme(t);
+}
+
+// ─── Overlay factory (fallback if HTML overlay missing) ────────
+function createAnalyzingOverlay() {
+  const d = document.createElement('div');
+  d.id = 'analyzing';
+  d.style.cssText = 'position:fixed;inset:0;background:rgba(5,7,10,0.97);z-index:99999;display:none;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px';
+  d.innerHTML = '<div style="position:relative;width:80px;height:80px;margin:0 auto 24px"><div style="position:absolute;inset:0;border-radius:50%;border:2px solid var(--accent);animation:pulseRing 1.4s ease-out infinite;opacity:.5"></div><div style="position:absolute;inset:18px;border-radius:50%;background:var(--bg3);border:1px solid rgba(255,107,53,0.4);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:14px;font-weight:800;color:var(--accent)">IQ</div></div>'
+    + '<div style="font-family:var(--fh);font-size:22px;font-weight:800;margin-bottom:6px">ANALYZING CLIP</div>'
+    + '<div id="prog-label" style="font-size:13px;color:var(--text2);margin-bottom:24px;font-weight:300">Starting...</div>'
+    + '<div style="width:360px;max-width:90vw;margin:0 auto 8px"><div style="height:8px;background:rgba(255,255,255,0.06);border-radius:4px;overflow:hidden"><div id="prog-bar" style="height:8px;background:linear-gradient(90deg,#FF4D6D,#FF8C42);border-radius:4px;width:0%;transition:width .5s ease"></div></div></div>'
+    + '<div id="prog-pct" style="font-family:var(--fm);font-size:20px;font-weight:700;color:var(--accent);margin-bottom:16px">0%</div>'
+    + '<div id="review-id-display" style="font-size:11px;color:var(--text3);font-family:var(--fm)"></div>';
+  return d;
 }
 
 // ─── Init ─────────────────────────────────────
