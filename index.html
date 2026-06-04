@@ -634,8 +634,17 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
     </div>
 
     <div id="url-zone" style="display:none;margin-bottom:18px">
-      <input id="url-input" placeholder="https://youtube.com/watch?v=..." oninput="checkUrl(this.value)" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:13px 14px;color:var(--text);font-size:14px;outline:none">
-      <div style="font-size:11px;color:var(--text3);margin-top:6px">YouTube and Twitch VOD links supported</div>
+      <input id="url-input" placeholder="https://youtube.com/watch?v=..." oninput="checkUrl(this.value)" style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:13px 14px;color:var(--text);font-size:14px;outline:none;margin-bottom:10px">
+      <!-- YouTube accuracy warning — prominent -->
+      <div style="background:rgba(245,158,11,0.06);border:2px solid rgba(245,158,11,0.4);border-radius:var(--r);padding:12px 14px">
+        <div style="font-size:12px;font-weight:700;color:var(--warn);margin-bottom:5px">⚠ YouTube links are significantly less accurate than file uploads</div>
+        <div style="font-size:12px;color:var(--text2);line-height:1.65;margin-bottom:8px">SiegeIQ <strong style="color:var(--text)">cannot watch</strong> your YouTube video. It analyzes using your written description and map context only — it cannot read your HUD, see your operator, or verify exact moments. Timestamps will be <strong style="color:var(--text)">approximate ranges</strong> like "early round (~0:20–0:40)", not clickable exact seconds.</div>
+        <div style="display:flex;flex-direction:column;gap:5px">
+          <div style="font-size:11px;color:var(--success);display:flex;align-items:flex-start;gap:6px"><span style="flex-shrink:0">✓</span><span><strong>MP4 upload:</strong> 16 real video frames extracted · exact timestamps · HUD reading · operator auto-detection</span></div>
+          <div style="font-size:11px;color:var(--warn);display:flex;align-items:flex-start;gap:6px"><span style="flex-shrink:0">⚠</span><span><strong>YouTube link:</strong> description-based only · approximate timestamps · no HUD reading · requires detailed written description for accuracy</span></div>
+        </div>
+        <div style="margin-top:10px;font-size:11px;color:var(--text3)">YouTube links are for Pro members who want quick feedback when they don't have the file. For best results, always upload the MP4.</div>
+      </div>
     </div>
 
     <!-- Operator selection -->
@@ -867,12 +876,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
     </div>
     <p style="font-size:13px;color:var(--text2);text-align:center;line-height:1.7;margin-bottom:20px">Pro users with similar profiles improve an average of <strong style="color:var(--text)">12 points per month</strong> with unlimited coaching. Your next breakthrough is one review away.</p>
     <!-- Founding member note -->
-    <div id="wall-founding" style="background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.25);border-radius:var(--r);padding:10px 14px;margin-bottom:16px;display:flex;align-items:center;gap:8px">
-      <span style="font-size:16px">⭐</span>
-      <div style="font-size:12px;color:var(--warn);line-height:1.5"><strong>Founding Member offer:</strong> Lock in $6.99/mo for life — <span id="wall-slots-left" style="font-weight:700">73 slots remaining</span>. Offer ends when slots fill.</div>
+    <div id="wall-founding" style="background:rgba(255,184,0,0.08);border:1px solid rgba(255,184,0,0.25);border-radius:var(--r);padding:10px 14px;margin-bottom:16px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+        <span style="font-size:16px">⭐</span>
+        <div style="font-size:12px;color:var(--warn);line-height:1.5"><strong>Founding Member offer:</strong> Lock in $6.99/mo for life — <span id="wall-slots-left" style="font-weight:700">73 slots remaining</span>.</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding-left:4px">
+        <span style="font-size:11px;color:var(--text2)">Use code at checkout:</span>
+        <span onclick="navigator.clipboard.writeText('FOUNDING').then(()=>{this.textContent='✓ COPIED';this.style.color='var(--success)';setTimeout(()=>{this.textContent='FOUNDING';this.style.color='var(--accent)';},1500)})" style="font-family:var(--fm);font-size:13px;font-weight:700;color:var(--accent);background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);border-radius:4px;padding:2px 10px;cursor:pointer;letter-spacing:.08em" title="Click to copy">FOUNDING</span>
+        <span style="font-size:10px;color:var(--text3)">→ auto-applied on checkout</span>
+      </div>
     </div>
     <div style="display:flex;gap:10px">
-      <button onclick="startCheckoutWithCode('pro','FOUNDING')" style="flex:2;font-family:var(--fh);font-size:15px;font-weight:800;letter-spacing:.08em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:14px;cursor:pointer;transition:transform .1s" onmouseenter="this.style.transform='translateY(-1px)'" onmouseleave="this.style.transform='none'">START 7-DAY TRIAL — $6.99/MO →</button>
+      <button onclick="startCheckoutWithCode('pro_monthly','FOUNDING')" style="flex:2;font-family:var(--fh);font-size:15px;font-weight:800;letter-spacing:.08em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:14px;cursor:pointer;transition:transform .1s" onmouseenter="this.style.transform='translateY(-1px)'" onmouseleave="this.style.transform='none'">START 7-DAY TRIAL — $6.99/MO →</button>
       <button onclick="document.getElementById('upgrade-wall').style.display='none'" style="flex:1;font-family:var(--fh);font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--text2);background:transparent;border:1px solid var(--border2);border-radius:var(--r);padding:14px;cursor:pointer">Maybe later</button>
     </div>
     <div style="text-align:center;font-size:11px;color:var(--text3);margin-top:10px">7-day free trial · Cancel anytime · No credit card required today</div>
@@ -905,9 +921,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
         <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
           <div style="font-family:var(--fm);font-size:12px;color:var(--warn)">⏳ <span id="founding-slots">73</span> of 100 slots remaining</div>
           <div style="font-family:var(--fm);font-size:11px;color:var(--text3)">Offer ends when slots fill or after 14 days</div>
-        </div>
-      </div>
-      <button onclick="startCheckoutWithCode('pro','FOUNDING')" style="font-family:var(--fh);font-size:14px;font-weight:800;letter-spacing:.08em;color:#fff;background:var(--warn);border:none;border-radius:var(--r);padding:12px 20px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:transform .1s" onmouseenter="this.style.transform='translateY(-1px)'" onmouseleave="this.style.transform='none'">CLAIM $6.99/MO →</button>
+          <div style="margin-top:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span style="font-size:11px;color:var(--text2)">Discount code at checkout:</span>
+            <span onclick="navigator.clipboard.writeText('FOUNDING').then(()=>{this.textContent='✓ COPIED';this.style.color='var(--success)';setTimeout(()=>{this.textContent='FOUNDING';this.style.color='var(--accent)';},1600)})" style="font-family:var(--fm);font-size:13px;font-weight:700;color:var(--accent);background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.35);border-radius:4px;padding:3px 11px;cursor:pointer;letter-spacing:.1em;user-select:all" title="Click to copy">FOUNDING</span>
+            <span style="font-size:10px;color:var(--text3)">← click to copy · auto-applied when using button above</span>
+          </div>
+        </div>     </div>
+      <button onclick="startCheckoutWithCode('pro_monthly','FOUNDING')" style="font-family:var(--fh);font-size:14px;font-weight:800;letter-spacing:.08em;color:#fff;background:var(--warn);border:none;border-radius:var(--r);padding:12px 20px;cursor:pointer;white-space:nowrap;flex-shrink:0;transition:transform .1s" onmouseenter="this.style.transform='translateY(-1px)'" onmouseleave="this.style.transform='none'">CLAIM $6.99/MO →</button>
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:left">
@@ -1528,31 +1548,93 @@ function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').s
 function checkUrl(v){hasClip=v.length>8;hasClip?enableAnalyze():disableAnalyze();}
 function enableAnalyze(){const b=document.getElementById('analyze-btn');b.textContent='ANALYZE CLIP →';b.style.background='var(--accent)';b.style.opacity='1';b.style.cursor='pointer';}
 function disableAnalyze(){const b=document.getElementById('analyze-btn');b.textContent='ADD A CLIP ABOVE';b.style.background='var(--bg3)';b.style.opacity='.4';b.style.cursor='not-allowed';}
-function showError(msg){const b=document.getElementById('error-box');b.textContent=msg;b.style.display='block';}
+function showError(msg){playSound('error');const b=document.getElementById('error-box');b.textContent=msg;b.style.display='block';}
 function hideError(){document.getElementById('error-box').style.display='none';}
+
+
+// ─── Sound Effects ─────────────────────────────────────
+function playClickSound() {
+  // Crisp tactile click — confirms button press immediately
+  try {
+    const ctx = getAudioCtx(); if (!ctx) return;
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.04);
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.07);
+  } catch(e) {}
+}
+
+function playSound(type) {
+  try {
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+
+    if (type === 'submit') {
+      // Rising two-tone click — confirms action
+      o.type = 'sine';
+      o.frequency.setValueAtTime(440, ctx.currentTime);
+      o.frequency.linearRampToValueAtTime(660, ctx.currentTime + 0.12);
+      g.gain.setValueAtTime(0.18, ctx.currentTime);
+      g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.18);
+      o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.18);
+    } else if (type === 'complete') {
+      // Three ascending chimes — analysis done
+      [0, 0.18, 0.36].forEach((delay, i) => {
+        const osc = ctx.createOscillator();
+        const gn  = ctx.createGain();
+        osc.connect(gn); gn.connect(ctx.destination);
+        osc.type = 'sine';
+        osc.frequency.value = [523, 659, 784][i]; // C5 E5 G5
+        gn.gain.setValueAtTime(0, ctx.currentTime + delay);
+        gn.gain.linearRampToValueAtTime(0.15, ctx.currentTime + delay + 0.04);
+        gn.gain.linearRampToValueAtTime(0, ctx.currentTime + delay + 0.22);
+        osc.start(ctx.currentTime + delay);
+        osc.stop(ctx.currentTime + delay + 0.25);
+      });
+    } else if (type === 'error') {
+      // Low buzz — something went wrong
+      o.type = 'sawtooth';
+      o.frequency.value = 120;
+      g.gain.setValueAtTime(0.12, ctx.currentTime);
+      g.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+      o.start(ctx.currentTime); o.stop(ctx.currentTime + 0.3);
+    }
+  } catch(e) {} // silently fail if AudioContext blocked
+}
 
 async function startAnalysis() {
   if(!hasClip) return;
+  playClickSound();
   hideError();
   const operator=document.getElementById('sel-operator').value || 'auto-detect';
   const map=document.getElementById('sel-map').value;
   const rank=document.getElementById('sel-rank').value;
   const description=document.getElementById('clip-description').value.trim();
-  const overlay=document.getElementById('analyzing');
-  overlay.style.display='flex';
-  setProgress(5,'Submitting to AI pipeline...');
+
+  // Navigate to dashboard immediately and show loading state there
+  show('dashboard');
+  setDashboardLoading(true);
 
   try {
     let reviewId;
     if(window.upMode==='url') {
       const url=document.getElementById('url-input').value.trim();
-      setProgress(15,'Sending to backend...');
       const resp=await fetch(`${API_URL}/review/submit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:'demo-user',source:url,operator,map_name:map,rank,description,round_num:1})});
       if(!resp.ok){const err=await resp.json();throw new Error(err.detail||'Submission failed');}
       const data=await resp.json();
       reviewId=data.review_id;
     } else {
-      setProgress(15,'Uploading video...');
+      // FILE MODE — show upload progress overlay on dashboard
+      const dashOverlay=document.getElementById('dash-upload-overlay');
+      if(dashOverlay) dashOverlay.style.display='flex';
       const formData=new FormData();
       formData.append('file',selectedFile);
       formData.append('user_id','demo-user');
@@ -1561,18 +1643,89 @@ async function startAnalysis() {
       formData.append('rank',rank);
       formData.append('description',description);
       const resp=await fetch(`${API_URL}/review/upload`,{method:'POST',body:formData});
+      if(dashOverlay) dashOverlay.style.display='none';
       if(!resp.ok){const err=await resp.json();throw new Error(err.detail||'Upload failed');}
       const data=await resp.json();
       reviewId=data.review_id;
     }
     document.getElementById('review-id-display').textContent=`Review ID: ${reviewId}`;
-    setProgress(30,'Analysis queued — extracting frames...');
     incrementReviewsUsed();
     updateReviewCountDisplay();
+    playSound('submit');
     pollForResult(reviewId,operator,map,rank);
   } catch(err) {
-    overlay.style.display='none';
+    setDashboardLoading(false);
     showError('Error: '+err.message);
+  }
+}
+
+// ─── Sound Effects ─────────────────────────────────────
+function playClickSound() {
+  // Crisp tactile click — confirms button press immediately
+  try {
+    const ctx = getAudioCtx(); if (!ctx) return;
+    const osc  = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.type = 'square';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(440, ctx.currentTime + 0.04);
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.06);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.07);
+  } catch(e) {}
+}
+const SOUNDS = {
+  submit: { freq:[330,523,659,880], dur:0.06, vol:0.15, type:'sine'   }, // ascending chime on submit
+  loaded: { freq:[523,784,1047,1319], dur:0.07, vol:0.13, type:'sine' }, // triumphant 4-note on load complete
+};
+let audioCtx = null;
+function getAudioCtx() {
+  if (!audioCtx) {
+    try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); }
+    catch(e) { return null; }
+  }
+  return audioCtx;
+}
+function playSound(name) {
+  try {
+    const ctx = getAudioCtx(); if (!ctx) return;
+    const s = SOUNDS[name]; if (!s) return;
+    s.freq.forEach((f, i) => {
+      const osc  = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.type = s.type;
+      osc.frequency.setValueAtTime(f, ctx.currentTime + i * s.dur);
+      gain.gain.setValueAtTime(s.vol, ctx.currentTime + i * s.dur);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + i * s.dur + s.dur * 1.8);
+      osc.start(ctx.currentTime + i * s.dur);
+      osc.stop(ctx.currentTime + i * s.dur + s.dur * 2);
+    });
+  } catch(e) {}
+}
+
+// ─── Dashboard Loading State ───────────────────────────
+function setDashboardLoading(on) {
+  const obsList = document.getElementById('obs-list');
+  const vidWrap = document.getElementById('video-container');
+  if (on) {
+    // Show pulsing loading state in obs list
+    if (obsList) obsList.innerHTML = `
+      <div style="padding:32px 20px;display:flex;flex-direction:column;gap:10px">
+        <div style="height:14px;background:var(--bg3);border-radius:4px;animation:pulse 1.4s ease-in-out infinite;width:80%"></div>
+        <div style="height:14px;background:var(--bg3);border-radius:4px;animation:pulse 1.4s ease-in-out infinite .15s;width:60%"></div>
+        <div style="height:14px;background:var(--bg3);border-radius:4px;animation:pulse 1.4s ease-in-out infinite .3s;width:70%"></div>
+        <div style="height:3px;background:linear-gradient(90deg,transparent,var(--accent),transparent);border-radius:2px;margin-top:8px;animation:shimmerBar 1.5s linear infinite"></div>
+        <div style="font-family:var(--fm);font-size:11px;color:var(--text3);text-align:center;margin-top:8px;letter-spacing:.1em">
+          AI ANALYZING YOUR CLIP...
+        </div>
+      </div>`;
+    // Keep video area showing what was submitted
+    if (vidWrap) vidWrap.style.opacity = '0.5';
+  } else {
+    if (vidWrap) vidWrap.style.opacity = '1';
   }
 }
 
@@ -1589,7 +1742,8 @@ function pollForResult(reviewId,operator,map,rank) {
       if(data.status==='complete'){
         clearInterval(pollInterval);
         setProgress(100,'Analysis complete!');
-        setTimeout(()=>{document.getElementById('analyzing').style.display='none';renderResults(data,operator,map,rank);show('dashboard');},600);
+        playSound('loaded');
+        setTimeout(()=>{document.getElementById('analyzing').style.display='none';setDashboardLoading(false);renderResults(data,operator,map,rank);},600);
       } else if(data.status==='failed'){
         clearInterval(pollInterval);
         document.getElementById('analyzing').style.display='none';
@@ -1609,6 +1763,8 @@ function setProgress(pct,label){
 const SEV_COL={critical:'#FF4444',warning:'#F59E0B',tip:'#3ECF8E'};
 
 function renderResults(data,operator,map,rank) {
+  playSound('loaded');  // success chime when coaching report loads
+  setDashboardLoading(false);
   // operator may be 'auto-detect' — use detected_operators from report instead
   const report=typeof data.report==='string'?JSON.parse(data.report):data.report;
   if(!report) return;
@@ -1634,23 +1790,34 @@ function renderResults(data,operator,map,rank) {
       + '</div></div>';
 
   } else if (yt) {
-    // YOUTUBE LINK
+    // YOUTUBE LINK — thumbnail + side-by-side watch UX
+    // Error 153 = YouTube blocks iframe embed from unknown origins.
+    // Solution: show thumbnail with video info, let each timestamp open YouTube at exact second.
     const videoId = yt[1];
     window.currentYouTubeId = videoId;
+    const ytUrl  = 'https://www.youtube.com/watch?v=' + videoId;
+    const thumbHd= 'https://img.youtube.com/vi/' + videoId + '/hqdefault.jpg';
     vc.style.minHeight = '0';
     vc.style.display = 'block';
-    vc.innerHTML = '<div style="background:var(--bg3);border-radius:var(--r);overflow:hidden">'
-      + '<div style="position:relative;width:100%;padding-bottom:56.25%;height:0;overflow:hidden">'
-      + '<iframe id="yt-player" width="100%" height="100%"'
-      + ' style="position:absolute;top:0;left:0;width:100%;height:100%"'
-      + ' src="https://www.youtube-nocookie.com/embed/' + videoId + '?enablejsapi=1&controls=1&rel=0&modestbranding=1"'
-      + ' frameborder="0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture"'
-      + ' allowfullscreen></iframe>'
-      + '</div>'
-      + '<div style="padding:8px 14px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--border)">'
-      + '<span style="font-size:11px;color:var(--text3)">Click any timestamp to jump + hear coaching</span>'
-      + '<a href="https://www.youtube.com/watch?v=' + videoId + '" target="_blank" style="font-size:11px;color:var(--accent);text-decoration:none;margin-left:auto">YouTube &#x2197;</a>'
-      + '</div></div>';
+    vc.innerHTML =
+      // Main thumbnail — clickable to open YouTube
+      '<div style="background:#000;border-radius:var(--r);overflow:hidden;position:relative;cursor:pointer" onclick="window.open(\''+ytUrl+'\',\'_blank\')">'
+      + '<img src="'+thumbHd+'" onerror="this.src=\'https://img.youtube.com/vi/'+videoId+'/mqdefault.jpg\'" style="width:100%;display:block;max-height:300px;object-fit:cover;opacity:.8" alt="YouTube video thumbnail">'
+      // Big play button
+      + '<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none">'
+      + '<div style="width:72px;height:72px;border-radius:50%;background:rgba(255,0,0,0.92);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 30px rgba(0,0,0,0.6);transition:transform .2s">'
+      + '<div style="width:0;height:0;border-style:solid;border-width:14px 0 14px 26px;border-color:transparent transparent transparent #fff;margin-left:5px"></div>'
+      + '</div></div>'
+      // Gradient overlay at bottom
+      + '<div style="position:absolute;bottom:0;left:0;right:0;padding:12px 14px;background:linear-gradient(transparent,rgba(0,0,0,0.8));pointer-events:none">'
+      + '<div style="font-size:12px;color:rgba(255,255,255,0.9);font-weight:500">Click to watch on YouTube</div>'
+      + '</div></div>'
+      // Info strip
+      + '<div style="padding:9px 14px;display:flex;align-items:center;gap:8px;border-top:1px solid var(--border);background:var(--bg3)">'
+      + '<span style="font-size:11px;color:var(--text3);flex:1">💡 Click any timestamp below to jump to that exact moment on YouTube</span>'
+      + '<a href="'+ytUrl+'" target="_blank" style="font-size:11px;font-weight:700;color:var(--accent);text-decoration:none;white-space:nowrap;padding:5px 12px;border:1px solid rgba(255,107,53,0.3);border-radius:var(--r);transition:all .15s" onmouseover="this.style.background=\'rgba(255,107,53,0.1)\'" onmouseout="this.style.background=\'none\'">Open video ↗</a>'
+      + '</div>';
+    window.ytSeekBase = ytUrl;
 
   } else {
     vc.style.minHeight = '200px';
@@ -1842,25 +2009,25 @@ if (window.speechSynthesis) {
 // --- YouTube timestamp navigation ---
 // Clicking a timestamp BOTH seeks the video AND reads the observation aloud
 function jumpToTimestamp(timeStr, obsIndex) {
-  // Convert M:SS to seconds
-  const parts = timeStr.split(':').map(Number);
-  const secs  = parts.length === 2 ? parts[0]*60 + parts[1] : parts[0];
+  // Parse timestamp — handle "0:38", "~0:38", ranges "0:20-0:40", "early round ~0:20"
+  const clean = (timeStr || '').replace(/[~\s]/g,'').split('-')[0];
+  const parts = clean.split(':').map(Number);
+  const secs  = (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]))
+    ? parts[0]*60 + parts[1] : (parts[0] || 0);
 
-  // Seek local video player if file was uploaded
+  // Local video — seek player
   const localPlayer = document.getElementById('local-player');
-  if (localPlayer) {
+  if (localPlayer && localPlayer.src) {
     localPlayer.currentTime = secs;
-    localPlayer.play();
+    localPlayer.play().catch(() => {});
   }
 
-  // Seek YouTube player if YouTube link was used
-  const videoId = window.currentYouTubeId;
-  if (videoId) {
-    const iframe = document.getElementById('yt-player');
-    if (iframe) {
-      iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId
-        + '?enablejsapi=1&controls=1&rel=0&modestbranding=1&start=' + secs + '&autoplay=1';
-    }
+  // YouTube — open at exact timestamp in new tab
+  if (window.currentYouTubeId && (!localPlayer || !localPlayer.src)) {
+    window.open(
+      'https://www.youtube.com/watch?v=' + window.currentYouTubeId + '&t=' + secs + 's',
+      '_blank'
+    );
   }
 
   // Scroll observation card into view
@@ -1871,16 +2038,12 @@ function jumpToTimestamp(timeStr, obsIndex) {
 // ─── Replay Loop ──────────────────────────────────
 function replayMoment(timeStr, obsIndex) {
   // Clear any existing replay loop
-  if (replayLoopInterval) {
-    clearInterval(replayLoopInterval);
-    replayLoopInterval = null;
-  }
+  if (replayLoopInterval) { clearInterval(replayLoopInterval); replayLoopInterval = null; }
 
-  // If clicking same obs again, stop replay (toggle off)
+  // Toggle off if clicking same obs
   if (replayObsIndex === obsIndex) {
     replayObsIndex = null;
     updateReplayButtons();
-    // Pause the video
     const lp = document.getElementById('local-player');
     if (lp) lp.pause();
     return;
@@ -1889,38 +2052,47 @@ function replayMoment(timeStr, obsIndex) {
   replayObsIndex = obsIndex;
   updateReplayButtons();
 
-  const parts = timeStr.split(':').map(Number);
-  const secs  = parts.length === 2 ? parts[0]*60 + parts[1] : parts[0];
-  const clipEnd = secs + 12; // replay 12-second window
+  // Parse timestamp — handle "0:38", "~0:38", "1:24", ranges like "0:20-0:40"
+  const clean = (timeStr || '').replace(/[~\s]/g,'').split('-')[0]; // take start of range
+  const parts = clean.split(':').map(Number);
+  const secs  = (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]))
+    ? parts[0]*60 + parts[1]
+    : (parts[0] || 0);
+  const windowEnd = secs + 12; // 12-second replay window
 
   const localPlayer = document.getElementById('local-player');
-  if (localPlayer) {
-    localPlayer.currentTime = secs;
-    localPlayer.play();
-    // Loop the window
-    replayLoopInterval = setInterval(() => {
-      if (!replayLoopInterval) return;
-      const lp = document.getElementById('local-player');
-      if (!lp) { clearInterval(replayLoopInterval); return; }
-      if (lp.currentTime >= clipEnd || lp.currentTime < secs - 1) {
-        lp.currentTime = secs;
-        lp.play();
-      }
-    }, 400);
-  }
+  const hasFile = localPlayer && localPlayer.src && localPlayer.src !== '';
 
-  // For YouTube — just seek to moment (can't loop YouTube embeds)
-  const videoId = window.currentYouTubeId;
-  if (videoId) {
+  if (hasFile) {
+    // FILE MODE — true looping replay
+    localPlayer.currentTime = secs;
+    localPlayer.play().catch(() => {});
+
+    replayLoopInterval = setInterval(() => {
+      const lp = document.getElementById('local-player');
+      if (!lp || !replayLoopInterval) { clearInterval(replayLoopInterval); replayLoopInterval = null; return; }
+      // Loop back when reaching window end OR when video ends
+      if (lp.ended || lp.currentTime >= windowEnd) {
+        lp.currentTime = secs;
+        lp.play().catch(() => {});
+      }
+    }, 200);
+  } else if (window.currentYouTubeId) {
+    // YOUTUBE MODE — seek to timestamp (can't true-loop YouTube embeds)
     const iframe = document.getElementById('yt-player');
     if (iframe) {
-      iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId
-        + '?enablejsapi=1&controls=1&rel=0&modestbranding=1&start=' + secs + '&autoplay=1';
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + window.currentYouTubeId
+        + '?start=' + secs + '&autoplay=1&rel=0&modestbranding=1&enablejsapi=1';
     }
+    // Show a note that replay loop requires file upload
+    const noteEl = document.getElementById('replay-yt-note');
+    if (noteEl) noteEl.style.display = 'block';
+    setTimeout(() => { if(noteEl) noteEl.style.display = 'none'; }, 4000);
   }
 
+  // Scroll the obs card into view
   const card = document.getElementById('obs-' + obsIndex);
-  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function stopReplay() {
@@ -2172,50 +2344,42 @@ async function updateFoundingSlots() {
   } catch(e) { /* silently fail — show default */ }
 }
 
-async function startCheckoutWithCode(plan, code) {
-  // Show loading state on any button that triggered this
-  const btns = document.querySelectorAll('[onclick*="startCheckoutWithCode"]');
-  btns.forEach(b => { b._origText = b.textContent; b.textContent = 'Connecting...'; b.disabled = true; });
+// ─── Direct Stripe Payment Links ─────────────────────────────────────────────
+// All payments go DIRECTLY to Stripe — no backend round-trip, instant redirect.
+// Stripe Payment Links support ?prefilled_promo_code= to auto-apply coupons.
+const STRIPE_DIRECT = {
+  'pro_monthly':  'https://buy.stripe.com/5kQcN559z1tB1h7ek393y00',
+  'pro_annual':   'https://buy.stripe.com/14AaEX59za07f7Xb7R93y01',
+  'team_monthly': 'https://buy.stripe.com/7sYbJ19pP5JRaRH6RB93y02',
+  'team_annual':  'https://buy.stripe.com/28E28rbxX8W3e3T0td93y03',
+};
 
-  const restore = () => btns.forEach(b => { if(b._origText) b.textContent = b._origText; b.disabled = false; });
+// Map any loose plan alias to the canonical key
+function normalizePlan(plan) {
+  const map = {
+    'pro':     'pro_monthly',
+    'diamond': 'pro_monthly',
+    'squad':   'team_monthly',
+    'team':    'team_monthly',
+  };
+  return map[plan] || plan;
+}
 
-  try {
-    const resp = await fetch(`${API_URL}/billing/checkout`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user_id:     (typeof getUserId !== 'undefined' && getUserId()) ? getUserId() : 'demo-user',
-        email:       (typeof getUserEmail !== 'undefined' && getUserEmail()) ? getUserEmail() : '',
-        plan,
-        coupon_code: code || null,
-      })
-    });
-    if (!resp.ok) throw new Error('Server error ' + resp.status);
-    const data = await resp.json();
-    restore();
-    if (data.checkout_url) {
-      window.location.href = data.checkout_url;
-    } else {
-      throw new Error('No checkout URL returned');
-    }
-  } catch(e) {
-    restore();
-    // Backend offline or error — show helpful message with direct Stripe fallback
-    const msg = document.createElement('div');
-    msg.style.cssText = 'position:fixed;top:80px;left:50%;transform:translateX(-50%);background:#1a1e25;border:1px solid rgba(255,107,53,0.4);border-radius:8px;padding:20px 28px;z-index:9999;max-width:400px;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,0.6)';
-    msg.innerHTML = `
-      <div style="font-size:16px;font-weight:700;color:#F0EEE8;margin-bottom:8px">Backend loading...</div>
-      <div style="font-size:13px;color:#9B9890;margin-bottom:14px;line-height:1.6">The server is starting up (Railway cold start can take ~30 seconds). Please try again in a moment.</div>
-      <button onclick="this.parentNode.remove();startCheckoutWithCode('${plan}','${code||''}')" style="font-family:var(--fh);font-size:13px;font-weight:700;color:#fff;background:var(--accent);border:none;padding:10px 24px;border-radius:4px;cursor:pointer;margin-right:8px">TRY AGAIN</button>
-      <button onclick="this.parentNode.remove()" style="font-size:13px;color:#9B9890;background:none;border:1px solid rgba(255,255,255,0.15);padding:10px 16px;border-radius:4px;cursor:pointer">Cancel</button>
-    `;
-    document.body.appendChild(msg);
-    setTimeout(() => msg.remove(), 15000);
-  }
+// Main checkout entry — goes DIRECT to Stripe, zero backend latency
+function startCheckoutWithCode(plan, code) {
+  plan = normalizePlan(plan);
+  const base = STRIPE_DIRECT[plan];
+  if (!base) { alert('Unknown plan: ' + plan); return; }
+
+  // Append coupon as prefilled promo code so it auto-applies on Stripe page
+  let url = base;
+  if (code) url += '?prefilled_promo_code=' + encodeURIComponent(code);
+
+  window.location.href = url;
 }
 
 // ─── Stripe checkout ──────────────────────────
-async function startCheckout(plan) {
+function startCheckout(plan) {
   startCheckoutWithCode(plan, '');
 }
 
