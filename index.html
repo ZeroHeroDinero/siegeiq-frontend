@@ -2190,24 +2190,40 @@ function renderHistory(){const h=document.getElementById('review-history');if(!r
 // --- AI Voice Coaching ---
 // Uses ElevenLabs for natural voice if API key set, browser TTS as fallback
 let voiceOn = false;
-let currentObservations = [];
-let replayLoopInterval = null;
-let replayObsIndex = null;
-const ELEVENLABS_API_KEY = 'sk_da1f2247bf87cf3b404ae7bd2f69bb8d7fc4c52215f483b4';
-const ELEVENLABS_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Adam - natural coaching voice
+let _currentVoiceSource = null;
+let _currentVoiceCtx    = null;
 
+const ELEVENLABS_API_KEY  = 'sk_da1f2247bf87cf3b404ae7bd2f69bb8d7fc4c52215f483b4';
+const ELEVENLABS_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Rachel — natural coaching voice
+
+// Toggle voice coaching on/off
 function toggleVoice() {
   voiceOn = !voiceOn;
-  document.getElementById('voice-toggle').style.background = voiceOn ? 'var(--accent)' : 'var(--bg3)';
-  document.getElementById('voice-thumb').style.left = voiceOn ? '22px' : '2px';
-  document.getElementById('voice-status').style.display = voiceOn ? 'block' : 'none';
-  if (!voiceOn) { stopVoice(); return; }
-  const msg = ELEVENLABS_API_KEY ? 'Premium voice ON — click any observation to hear it' : 'Voice ON — click any observation to hear it';
-  document.getElementById('voice-reading').textContent = msg;
+  const toggle = document.getElementById('voice-toggle');
+  const label  = document.getElementById('voice-reading');
+  if (toggle) toggle.checked = voiceOn;
+  if (label)  label.textContent = voiceOn ? 'Ready — click any observation.' : 'Voice coaching off.';
+  if (!voiceOn) stopVoice();
 }
 
+// Stop any currently playing voice
+function stopVoice() {
+  if (_currentVoiceSource) {
+    try { _currentVoiceSource.stop(); } catch(e) {}
+    _currentVoiceSource = null;
+  }
+  if (_currentVoiceCtx) {
+    try { _currentVoiceCtx.close(); } catch(e) {}
+    _currentVoiceCtx = null;
+  }
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+  // Restore video volume
+  const lp = document.getElementById('local-player');
+  if (lp) lp.volume = 1;
+}
+
+// Main voice function — async so await works correctly
 async function speakObservation(index) {
-  // Only speaks when voice is toggled ON and user clicks an observation
   if (!voiceOn) return;
   const obs = currentObservations[index];
   if (!obs) return;
@@ -2217,90 +2233,80 @@ async function speakObservation(index) {
                  : obs.severity === 'warning'  ? 'Warning'
                  : 'Good play';
   const cat  = (obs.category || '').replace(/_/g, ' ');
-  const text = sevLabel + ' at ' + obs.timestamp + '. ' + obs.observation + '. Fix: ' + obs.fix;
+  // Build spoken text — truncate to 350 chars for free plan limits
+  let text = sevLabel + '. ' + obs.observation;
+  if (obs.fix) text += ' Fix: ' + obs.fix;
+  if (text.length > 350) text = text.slice(0, 347) + '...';
 
-  document.getElementById('voice-reading').textContent = 'Speaking: ' + obs.timestamp + ' — ' + cat + '...';
+  const statusEl = document.getElementById('voice-reading');
+  if (statusEl) statusEl.textContent = 'Speaking: ' + (obs.timestamp || '') + ' — ' + cat + '...';
 
-  if (ELEVENLABS_API_KEY) {
+  // ── Duck video volume while speaking ──────────────────────────────
+  const lp = document.getElementById('local-player');
+  if (lp) lp.volume = 0.2;
+
+  // ── Try ElevenLabs first ──────────────────────────────────────────
+  if (ELEVENLABS_API_KEY && ELEVENLABS_VOICE_ID) {
     try {
-      // Using standard endpoint — works on all ElevenLabs tiers including Starter
-      const resp = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + ELEVENLABS_VOICE_ID, {
-        method: 'POST',
-        headers: {
-          'xi-api-key': ELEVENLABS_API_KEY,
-          'Content-Type': 'application/json',
-          'Accept': 'audio/mpeg'
-        },
-        body: JSON.stringify({
-          text: text,
-          model_id: 'eleven_monolingual_v1',
-          voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.85
-          }
-        })
-      });
+      const resp = await fetch(
+        'https://api.elevenlabs.io/v1/text-to-speech/' + ELEVENLABS_VOICE_ID,
+        {
+          method: 'POST',
+          headers: {
+            'xi-api-key':   ELEVENLABS_API_KEY,
+            'Content-Type': 'application/json',
+            'Accept':       'audio/mpeg'
+          },
+          body: JSON.stringify({
+            text:     text,
+            model_id: 'eleven_multilingual_v2',
+            voice_settings: {
+              stability:        0.45,
+              similarity_boost: 0.80,
+              style:            0.30,
+              use_speaker_boost: true
+            }
+          })
+        }
+      );
+
       if (resp.ok) {
         const arrayBuffer = await resp.arrayBuffer();
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const decoded  = await audioCtx.decodeAudioData(arrayBuffer);
-        const source   = audioCtx.createBufferSource();
-        source.buffer  = decoded;
+        const audioCtx    = new (window.AudioContext || window.webkitAudioContext)();
+        _currentVoiceCtx  = audioCtx;
+        const decoded     = await audioCtx.decodeAudioData(arrayBuffer);
+        const source      = audioCtx.createBufferSource();
+        source.buffer     = decoded;
         source.connect(audioCtx.destination);
-        window._siegeSource = source;
-        window._siegeCtx    = audioCtx;
-        // Mute video while voice plays
-        const lp = document.getElementById('local-player');
-        const lv = lp ? lp.volume : null;
-        if (lp) lp.volume = 0;
-        source.onended = () => {
-          if (lp && lv !== null) lp.volume = lv;
-          document.getElementById('voice-reading').textContent = 'Done. Click another observation to hear it.';
-        };
+        _currentVoiceSource = source;
         source.start(0);
-        return;
+        source.onended = () => {
+          _currentVoiceSource = null;
+          if (lp) lp.volume = 1;
+          if (statusEl) statusEl.textContent = 'Done — click another observation.';
+        };
+        return; // ElevenLabs worked — skip browser fallback
       } else {
-        const errText = await resp.text();
-        console.warn('ElevenLabs error:', resp.status, errText);
+        const err = await resp.text().catch(() => '');
+        console.warn('[SiegeIQ Voice] ElevenLabs error', resp.status, err.slice(0, 100));
       }
-    } catch(e) {
-      console.warn('ElevenLabs failed:', e);
-      /* fall through to browser TTS */
+    } catch (e) {
+      console.warn('[SiegeIQ Voice] ElevenLabs fetch failed:', e.message);
     }
   }
 
-  // Browser TTS fallback
+  // ── Browser TTS fallback (if ElevenLabs fails) ────────────────────
+  if (!window.speechSynthesis) { if (lp) lp.volume = 1; return; }
   const utter = new SpeechSynthesisUtterance(text);
-  utter.rate  = 0.88;
-  utter.pitch = 0.9;
-  const voices    = window.speechSynthesis.getVoices();
-  const preferred = voices.find(v => v.lang === 'en-GB' && v.name.includes('Daniel'))
-                 || voices.find(v => v.lang === 'en-US' && v.name.includes('Google'))
-                 || voices.find(v => v.lang === 'en-US')
-                 || voices[0];
-  if (preferred) utter.voice = preferred;
-  // Mute video while speaking
-  const _lp = document.getElementById('local-player');
-  const _lv = _lp ? _lp.volume : null;
-  if (_lp) _lp.volume = 0;
-  utter.onend = () => {
-    if (_lp && _lv !== null) _lp.volume = _lv;
-    document.getElementById('voice-reading').textContent = 'Done. Click another observation.';
-  };
-  utter.onerror = () => { if (_lp && _lv !== null) _lp.volume = _lv; };
+  const voices = window.speechSynthesis.getVoices();
+  const pick = voices.find(v => /Google UK English Male|Daniel|Alex|Rishi|Aaron/i.test(v.name))
+            || voices.find(v => v.lang && v.lang.startsWith('en'));
+  if (pick) utter.voice = pick;
+  utter.rate  = 0.92;
+  utter.pitch = 1.0;
+  utter.onend   = () => { if (lp) lp.volume = 1; if (statusEl) statusEl.textContent = 'Done — click another observation.'; };
+  utter.onerror = () => { if (lp) lp.volume = 1; };
   window.speechSynthesis.speak(utter);
-}
-
-function stopVoice() {
-  window.speechSynthesis.cancel();
-  if (window._siegeSource) { try { window._siegeSource.stop(); } catch(e){} window._siegeSource = null; }
-  if (window._siegeCtx)    { try { window._siegeCtx.close();  } catch(e){} window._siegeCtx    = null; }
-  if (window._siegeAudio)  { try { window._siegeAudio.pause(); } catch(e){} window._siegeAudio  = null; }
-  // Restore video volume
-  const _rlp = document.getElementById('local-player');
-  if (_rlp) _rlp.volume = 1;
-  const el = document.getElementById('voice-reading');
-  if (el && voiceOn) el.textContent = 'Ready — click any timestamp or observation.';
 }
 
 if (window.speechSynthesis) {
