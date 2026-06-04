@@ -708,7 +708,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
   </div>
 
   <!-- Analyzing overlay -->
-  <div id="analyzing" style="display:none;position:fixed;inset:0;background:rgba(5,7,10,0.96);backdrop-filter:blur(12px);z-index:200;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px">
+  <div id="analyzing" style="display:none;position:fixed;inset:0;background:rgba(5,7,10,0.97);backdrop-filter:blur(16px);z-index:10001;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px">
     <!-- Animated logo mark -->
     <div style="position:relative;width:80px;height:80px;margin:0 auto 28px">
       <div style="position:absolute;inset:0;border-radius:50%;border:2px solid var(--accent);animation:pulseRing 1.4s ease-out infinite;opacity:.5"></div>
@@ -1658,6 +1658,9 @@ async function startAnalysis() {
   // Show full-screen animated overlay (position:fixed — covers everything)
   const overlay = document.getElementById('analyzing');
   if (overlay) overlay.style.display = 'flex';
+  setProgress(0, 'Starting...');
+  // Small delay so browser renders the 0% bar before animating
+  await new Promise(r => setTimeout(r, 80));
   setProgress(5, 'Preparing your clip...');
 
   try {
@@ -1705,7 +1708,6 @@ async function startAnalysis() {
     document.getElementById('review-id-display').textContent=`Review ID: ${reviewId}`;
     incrementReviewsUsed();
     updateReviewCountDisplay();
-    playSound('submit');
     setProgress(32, 'Extracting frames from clip...');
     pollForResult(reviewId,operator,map,rank);
   } catch(err) {
@@ -1785,19 +1787,24 @@ function setDashboardLoading(on) {
 }
 
 function pollForResult(reviewId,operator,map,rank) {
-  let pct=30;
+  let pct=32;
   const labels=['Extracting key frames...','Analyzing tactical decisions...','Scoring positioning...','Evaluating utility usage...','Building coaching report...'];
+  // Smooth continuous progress animation — independent of poll interval
+  const progressTick = setInterval(() => {
+    if (pct < 89) {
+      pct += (89 - pct) * 0.025 + 0.3; // eases toward 89%, never reaches 90
+      setProgress(pct, labels[Math.min(4, Math.floor((pct-30)/12))]);
+    }
+  }, 400);
   pollInterval=setInterval(async()=>{
-    pct=Math.min(90,pct+Math.random()*6+1); // faster visual progress
-    setProgress(pct,labels[Math.min(4,Math.floor((pct-30)/12))]);
     try {
       const resp=await fetch(`${API_URL}/review/${reviewId}?user_id=demo-user`);
       if(!resp.ok) return;
       const data=await resp.json();
       if(data.status==='complete'){
         clearInterval(pollInterval);
+        clearInterval(progressTick);
         setProgress(100,'Analysis complete!');
-        playSound('loaded');
         setTimeout(()=>{
           const ov=document.getElementById('analyzing');
           if(ov) ov.style.display='none';
@@ -1806,6 +1813,7 @@ function pollForResult(reviewId,operator,map,rank) {
         },600);
       } else if(data.status==='failed'){
         clearInterval(pollInterval);
+        clearInterval(progressTick);
         document.getElementById('analyzing').style.display='none';
         showError('Analysis failed: '+(data.error||'Unknown error. Check Railway logs.'));
       }
@@ -1878,7 +1886,8 @@ function renderResults(data,operator,map,rank) {
   const report=typeof data.report==='string'?JSON.parse(data.report):data.report;
   if(!report) return;
   // Show map + rank + detected operators in header
-  const detectedOps = (report.detected_operators || []).join(', ') || operator || 'Detecting...';
+  const rawOps = (report.detected_operators || []).filter(o => o && !['Unknown attacker','Unknown Attacker','unknown attacker','auto-detect','Unknown','Detecting...'].includes(o));
+  const detectedOps = rawOps.join(', ') || (operator && operator !== 'auto-detect' ? operator : '');
   document.getElementById('review-meta').textContent = [(map||'').toUpperCase(), detectedOps.toUpperCase(), (rank||'').toUpperCase()].filter(Boolean).join(' · ');
   document.getElementById('review-status-badge').style.display='inline-block';
 
@@ -1966,7 +1975,7 @@ function renderResults(data,operator,map,rank) {
               <!-- Category -->
               ${o.category ? `<span style="font-family:var(--fm);font-size:10px;color:var(--text3);background:var(--bg3);padding:2px 8px;border-radius:10px;border:1px solid var(--border)">${(o.category||'').replace(/_/g,' ').toUpperCase()}</span>` : ''}
               <!-- Operator pill -->
-              ${o.operator ? `<span style="font-family:var(--fh);font-size:10px;font-weight:700;color:var(--accent);background:rgba(255,107,53,0.1);padding:2px 8px;border-radius:10px;border:1px solid rgba(255,107,53,0.25)">${o.operator}</span>` : ''}
+              ${(o.operator && o.operator !== 'Unknown attacker' && o.operator !== 'auto-detect' && o.operator !== 'Unknown') ? `<span style="font-family:var(--fh);font-size:10px;font-weight:700;color:var(--accent);background:rgba(255,107,53,0.1);padding:2px 8px;border-radius:10px;border:1px solid rgba(255,107,53,0.25)">${o.operator}</span>` : ''}
             </div>
             <!-- Observation text -->
             <div style="font-size:13px;color:var(--text2);line-height:1.6;font-weight:300">${o.observation}</div><div id="fix-${i}" style="display:none;margin-top:9px;font-size:12px;color:var(--text);line-height:1.6;padding:9px 11px;background:var(--bg);border-radius:4px;border-left:2px solid ${col}"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}<div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
@@ -2163,10 +2172,8 @@ function jumpToTimestamp(timeStr, obsIndex) {
 
 // ─── Replay Loop ──────────────────────────────────
 function replayMoment(timeStr, obsIndex) {
-  // Clear any existing replay loop
   if (replayLoopInterval) { clearInterval(replayLoopInterval); replayLoopInterval = null; }
 
-  // Toggle off if clicking same obs
   if (replayObsIndex === obsIndex) {
     replayObsIndex = null;
     updateReplayButtons();
@@ -2178,47 +2185,45 @@ function replayMoment(timeStr, obsIndex) {
   replayObsIndex = obsIndex;
   updateReplayButtons();
 
-  // Parse timestamp — handle "0:38", "~0:38", "1:24", ranges like "0:20-0:40"
-  const clean = (timeStr || '').replace(/[~\s]/g,'').split('-')[0]; // take start of range
-  const parts = clean.split(':').map(Number);
-  const secs  = (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1]))
-    ? parts[0]*60 + parts[1]
-    : (parts[0] || 0);
-  const windowEnd = secs + 12; // 12-second replay window
+  // Extract first mm:ss pattern from any timestamp format
+  // Handles: "0:38", "1:24", "early round (~0:10-0:30)", "~1:00-1:30" etc.
+  const mmss = (timeStr || '').match(/(\d+):(\d{2})/);
+  const secs = mmss ? parseInt(mmss[1]) * 60 + parseInt(mmss[2]) : 0;
+  const windowEnd = secs + 12;
 
-  const localPlayer = document.getElementById('local-player');
-  const hasFile = localPlayer && localPlayer.src && localPlayer.src !== '';
+  const lp = document.getElementById('local-player');
+  const hasBlob = window.localVideoURL && window.localVideoURL.startsWith('blob:') && lp;
 
-  if (hasFile) {
-    // FILE MODE — true looping replay
-    localPlayer.currentTime = secs;
-    localPlayer.play().catch(() => {});
+  if (hasBlob) {
+    if (!lp.src || !lp.src.startsWith('blob:')) {
+      lp.src = window.localVideoURL;
+    }
+    const doLoop = () => {
+      lp.currentTime = secs;
+      lp.play().catch(() => {});
+      clearInterval(replayLoopInterval);
+      replayLoopInterval = setInterval(() => {
+        const p = document.getElementById('local-player');
+        if (!p || !replayLoopInterval) { clearInterval(replayLoopInterval); replayLoopInterval = null; return; }
+        if (p.ended || p.currentTime >= windowEnd) { p.currentTime = secs; p.play().catch(() => {}); }
+      }, 250);
+    };
+    if (lp.readyState >= 2) {
+      doLoop();
+    } else {
+      lp.addEventListener('canplay', function h(){ lp.removeEventListener('canplay',h); doLoop(); });
+      lp.load();
+    }
+    const vc = document.getElementById('video-container');
+    if (vc) vc.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    replayLoopInterval = setInterval(() => {
-      const lp = document.getElementById('local-player');
-      if (!lp || !replayLoopInterval) { clearInterval(replayLoopInterval); replayLoopInterval = null; return; }
-      // Loop back when reaching window end OR when video ends
-      if (lp.ended || lp.currentTime >= windowEnd) {
-        lp.currentTime = secs;
-        lp.play().catch(() => {});
-      }
-    }, 200);
   } else if (window.currentYouTubeId) {
-    // YOUTUBE MODE — seek to timestamp (can't true-loop YouTube embeds)
     const iframe = document.getElementById('yt-player');
     if (iframe) {
       iframe.src = 'https://www.youtube-nocookie.com/embed/' + window.currentYouTubeId
         + '?start=' + secs + '&autoplay=1&rel=0&modestbranding=1&enablejsapi=1';
     }
-    // Show a note that replay loop requires file upload
-    const noteEl = document.getElementById('replay-yt-note');
-    if (noteEl) noteEl.style.display = 'block';
-    setTimeout(() => { if(noteEl) noteEl.style.display = 'none'; }, 4000);
   }
-
-  // Scroll the obs card into view
-  const card = document.getElementById('obs-' + obsIndex);
-  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function stopReplay() {
@@ -2304,8 +2309,8 @@ function populateShareCard(report, operator, map, rank) {
   const sc = report.overall_score || 0;
   const verdict = sc >= 70 ? 'Strong performance' : sc >= 50 ? 'Room to improve' : 'Needs work';
   const col = sc >= 70 ? '#3ECF8E' : sc >= 50 ? '#F59E0B' : '#FF4444';
-  const shareOps = (report.detected_operators || []).join(', ') || operator || 'Auto-detected';
-  document.getElementById('sc-meta').textContent = (map||'Unknown').toUpperCase() + ' - ' + shareOps.toUpperCase() + ' - ' + (rank||'').toUpperCase();
+  const shareOps = (report.detected_operators || []).filter(o=>o&&!['Unknown attacker','Unknown Attacker','auto-detect','Unknown'].includes(o)).join(', ') || (operator && operator !== 'auto-detect' ? operator : '');
+  document.getElementById('sc-meta').textContent = [map||'Unknown', shareOps||null, rank||null].filter(Boolean).map(s=>s.toUpperCase()).join(' · ');
   const scoreEl = document.getElementById('sc-score');
   scoreEl.textContent = sc;
   scoreEl.style.color = col;
@@ -2327,7 +2332,7 @@ function populateShareCard(report, operator, map, rank) {
     badgeScore.style.textShadow = `0 0 30px ${col}80`;
   }
   const badgeMeta = document.getElementById('badge-meta');
-  if (badgeMeta) badgeMeta.textContent = (map||'Unknown').toUpperCase() + (shareOps ? ' · ' + shareOps.toUpperCase() : '') + (rank ? ' · ' + rank.toUpperCase() : '');
+  if (badgeMeta) badgeMeta.textContent = [map||'Unknown', shareOps||null, rank||null].filter(Boolean).map(s=>s.toUpperCase()).join(' · ');
   const badgeVerdict = document.getElementById('badge-verdict');
   if (badgeVerdict) { badgeVerdict.textContent = verdict.toUpperCase(); badgeVerdict.style.color = col; }
   // Find lowest category score for the weakness line
