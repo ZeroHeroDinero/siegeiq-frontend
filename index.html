@@ -914,7 +914,25 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
       </div>
       <div id="cert-btn-container" style="display:none"></div>
 
-      <div style="background:rgba(255,107,53,.07);border:1px solid rgba(255,107,53,.22);border-radius:var(--r);padding:16px">
+      <div style="<!-- Thumbs accuracy feedback explainer -->
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:10px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:9px">
+          <span style="font-size:15px">&#128077;</span><span style="font-size:15px">&#128078;</span>
+          <div style="font-family:var(--fm);font-size:10px;color:var(--text3);letter-spacing:.1em;text-transform:uppercase">How your ratings help</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:7px">
+          <div style="display:flex;gap:7px;font-size:11px;color:var(--text2);font-weight:300;line-height:1.5">
+            <span style="color:var(--success);flex-shrink:0">+</span>
+            <span><strong style="color:var(--text)">For you</strong> — confirms which notes to act on. Thumbs-down flags inaccurate observations so you can skip them.</span>
+          </div>
+          <div style="display:flex;gap:7px;font-size:11px;color:var(--text2);font-weight:300;line-height:1.5">
+            <span style="color:var(--accent);flex-shrink:0">-</span>
+            <span><strong style="color:var(--text)">For SiegeIQ</strong> — every rating improves AI accuracy for your map, operator, and rank over time.</span>
+          </div>
+        </div>
+        <div style="margin-top:9px;font-size:10px;color:var(--text3);font-family:var(--fm)">Ratings are anonymous and never shared.</div>
+      </div>
+      background:rgba(255,107,53,.07);border:1px solid rgba(255,107,53,.22);border-radius:var(--r);padding:16px">
         <div style="font-family:var(--fh);font-size:18px;font-weight:700;margin-bottom:5px">Unlock unlimited reviews</div>
         <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px">Go Pro for unlimited reviews, priority processing, operator coaching, and weekly trend reports.</div>
         <button onclick="show('pricing')" style="width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:10px;cursor:pointer">GO PRO — $9.99/MO →</button>
@@ -1906,6 +1924,35 @@ function setProgress(pct,label){
 
 // ─── Render results ───────────────────────────
 // ── Phase label from timestamp ─────────────────────────────────
+// Generate a short headline for each observation card
+function getObsHeadline(o) {
+  const sev = (o.severity || '').toLowerCase();
+  const cat = (o.category || '').toLowerCase().replace(/_/g,' ');
+  const op  = o.operator && o.operator !== 'Unknown attacker' && o.operator !== 'auto-detect' ? o.operator : '';
+
+  // Map severity + category → short compelling headline
+  const headlines = {
+    'critical:game sense':   'Game Sense Breakdown',
+    'critical:positioning':  'Positioning Error',
+    'critical:utility':      'Utility Misuse',
+    'critical:decisions':    'Decision Cost You the Round',
+    'critical:rotation':     'Rotation Mistake',
+    'warning:game sense':    'Missed Information',
+    'warning:positioning':   'Positioning Risk',
+    'warning:utility':       'Utility Timing Issue',
+    'warning:decisions':     'Sub-Optimal Decision',
+    'warning:rotation':      'Rotation Concern',
+    'tip:game sense':        'Game Sense Strength',
+    'tip:positioning':       'Good Positioning Read',
+    'tip:utility':           'Strong Utility Usage',
+    'tip:decisions':         'Correct Decision',
+    'tip:rotation':          'Solid Rotation',
+  };
+  const key = sev + ':' + cat;
+  const base = headlines[key] || (cat ? cat.charAt(0).toUpperCase() + cat.slice(1) : sev === 'critical' ? 'Critical Issue' : sev === 'tip' ? 'Coaching Tip' : 'Coaching Note');
+  return op ? base + ' — ' + op : base;
+}
+
 function getPhaseLabel(ts) {
   if (!ts) return 'UNKNOWN';
   // Handle range like "~0:20-0:40" — use midpoint
@@ -2028,6 +2075,8 @@ function renderResults(data,operator,map,rank) {
               ${(o.operator && o.operator !== 'Unknown attacker' && o.operator !== 'auto-detect' && o.operator !== 'Unknown') ? `<span style="font-family:var(--fh);font-size:10px;font-weight:700;color:var(--accent);background:rgba(255,107,53,0.1);padding:2px 8px;border-radius:10px;border:1px solid rgba(255,107,53,0.25)">${o.operator}</span>` : ''}
             </div>
             <!-- Observation text -->
+            <!-- Headline derived from severity + category -->
+            <div style="font-family:var(--fh);font-size:14px;font-weight:700;color:var(--text);margin-bottom:5px;letter-spacing:-.1px">${getObsHeadline(o)}</div>
             <div style="font-size:13px;color:var(--text2);line-height:1.6;font-weight:300">${o.observation}</div><div id="fix-${i}" style="display:none;margin-top:9px;font-size:12px;color:var(--text);line-height:1.6;padding:9px 11px;background:var(--bg);border-radius:4px;border-left:2px solid ${col}"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}<div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 <button class="replay-btn" data-obs-index="${i}" onclick="event.stopPropagation();replayMoment('${o.timestamp}',${i})" style="font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--accent);background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.25);border-radius:var(--r);padding:5px 12px;cursor:pointer;transition:all .15s">🔁 REPLAY</button>
                 <span style="font-size:10px;color:var(--text3)">Loops 12 seconds</span>
@@ -2060,10 +2109,8 @@ function toggleObs(i,sev){
   chev.style.transform=open?'rotate(0)':'rotate(90deg)';
   const clsMap={critical:'open-critical',warning:'open-warning',tip:'open-tip'};
   if(clsMap[sev])card.classList.toggle(clsMap[sev],!open);
-  if(!open){
-    // Jump to timestamp in video AND speak the observation
-    const obs=currentObservations[i];
-    if(obs && obs.timestamp) jumpToTimestamp(obs.timestamp, i);
+  if(!open && voiceOn){
+    // Only speak if voice coaching is explicitly ON
     speakObservation(i);
   }
 }
