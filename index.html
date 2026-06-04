@@ -1566,6 +1566,9 @@ function handleFile(f) {
   window.localVideoURL = URL.createObjectURL(f);
   playClickSound(); // tactile confirm when file loads into browser memory
   window.localVideoName = f.name;
+  // Pre-load video into the dashboard player so it's ready when overlay closes
+  const lprev = document.getElementById('local-player');
+  if (lprev) { lprev.src = window.localVideoURL; lprev.load(); }
   document.getElementById('drop-icon').textContent='✓';
   document.getElementById('drop-icon').style.color='var(--success)';
   document.getElementById('drop-title').textContent=f.name;
@@ -1648,13 +1651,14 @@ async function startAnalysis() {
   const rank=document.getElementById('sel-rank').value;
   const description=document.getElementById('clip-description').value.trim();
 
-  // Show the full animated overlay IMMEDIATELY — before any async work
+  // Show dashboard page first, then overlay on top of it
+  show('dashboard');
+  setDashboardLoading(true);
+
+  // Show full-screen animated overlay (position:fixed — covers everything)
   const overlay = document.getElementById('analyzing');
   if (overlay) overlay.style.display = 'flex';
   setProgress(5, 'Preparing your clip...');
-
-  // Navigate to dashboard in background so it's ready when overlay closes
-  show('dashboard');
 
   try {
     let reviewId;
@@ -1662,13 +1666,12 @@ async function startAnalysis() {
       setProgress(15, 'Sending to AI pipeline...');
       const url=document.getElementById('url-input').value.trim();
       const resp=await fetch(`${API_URL}/review/submit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:'demo-user',source:url,operator,map_name:map,rank,description,round_num:1})});
-      if(!resp.ok){const err=await resp.json();throw new Error(err.detail||'Submission failed');}
+      if(!resp.ok){const err=await resp.json().catch(()=>({}));throw new Error(err.detail||'Submission failed');}
       const data=await resp.json();
       reviewId=data.review_id;
-      setProgress(28, 'Clip received — loading operator intelligence...');
+      setProgress(28, 'Clip received — loading AI context...');
     } else {
-      // FILE MODE — animate progress during actual upload
-      setProgress(10, 'Uploading video to server...');
+      setProgress(8, 'Uploading video to server...');
       const formData=new FormData();
       formData.append('file',selectedFile);
       formData.append('user_id','demo-user');
@@ -1677,31 +1680,26 @@ async function startAnalysis() {
       formData.append('rank',rank);
       formData.append('description',description);
 
-      // Simulate upload progress while fetch is running
-      let uploadPct = 10;
-      // Use XHR for real upload progress percentage
       const resp = await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', `${API_URL}/review/upload`);
         xhr.upload.onprogress = (e) => {
           if (e.lengthComputable) {
-            const pct = Math.round((e.loaded / e.total) * 22) + 5; // 5–27%
-            setProgress(pct, `Uploading ${Math.round(e.loaded/1024/1024*10)/10}MB of ${Math.round(e.total/1024/1024*10)/10}MB...`);
+            const pct = Math.round((e.loaded / e.total) * 20) + 5;
+            const loaded = (e.loaded/1024/1024).toFixed(1);
+            const total  = (e.total /1024/1024).toFixed(1);
+            setProgress(pct, `Uploading ${loaded}MB of ${total}MB...`);
           }
         };
-        xhr.onload = () => resolve({ ok: xhr.status < 400, status: xhr.status,
-          json: async () => JSON.parse(xhr.responseText) });
+        xhr.onload  = () => resolve({ok:xhr.status<400,status:xhr.status,json:async()=>JSON.parse(xhr.responseText)});
         xhr.onerror = () => reject(new Error('Network error during upload'));
         xhr.send(formData);
       });
-      if(!resp.ok){
-        if(overlay) overlay.style.display='none';
-        const err=await resp.json();
-        throw new Error(err.detail||'Upload failed');
-      }
+
+      if(!resp.ok){const err=await resp.json().catch(()=>({}));throw new Error(err.detail||'Upload failed ('+resp.status+')');}
       const data=await resp.json();
       reviewId=data.review_id;
-      setProgress(28, 'Upload complete — loading operator intelligence...');
+      setProgress(28, 'Upload complete — extracting frames...');
     }
 
     document.getElementById('review-id-display').textContent=`Review ID: ${reviewId}`;
@@ -1712,7 +1710,8 @@ async function startAnalysis() {
     pollForResult(reviewId,operator,map,rank);
   } catch(err) {
     if(overlay) overlay.style.display='none';
-    showError('Error: '+err.message);
+    setDashboardLoading(false);
+    showError('Analysis failed: '+err.message+'. Please try again.');
   }
 }
 
@@ -1767,22 +1766,21 @@ function playSound(name) {
 function setDashboardLoading(on) {
   const obsList = document.getElementById('obs-list');
   const vidWrap = document.getElementById('video-container');
+  const topBar  = document.getElementById('dash-top-bar-text');
   if (on) {
-    // Show pulsing loading state in obs list
+    // Replace obs list with "analysis in progress" state
+    // This shows BEHIND the overlay but is ready when overlay closes
     if (obsList) obsList.innerHTML = `
-      <div style="padding:32px 20px;display:flex;flex-direction:column;gap:10px">
-        <div style="height:14px;background:var(--bg3);border-radius:4px;animation:pulse 1.4s ease-in-out infinite;width:80%"></div>
-        <div style="height:14px;background:var(--bg3);border-radius:4px;animation:pulse 1.4s ease-in-out infinite .15s;width:60%"></div>
-        <div style="height:14px;background:var(--bg3);border-radius:4px;animation:pulse 1.4s ease-in-out infinite .3s;width:70%"></div>
-        <div style="height:3px;background:linear-gradient(90deg,transparent,var(--accent),transparent);border-radius:2px;margin-top:8px;animation:shimmerBar 1.5s linear infinite"></div>
-        <div style="font-family:var(--fm);font-size:11px;color:var(--text3);text-align:center;margin-top:8px;letter-spacing:.1em">
-          AI ANALYZING YOUR CLIP...
-        </div>
+      <div style="padding:32px 20px;text-align:center;color:var(--text3)">
+        <div style="width:40px;height:40px;border:2px solid var(--bg3);border-top-color:var(--accent);border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px"></div>
+        <div style="font-family:var(--fh);font-size:14px;font-weight:700;color:var(--text2);margin-bottom:6px">AI is analyzing your clip</div>
+        <div style="font-size:12px;font-weight:300;line-height:1.6">Your coaching report will appear here automatically.<br>This usually takes 30–90 seconds depending on clip length.</div>
       </div>`;
-    // Keep video area showing what was submitted
-    if (vidWrap) vidWrap.style.opacity = '0.5';
+    if (vidWrap) vidWrap.style.opacity = '0.4';
+    if (topBar)  topBar.textContent = 'AI ANALYZING YOUR CLIP...';
   } else {
     if (vidWrap) vidWrap.style.opacity = '1';
+    if (topBar)  topBar.textContent = 'Click any timestamp below to jump to that moment + hear voice coaching';
   }
 }
 
