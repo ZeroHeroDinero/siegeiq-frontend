@@ -698,6 +698,82 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
       <div style="font-size:11px;color:var(--text3);margin-top:5px">The more detail you add — timestamps, what went wrong, what you were trying to do — the more accurate and useful your coaching will be.</div>
     </div>
 
+    <!-- How scoring works — collapsible guide -->
+    <div style="margin-bottom:14px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden">
+      <button onclick="toggleScoringGuide()" id="scoring-guide-btn" style="width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:var(--bg2);border:none;cursor:pointer;text-align:left">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:15px">🎯</span>
+          <span style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--text);letter-spacing:.02em">How to score 90+ — tips before you submit</span>
+        </div>
+        <span id="scoring-guide-chev" style="font-size:18px;color:var(--text2);transition:transform .2s;width:24px;height:24px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.05);border-radius:50%">›</span>
+      </button>
+      <div id="scoring-guide-body" style="display:none;padding:16px;background:var(--bg3);border-top:1px solid var(--border)">
+
+        <!-- Score categories -->
+        <div style="font-family:var(--fm);font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:12px">What SiegeIQ scores you on</div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px">
+
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="font-family:var(--fh);font-size:11px;font-weight:700;color:var(--accent);background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.2);border-radius:4px;padding:2px 8px;white-space:nowrap;flex-shrink:0">GAME SENSE</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.5;font-weight:300">Drone before entry, read audio cues, identify defender positions before committing to a push.</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="font-family:var(--fh);font-size:11px;font-weight:700;color:#3ECF8E;background:rgba(62,207,142,0.08);border:1px solid rgba(62,207,142,0.2);border-radius:4px;padding:2px 8px;white-space:nowrap;flex-shrink:0">POSITIONING</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.5;font-weight:300">Use off-angles. Never peak the same spot twice. Create crossfires before pushing doorways.</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="font-family:var(--fh);font-size:11px;font-weight:700;color:#F59E0B;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:4px;padding:2px 8px;white-space:nowrap;flex-shrink:0">UTILITY</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.5;font-weight:300">Use gadgets proactively — Thatcher before Thermite, Ash on Bandit batteries, not on barricades.</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="font-family:var(--fh);font-size:11px;font-weight:700;color:#A78BFA;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);border-radius:4px;padding:2px 8px;white-space:nowrap;flex-shrink:0">DECISIONS</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.5;font-weight:300">In 1vX situations, isolate angles. Take fights when you have the advantage, not when desperate.</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div style="font-family:var(--fh);font-size:11px;font-weight:700;color:#00D4FF;background:rgba(0,212,255,0.08);border:1px solid rgba(0,212,255,0.15);border-radius:4px;padding:2px 8px;white-space:nowrap;flex-shrink:0">ROTATION</div>
+            <div style="font-size:12px;color:var(--text2);line-height:1.5;font-weight:300">Control map zones between sites. Cut off defender rotations. Don't over-rotate or abandon hold.</div>
+          </div>
+        </div>
+
+        <!-- Divider -->
+        <div style="height:1px;background:var(--border);margin-bottom:14px"></div>
+
+        <!-- Tips for accurate coaching -->
+        <div style="font-family:var(--fm);font-size:10px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px">For the most accurate coaching</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;gap:8px;font-size:12px;color:var(--text2);font-weight:300;line-height:1.5">
+            <span style="color:var(--success);flex-shrink:0;margin-top:1px">✓</span>
+            <span>Select your <strong style="color:var(--text)">correct operator</strong> — coaching uses your exact gadgets and kit</span>
+          </div>
+          <div style="display:flex;gap:8px;font-size:12px;color:var(--text2);font-weight:300;line-height:1.5">
+            <span style="color:var(--success);flex-shrink:0;margin-top:1px">✓</span>
+            <span>Submit a <strong style="color:var(--text)">single clean round</strong> — not a highlight reel or multi-round clip</span>
+          </div>
+          <div style="display:flex;gap:8px;font-size:12px;color:var(--text2);font-weight:300;line-height:1.5">
+            <span style="color:var(--success);flex-shrink:0;margin-top:1px">✓</span>
+            <span><strong style="color:var(--text)">Describe what happened</strong> in the description field — key moments, timestamps, what went wrong</span>
+          </div>
+          <div style="display:flex;gap:8px;font-size:12px;color:var(--text2);font-weight:300;line-height:1.5">
+            <span style="color:var(--success);flex-shrink:0;margin-top:1px">✓</span>
+            <span>Upload as <strong style="color:var(--text)">MP4 file</strong> for frame-accurate timestamps — YouTube links use approximate ranges</span>
+          </div>
+          <div style="display:flex;gap:8px;font-size:12px;color:var(--text2);font-weight:300;line-height:1.5">
+            <span style="color:var(--danger);flex-shrink:0;margin-top:1px">✕</span>
+            <span>Avoid <strong style="color:var(--text)">disconnected multi-round clips</strong> — one round, one map, one operator per submission</span>
+          </div>
+        </div>
+
+        <!-- Score target callout -->
+        <div style="margin-top:14px;background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.2);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:10px">
+          <span style="font-size:20px;flex-shrink:0">🏆</span>
+          <div>
+            <div style="font-family:var(--fh);font-size:12px;font-weight:700;color:var(--accent);margin-bottom:2px">Score 95+ = Elite performance</div>
+            <div style="font-size:11px;color:var(--text3);line-height:1.5">Fewer than 5% of analyzed rounds reach 95+. Strong fundamentals, clean utility, and read-based decision making are the difference.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <button id="analyze-btn" onclick="startAnalysis()" style="width:100%;font-family:var(--fh);font-size:17px;font-weight:700;letter-spacing:.08em;color:#fff;background:var(--bg3);border:none;border-radius:var(--r);padding:15px;cursor:not-allowed;opacity:.4;transition:all .15s">ADD A CLIP ABOVE</button>
     <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:10px">Free plan: ~15 min · Pro plan: ~2 min priority</div>
     <div style="display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:10px 14px;margin-top:12px">
@@ -708,48 +784,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
   </div>
 
   <!-- Analyzing overlay -->
-  <div id="analyzing" style="display:none;position:fixed;inset:0;background:rgba(5,7,10,0.97);backdrop-filter:blur(16px);z-index:10001;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px">
-    <!-- Animated logo mark -->
-    <div style="position:relative;width:80px;height:80px;margin:0 auto 28px">
-      <div style="position:absolute;inset:0;border-radius:50%;border:2px solid var(--accent);animation:pulseRing 1.4s ease-out infinite;opacity:.5"></div>
-      <div style="position:absolute;inset:8px;border-radius:50%;border:1px solid var(--accent);animation:pulseRing 1.4s .4s ease-out infinite;opacity:.3"></div>
-      <div style="position:absolute;inset:18px;border-radius:50%;background:var(--bg3);border:1px solid rgba(255,107,53,0.4);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:14px;font-weight:800;color:var(--accent)">IQ</div>
-    </div>
-    <div style="font-family:var(--fh);font-size:24px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px">ANALYZING CLIP</div>
-    <div id="prog-label" style="font-size:13px;color:var(--text2);margin-bottom:28px;font-weight:300">Submitting to AI pipeline...</div>
-
-    <!-- Progress bar with shimmer and percentage -->
-    <div style="width:360px;max-width:90vw;margin:0 auto 6px">
-      <div style="position:relative;height:6px;background:var(--bg3);border-radius:4px;overflow:hidden">
-        <div id="prog-bar" style="height:6px;background:linear-gradient(90deg,#FF4D6D,#FF8C42);border-radius:4px;width:0%;transition:width .6s ease;position:relative">
-          <!-- Shimmer sweep -->
-          <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.35) 50%,transparent 100%);animation:shimmerBar 1.4s ease-in-out infinite"></div>
-        </div>
-      </div>
-    </div>
-    <div id="prog-pct" style="font-family:var(--fm);font-size:16px;font-weight:700;color:var(--accent);margin-bottom:24px">0%</div>
-
-    <!-- Step indicators -->
-    <div style="width:360px;max-width:90vw;text-align:left">
-      <div id="pstep-0" class="pstep" style="display:flex;align-items:center;gap:10px;padding:8px 0;opacity:.3;transition:opacity .3s">
-        <div id="pdot-0" style="width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .3s"></div>
-        <span style="font-family:var(--fm);font-size:11px;color:var(--text2)">Extracting frames from clip</span>
-      </div>
-      <div id="pstep-1" class="pstep" style="display:flex;align-items:center;gap:10px;padding:8px 0;opacity:.3;transition:opacity .3s">
-        <div id="pdot-1" style="width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .3s"></div>
-        <span style="font-family:var(--fm);font-size:11px;color:var(--text2)">Loading operator & map intelligence</span>
-      </div>
-      <div id="pstep-2" class="pstep" style="display:flex;align-items:center;gap:10px;padding:8px 0;opacity:.3;transition:opacity .3s">
-        <div id="pdot-2" style="width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .3s"></div>
-        <span style="font-family:var(--fm);font-size:11px;color:var(--text2)">Running AI vision analysis</span>
-      </div>
-      <div id="pstep-3" class="pstep" style="display:flex;align-items:center;gap:10px;padding:8px 0;opacity:.3;transition:opacity .3s">
-        <div id="pdot-3" style="width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .3s"></div>
-        <span style="font-family:var(--fm);font-size:11px;color:var(--text2)">Scoring & building coaching report</span>
-      </div>
-    </div>
-    <div id="review-id-display" style="font-size:11px;color:var(--text3);margin-top:20px;font-family:var(--fm)"></div>
-  </div>
+  
 </div>
 
 <!-- ═══════════ DASHBOARD ═══════════ -->
@@ -1987,7 +2022,7 @@ function renderResults(data,operator,map,rank) {
                   <button id="thumb-down-${i}" onclick="event.stopPropagation();rateFeedback(${i},'down')" style="font-size:14px;background:none;border:none;cursor:pointer;padding:2px 4px;border-radius:4px;transition:background .15s;opacity:.5" title="This observation is inaccurate">👎</button>
                   <span id="thumb-label-${i}" style="font-size:10px;color:var(--text3);display:none"></span>
                 </div>
-              </div></div></div><span id="chev-${i}" style="font-size:18px;color:var(--text3);transition:transform .15s">›</span></div>`}).join('');
+              </div></div></div><span id="chev-${i}" style="font-size:22px;color:var(--text2);transition:transform .2s;flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.05);border-radius:50%">›</span></div>`}).join('');
   currentObservations=obs;
   reviewHistory.unshift({map,operator,rank,score:sc,date:'Just now'});
   renderHistory();
@@ -2005,7 +2040,7 @@ function toggleObs(i,sev){
   const fix=document.getElementById('fix-'+i);
   const chev=document.getElementById('chev-'+i);
   const card=document.getElementById('obs-'+i);
-  const open=fix.style.display!=='none';
+  const open=fix.style.display!=='none' && fix.style.display!=='';
   fix.style.display=open?'none':'block';
   chev.style.transform=open?'rotate(0)':'rotate(90deg)';
   const clsMap={critical:'open-critical',warning:'open-warning',tip:'open-tip'};
@@ -2028,7 +2063,7 @@ let currentObservations = [];
 let replayLoopInterval = null;
 let replayObsIndex = null;
 const ELEVENLABS_API_KEY = 'sk_da1f2247bf87cf3b404ae7bd2f69bb8d7fc4c52215f483b4';
-const ELEVENLABS_VOICE_ID = 'pNInz6obpgDQGcFmaJgB'; // Adam - natural coaching voice
+const ELEVENLABS_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Adam - natural coaching voice
 
 function toggleVoice() {
   voiceOn = !voiceOn;
@@ -2727,6 +2762,16 @@ function runLiveDemo() {
   }, 3200);
 }
 
+// ─── Scoring Guide Toggle ──────────────────────
+function toggleScoringGuide() {
+  const body = document.getElementById('scoring-guide-body');
+  const chev = document.getElementById('scoring-guide-chev');
+  if (!body) return;
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'block';
+  if (chev) chev.style.transform = open ? 'none' : 'rotate(90deg)';
+}
+
 // ─── FAQ ──────────────────────────────────────
 const FAQS = [
   {
@@ -3320,5 +3365,49 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
   io.observe(el);
 });
 </script>
+
+<!-- Full-screen analyzing overlay — OUTSIDE all pages so show() cannot hide it -->
+<div id="analyzing" style="display:none;position:fixed;inset:0;background:rgba(5,7,10,0.97);backdrop-filter:blur(16px);z-index:10001;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px">
+    <!-- Animated logo mark -->
+    <div style="position:relative;width:80px;height:80px;margin:0 auto 28px">
+      <div style="position:absolute;inset:0;border-radius:50%;border:2px solid var(--accent);animation:pulseRing 1.4s ease-out infinite;opacity:.5"></div>
+      <div style="position:absolute;inset:8px;border-radius:50%;border:1px solid var(--accent);animation:pulseRing 1.4s .4s ease-out infinite;opacity:.3"></div>
+      <div style="position:absolute;inset:18px;border-radius:50%;background:var(--bg3);border:1px solid rgba(255,107,53,0.4);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:14px;font-weight:800;color:var(--accent)">IQ</div>
+    </div>
+    <div style="font-family:var(--fh);font-size:24px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px">ANALYZING CLIP</div>
+    <div id="prog-label" style="font-size:13px;color:var(--text2);margin-bottom:28px;font-weight:300">Submitting to AI pipeline...</div>
+
+    <!-- Progress bar with shimmer and percentage -->
+    <div style="width:360px;max-width:90vw;margin:0 auto 6px">
+      <div style="position:relative;height:6px;background:var(--bg3);border-radius:4px;overflow:hidden">
+        <div id="prog-bar" style="height:6px;background:linear-gradient(90deg,#FF4D6D,#FF8C42);border-radius:4px;width:0%;transition:width .6s ease;position:relative">
+          <!-- Shimmer sweep -->
+          <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.35) 50%,transparent 100%);animation:shimmerBar 1.4s ease-in-out infinite"></div>
+        </div>
+      </div>
+    </div>
+    <div id="prog-pct" style="font-family:var(--fm);font-size:16px;font-weight:700;color:var(--accent);margin-bottom:24px">0%</div>
+
+    <!-- Step indicators -->
+    <div style="width:360px;max-width:90vw;text-align:left">
+      <div id="pstep-0" class="pstep" style="display:flex;align-items:center;gap:10px;padding:8px 0;opacity:.3;transition:opacity .3s">
+        <div id="pdot-0" style="width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .3s"></div>
+        <span style="font-family:var(--fm);font-size:11px;color:var(--text2)">Extracting frames from clip</span>
+      </div>
+      <div id="pstep-1" class="pstep" style="display:flex;align-items:center;gap:10px;padding:8px 0;opacity:.3;transition:opacity .3s">
+        <div id="pdot-1" style="width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .3s"></div>
+        <span style="font-family:var(--fm);font-size:11px;color:var(--text2)">Loading operator & map intelligence</span>
+      </div>
+      <div id="pstep-2" class="pstep" style="display:flex;align-items:center;gap:10px;padding:8px 0;opacity:.3;transition:opacity .3s">
+        <div id="pdot-2" style="width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .3s"></div>
+        <span style="font-family:var(--fm);font-size:11px;color:var(--text2)">Running AI vision analysis</span>
+      </div>
+      <div id="pstep-3" class="pstep" style="display:flex;align-items:center;gap:10px;padding:8px 0;opacity:.3;transition:opacity .3s">
+        <div id="pdot-3" style="width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .3s"></div>
+        <span style="font-family:var(--fm);font-size:11px;color:var(--text2)">Scoring & building coaching report</span>
+      </div>
+    </div>
+    <div id="review-id-display" style="font-size:11px;color:var(--text3);margin-top:20px;font-family:var(--fm)"></div>
+  </div>
 </body>
 </html>
