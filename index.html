@@ -708,19 +708,47 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
   </div>
 
   <!-- Analyzing overlay -->
-  <div id="analyzing" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:200;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px">
-    <div style="position:relative;width:100px;height:100px;margin:0 auto 32px">
-      <div style="position:absolute;inset:0;border-radius:50%;border:1px solid var(--accent);animation:pulseRing 1.4s ease-out infinite;opacity:.4"></div>
-      <div style="position:absolute;inset:10px;border-radius:50%;border:1px solid var(--accent);animation:pulseRing 1.4s .35s ease-out infinite;opacity:.3"></div>
-      <div style="position:absolute;inset:20px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:26px">◉</div>
+  <div id="analyzing" style="display:none;position:fixed;inset:0;background:rgba(5,7,10,0.96);backdrop-filter:blur(12px);z-index:200;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px">
+    <!-- Animated logo mark -->
+    <div style="position:relative;width:80px;height:80px;margin:0 auto 28px">
+      <div style="position:absolute;inset:0;border-radius:50%;border:2px solid var(--accent);animation:pulseRing 1.4s ease-out infinite;opacity:.5"></div>
+      <div style="position:absolute;inset:8px;border-radius:50%;border:1px solid var(--accent);animation:pulseRing 1.4s .4s ease-out infinite;opacity:.3"></div>
+      <div style="position:absolute;inset:18px;border-radius:50%;background:var(--bg3);border:1px solid rgba(255,107,53,0.4);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:14px;font-weight:800;color:var(--accent)">IQ</div>
     </div>
-    <div style="font-family:var(--fh);font-size:28px;font-weight:700;margin-bottom:8px">ANALYZING CLIP</div>
-    <div id="prog-label" style="font-size:13px;color:var(--text2);margin-bottom:24px">Submitting to AI pipeline...</div>
-    <div style="width:300px;height:3px;background:var(--bg3);border-radius:2px;margin:0 auto 8px">
-      <div id="prog-bar" style="height:3px;background:var(--accent);border-radius:2px;width:0%;transition:width .5s ease"></div>
+    <div style="font-family:var(--fh);font-size:24px;font-weight:800;letter-spacing:-.5px;margin-bottom:6px">ANALYZING CLIP</div>
+    <div id="prog-label" style="font-size:13px;color:var(--text2);margin-bottom:28px;font-weight:300">Submitting to AI pipeline...</div>
+
+    <!-- Progress bar with shimmer and percentage -->
+    <div style="width:360px;max-width:90vw;margin:0 auto 6px">
+      <div style="position:relative;height:6px;background:var(--bg3);border-radius:4px;overflow:hidden">
+        <div id="prog-bar" style="height:6px;background:linear-gradient(90deg,#FF4D6D,#FF8C42);border-radius:4px;width:0%;transition:width .6s ease;position:relative">
+          <!-- Shimmer sweep -->
+          <div style="position:absolute;inset:0;background:linear-gradient(90deg,transparent 0%,rgba(255,255,255,0.35) 50%,transparent 100%);animation:shimmerBar 1.4s ease-in-out infinite"></div>
+        </div>
+      </div>
     </div>
-    <div id="prog-pct" style="font-size:12px;color:var(--text3)">0%</div>
-    <div id="review-id-display" style="font-size:11px;color:var(--text3);margin-top:12px"></div>
+    <div id="prog-pct" style="font-family:var(--fm);font-size:16px;font-weight:700;color:var(--accent);margin-bottom:24px">0%</div>
+
+    <!-- Step indicators -->
+    <div style="width:360px;max-width:90vw;text-align:left">
+      <div id="pstep-0" class="pstep" style="display:flex;align-items:center;gap:10px;padding:8px 0;opacity:.3;transition:opacity .3s">
+        <div id="pdot-0" style="width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .3s"></div>
+        <span style="font-family:var(--fm);font-size:11px;color:var(--text2)">Extracting frames from clip</span>
+      </div>
+      <div id="pstep-1" class="pstep" style="display:flex;align-items:center;gap:10px;padding:8px 0;opacity:.3;transition:opacity .3s">
+        <div id="pdot-1" style="width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .3s"></div>
+        <span style="font-family:var(--fm);font-size:11px;color:var(--text2)">Loading operator & map intelligence</span>
+      </div>
+      <div id="pstep-2" class="pstep" style="display:flex;align-items:center;gap:10px;padding:8px 0;opacity:.3;transition:opacity .3s">
+        <div id="pdot-2" style="width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .3s"></div>
+        <span style="font-family:var(--fm);font-size:11px;color:var(--text2)">Running AI vision analysis</span>
+      </div>
+      <div id="pstep-3" class="pstep" style="display:flex;align-items:center;gap:10px;padding:8px 0;opacity:.3;transition:opacity .3s">
+        <div id="pdot-3" style="width:20px;height:20px;border-radius:50%;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:9px;transition:all .3s"></div>
+        <span style="font-family:var(--fm);font-size:11px;color:var(--text2)">Scoring & building coaching report</span>
+      </div>
+    </div>
+    <div id="review-id-display" style="font-size:11px;color:var(--text3);margin-top:20px;font-family:var(--fm)"></div>
   </div>
 </div>
 
@@ -1536,6 +1564,7 @@ function handleFile(f) {
   // Store local object URL so we can play the video in the dashboard after analysis
   if(window.localVideoURL) URL.revokeObjectURL(window.localVideoURL);
   window.localVideoURL = URL.createObjectURL(f);
+  playClickSound(); // tactile confirm when file loads into browser memory
   window.localVideoName = f.name;
   document.getElementById('drop-icon').textContent='✓';
   document.getElementById('drop-icon').style.color='var(--success)';
@@ -1754,12 +1783,61 @@ function pollForResult(reviewId,operator,map,rank) {
 }
 
 function setProgress(pct,label){
-  document.getElementById('prog-bar').style.width=pct+'%';
-  document.getElementById('prog-pct').textContent=Math.round(pct)+'%';
-  document.getElementById('prog-label').textContent=label;
+  const bar = document.getElementById('prog-bar');
+  const pctEl = document.getElementById('prog-pct');
+  const lblEl = document.getElementById('prog-label');
+  if (bar) bar.style.width = pct + '%';
+  if (pctEl) pctEl.textContent = Math.round(pct) + '%';
+  if (lblEl) lblEl.textContent = label;
+
+  // Animate step indicators based on progress
+  // Step 0: 0-25% | Step 1: 25-55% | Step 2: 55-85% | Step 3: 85-100%
+  const thresholds = [0, 25, 55, 85];
+  thresholds.forEach((t, i) => {
+    const step = document.getElementById('pstep-' + i);
+    const dot  = document.getElementById('pdot-'  + i);
+    if (!step || !dot) return;
+    if (pct >= t) {
+      step.style.opacity = '1';
+      const isDone = (i < thresholds.length - 1) ? pct >= thresholds[i+1] : pct >= 98;
+      if (isDone) {
+        dot.style.background   = 'rgba(62,207,142,0.2)';
+        dot.style.borderColor  = '#3ECF8E';
+        dot.style.color        = '#3ECF8E';
+        dot.textContent        = '✓';
+      } else {
+        dot.style.background   = 'rgba(255,107,53,0.15)';
+        dot.style.borderColor  = 'var(--accent)';
+        dot.style.color        = 'var(--accent)';
+        dot.textContent        = '●';
+      }
+    }
+  });
 }
 
 // ─── Render results ───────────────────────────
+// ── Phase label from timestamp ─────────────────────────────────
+function getPhaseLabel(ts) {
+  if (!ts) return 'UNKNOWN';
+  // Handle range like "~0:20-0:40" — use midpoint
+  const clean = ts.replace(/[~\s]/g,'');
+  const parts  = clean.split('-');
+  const start  = parts[0];
+  const sp     = start.split(':').map(Number);
+  const secs   = (sp.length === 2 && !isNaN(sp[0]) && !isNaN(sp[1]))
+    ? sp[0]*60 + sp[1] : (sp[0] || 0);
+  // Typical Siege round is ~3:30 (210s), but clips can be sub-round
+  // Phase buckets based on remaining time convention (countdown timer)
+  // Most clips submitted show 2:00-0:00 range — use % of detected range
+  if (secs <= 15)  return 'END OF ROUND';
+  if (secs <= 40)  return 'LATE ROUND';
+  if (secs <= 75)  return 'MID-LATE';
+  if (secs <= 110) return 'MID ROUND';
+  if (secs <= 150) return 'EARLY-MID';
+  if (secs <= 190) return 'EARLY ROUND';
+  return 'PRE-ROUND';
+}
+
 const SEV_COL={critical:'#FF4444',warning:'#F59E0B',tip:'#3ECF8E'};
 
 function renderResults(data,operator,map,rank) {
@@ -1843,7 +1921,24 @@ function renderResults(data,operator,map,rank) {
   const pips=document.getElementById('timeline-pips');
   pips.innerHTML=obs.map((o,i)=>{const pct=Math.round(((i+1)/(obs.length+1))*100);const col=SEV_COL[o.severity]||'#9B9890';return `<button onclick="scrollToObs(${i})" style="position:absolute;left:${pct}%;top:2px;width:12px;height:12px;border-radius:50%;background:${col};border:2px solid var(--bg);cursor:pointer;transform:translateX(-50%)" title="${o.timestamp}"></button>`;}).join('');
   const list=document.getElementById('obs-list');
-  list.innerHTML=obs.map((o,i)=>{const col=SEV_COL[o.severity]||'#9B9890';return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s"><div style="display:flex;align-items:flex-start;gap:10px"><div style="min-width:36px;margin-top:1px"><button onclick="event.stopPropagation();jumpToTimestamp('${o.timestamp}',${i});speakObservation(${i})" title="Jump to ${o.timestamp} in video" style="font-family:var(--fh);font-size:13px;font-weight:700;color:${col};background:none;border:none;cursor:pointer;padding:0;text-decoration:underline dotted;text-underline-offset:2px">${o.timestamp}</button></div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="tag ${o.severity}">${o.severity}</span><span style="font-size:10px;color:var(--text3)">${(o.category||'').replace('_',' ')}</span>${o.operator ? `<span style="font-size:10px;font-weight:600;color:var(--accent);background:rgba(255,107,53,0.1);padding:1px 6px;border-radius:10px;border:1px solid rgba(255,107,53,0.2)">${o.operator}</span>` : ''}</div><div style="font-size:13px;color:var(--text2);line-height:1.5">${o.observation}</div><div id="fix-${i}" style="display:none;margin-top:9px;font-size:12px;color:var(--text);line-height:1.6;padding:9px 11px;background:var(--bg);border-radius:4px;border-left:2px solid ${col}"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}<div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+  list.innerHTML=obs.map((o,i)=>{const col=SEV_COL[o.severity]||'#9B9890';return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s"><div>
+            <!-- Card header row: phase pill + meta badges -->
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;flex-wrap:wrap">
+              <!-- Phase + timestamp combined button -->
+              <button onclick="event.stopPropagation();jumpToTimestamp('${o.timestamp}',${i});speakObservation(${i})" title="Jump to ${o.timestamp}" style="display:inline-flex;align-items:center;gap:6px;background:rgba(0,0,0,0.25);border:1px solid ${col}40;border-radius:20px;padding:3px 10px 3px 6px;cursor:pointer">
+                <span style="width:6px;height:6px;border-radius:50%;background:${col};flex-shrink:0"></span>
+                <span style="font-family:var(--fh);font-size:11px;font-weight:700;color:${col};letter-spacing:.04em">${getPhaseLabel(o.timestamp)}</span>
+                <span style="font-family:var(--fm);font-size:10px;color:${col};opacity:.6">${o.timestamp}</span>
+              </button>
+              <!-- Severity -->
+              <span class="tag ${o.severity}">${o.severity}</span>
+              <!-- Category -->
+              ${o.category ? `<span style="font-family:var(--fm);font-size:10px;color:var(--text3);background:var(--bg3);padding:2px 8px;border-radius:10px;border:1px solid var(--border)">${(o.category||'').replace(/_/g,' ').toUpperCase()}</span>` : ''}
+              <!-- Operator pill -->
+              ${o.operator ? `<span style="font-family:var(--fh);font-size:10px;font-weight:700;color:var(--accent);background:rgba(255,107,53,0.1);padding:2px 8px;border-radius:10px;border:1px solid rgba(255,107,53,0.25)">${o.operator}</span>` : ''}
+            </div>
+            <!-- Observation text -->
+            <div style="font-size:13px;color:var(--text2);line-height:1.6;font-weight:300">${o.observation}</div><div id="fix-${i}" style="display:none;margin-top:9px;font-size:12px;color:var(--text);line-height:1.6;padding:9px 11px;background:var(--bg);border-radius:4px;border-left:2px solid ${col}"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}<div style="margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
                 <button class="replay-btn" data-obs-index="${i}" onclick="event.stopPropagation();replayMoment('${o.timestamp}',${i})" style="font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:.06em;color:var(--accent);background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.25);border-radius:var(--r);padding:5px 12px;cursor:pointer;transition:all .15s">🔁 REPLAY</button>
                 <span style="font-size:10px;color:var(--text3)">Loops 12 seconds</span>
                 <div style="margin-left:auto;display:flex;align-items:center;gap:4px">
@@ -1852,7 +1947,7 @@ function renderResults(data,operator,map,rank) {
                   <button id="thumb-down-${i}" onclick="event.stopPropagation();rateFeedback(${i},'down')" style="font-size:14px;background:none;border:none;cursor:pointer;padding:2px 4px;border-radius:4px;transition:background .15s;opacity:.5" title="This observation is inaccurate">👎</button>
                   <span id="thumb-label-${i}" style="font-size:10px;color:var(--text3);display:none"></span>
                 </div>
-              </div></div></div><span id="chev-${i}" style="font-size:18px;color:var(--text3);transition:transform .15s">›</span></div></div>`}).join('');
+              </div></div></div><span id="chev-${i}" style="font-size:18px;color:var(--text3);transition:transform .15s">›</span></div>`}).join('');
   currentObservations=obs;
   reviewHistory.unshift({map,operator,rank,score:sc,date:'Just now'});
   renderHistory();
