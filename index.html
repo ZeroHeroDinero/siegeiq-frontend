@@ -2255,6 +2255,28 @@ function toggleObs(i,sev){
   }
 }
 function scrollToObs(i){const el=document.getElementById('obs-'+i);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});}
+function saveReviewToProgress(report, operator, map, rank) {
+  // Save this review to local progress history for trend tracking
+  try {
+    const entry = {
+      date:     new Date().toISOString(),
+      score:    report.overall_score || 0,
+      operator: operator || (report.detected_operators||[])[0] || '',
+      map:      map || '',
+      rank:     rank || '',
+      scores:   report.category_scores || {}
+    };
+    const key = 'siegeiq_progress';
+    const existing = JSON.parse(localStorage.getItem(key) || '[]');
+    existing.unshift(entry);
+    // Keep last 50 reviews
+    localStorage.setItem(key, JSON.stringify(existing.slice(0, 50)));
+  } catch(e) {
+    // localStorage may be blocked in some browsers — fail silently
+    console.warn('[SiegeIQ] Could not save progress:', e.message);
+  }
+}
+
 function renderHistory(){const h=document.getElementById('review-history');if(!reviewHistory.length){h.innerHTML='<div style="font-size:12px;color:var(--text3)">No reviews yet.</div>';return;}h.innerHTML=reviewHistory.slice(0,5).map((r,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;${i<reviewHistory.length-1?'border-bottom:1px solid var(--border)':''}"><div><div style="font-size:13px;font-weight:500">${r.map||'Unknown'} · ${r.operator||'Unknown'}</div><div style="font-size:11px;color:var(--text3)">${r.date}</div></div><div style="font-family:var(--fh);font-size:22px;font-weight:700;color:${r.score>=70?'var(--success)':r.score>=50?'var(--warn)':'var(--danger)'}">${r.score}</div></div>`).join('');}
 
 
