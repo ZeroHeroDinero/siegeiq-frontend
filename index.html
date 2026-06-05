@@ -2336,6 +2336,17 @@ window.addEventListener('hashchange', function() {
   if (h && valid.indexOf(h) !== -1 && typeof show === 'function') show(h);
 });
 
+
+// Global goTo — footer button handler, works even if show() scope is blocked
+window.goTo = function(p) {
+  if (typeof show === 'function') { show(p); return; }
+  document.querySelectorAll('.page').forEach(function(el) {
+    el.classList.remove('active');
+    el.style.removeProperty('display');
+  });
+  var t = document.getElementById('page-' + p);
+  if (t) { t.classList.add('active'); t.scrollIntoView({ block: 'start' }); }
+};
 show('landing');
 updateOperators();
 buildCompTable();
@@ -2568,10 +2579,10 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
         <div>
           <div style="font-size:11px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Support</div>
           <div style="display:flex;flex-direction:column;gap:10px">
-            <button onclick="show('contact')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Contact Us</button>
-            <button onclick="show('bug')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Report a Bug</button>
+            <button onclick="goTo('contact')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Contact Us</button>
+            <button onclick="goTo('bug')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Report a Bug</button>
             <a onclick="show('upload')" style="font-size:13px;color:var(--text2);text-decoration:none;cursor:pointer;transition:color .15s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Get Started Free</a>
-            <button onclick="show('partnerships')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Partnerships</button>
+            <button onclick="goTo('partnerships')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Partnerships</button>
           </div>
         </div>
 
@@ -2579,9 +2590,9 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
         <div>
           <div style="font-size:11px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Legal</div>
           <div style="display:flex;flex-direction:column;gap:10px">
-            <button onclick="show('privacy')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Privacy Policy</button>
-            <button onclick="show('terms')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Terms of Service</button>
-            <button onclick="show('cookies')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Cookie Policy</button>
+            <button onclick="goTo('privacy')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Privacy Policy</button>
+            <button onclick="goTo('terms')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Terms of Service</button>
+            <button onclick="goTo('cookies')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Cookie Policy</button>
           </div>
         </div>
 
