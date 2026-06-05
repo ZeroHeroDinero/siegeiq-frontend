@@ -822,6 +822,12 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
 
 <!-- ═══════════ DASHBOARD ═══════════ -->
 <div id="page-dashboard" class="page" style="padding-top:56px;background:var(--bg)">
+  <!-- Debug status bar — shows poll status, hidden by default, visible during analysis -->
+  <div id="dash-status-bar" style="display:none;background:rgba(0,0,0,0.6);border-bottom:1px solid var(--border);padding:6px 24px;font-family:var(--fm);font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px">
+    <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1s infinite;flex-shrink:0"></span>
+    <span id="dash-status-text">Waiting for analysis...</span>
+  </div>
+
   <!-- Error box for dashboard-level errors -->
   <div id="dash-error-box" style="display:none;margin:8px 24px;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.3);border-radius:8px;padding:10px 14px;font-size:13px;color:#FF6B6B"></div>
 
@@ -1790,6 +1796,9 @@ async function startAnalysis() {
   // Show dashboard page first, then overlay on top of it
   show('dashboard');
   setDashboardLoading(true);
+  // Show status bar so user can see what's happening
+  const dsb = document.getElementById('dash-status-bar');
+  if (dsb) dsb.style.display = 'flex';
 
   // Show analyzing overlay — bulletproof version
   let overlay = document.getElementById('analyzing');
@@ -1947,11 +1956,26 @@ function pollForResult(reviewId,operator,map,rank) {
       setProgress(pct, labels[Math.min(4, Math.floor((pct-30)/12))]);
     }
   }, 400);
+  let pollAttempts = 0;
+  const maxAttempts = 60; // 3 minutes at 3s intervals
   pollInterval=setInterval(async()=>{
+    pollAttempts++;
+    if (pollAttempts > maxAttempts) {
+      clearInterval(pollInterval);
+      clearInterval(progressTick);
+      const ov = document.getElementById('analyzing');
+      if (ov) ov.style.display = 'none';
+      showError('Analysis is taking longer than expected. Your clip may still be processing — try refreshing the dashboard in a minute.');
+      show('dashboard');
+      return;
+    }
     try {
+      const sb = document.getElementById('dash-status-text');
+      if (sb) sb.textContent = 'Checking analysis status... (attempt ' + pollAttempts + ')';
       const resp=await fetch(`${API_URL}/review/${reviewId}?user_id=demo-user`);
-      if(!resp.ok) return;
+      if(!resp.ok) { if(sb) sb.textContent = 'Server error ' + resp.status + ', retrying...'; return; }
       const data=await resp.json();
+      if(sb) sb.textContent = 'Status: ' + data.status + (data.status === 'processing' ? ' — AI is analyzing frames...' : '');
       if(data.status==='complete'){
         clearInterval(pollInterval);
         clearInterval(progressTick);
@@ -1972,7 +1996,9 @@ function pollForResult(reviewId,operator,map,rank) {
         document.getElementById('analyzing').style.display='none';
         showError('Analysis failed: '+(data.error||'Unknown error. Check Railway logs.'));
       }
-    } catch(e){}
+    } catch(e){
+      console.error('[SiegeIQ Poll Error]', e.message);
+    }
   },3000); // Poll every 3s — faster feedback
 }
 
@@ -2064,6 +2090,9 @@ function getPhaseLabel(ts) {
 const SEV_COL={critical:'#FF4444',warning:'#F59E0B',tip:'#3ECF8E'};
 
 function renderResults(data,operator,map,rank) {
+  // Hide status bar - we have results
+  const dsb2 = document.getElementById('dash-status-bar');
+  if (dsb2) dsb2.style.display = 'none';
   // Dashboard already shown by pollForResult - this is a safety backup
   if(!document.getElementById('page-dashboard').classList.contains('active')) show('dashboard');
   playSound('loaded');  // success chime when coaching report loads
@@ -2095,7 +2124,7 @@ function renderResults(data,operator,map,rank) {
   const vc = document.getElementById('video-container');
   const yt = (data.source || '').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
 
-  if (window.localVideoURL && window.upMode === 'file') {
+  if (window.localVideoURL) { // show local video if available
     // LOCAL FILE — play directly from browser memory, no server needed
     window.currentYouTubeId = null;
     vc.style.minHeight = '0';
