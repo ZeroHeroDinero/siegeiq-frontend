@@ -108,7 +108,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .demo-obs{padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:10px;align-items:flex-start;opacity:0;transform:translateX(-16px);transition:opacity .4s,transform .4s}
 .demo-obs.show{opacity:1;transform:translateX(0)}
 .page{display:none;background:var(--bg);min-height:calc(100vh - 56px)}
-.page.active{display:block}
+.page.active{display:block;min-height:calc(100vh - 56px);background:var(--bg)}
 html{scroll-behavior:auto}
 select,input,button{font-family:var(--fb)}
 nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px}
@@ -822,6 +822,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
 
 <!-- ═══════════ DASHBOARD ═══════════ -->
 <div id="page-dashboard" class="page" style="padding-top:56px;background:var(--bg)">
+  <!-- Error box for dashboard-level errors -->
+  <div id="dash-error-box" style="display:none;margin:8px 24px;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.3);border-radius:8px;padding:10px 14px;font-size:13px;color:#FF6B6B"></div>
+
   <!-- Dashboard top bar — upload CTA -->
   <div style="background:rgba(255,107,53,0.06);border-bottom:1px solid rgba(255,107,53,0.2);padding:10px 24px;display:flex;align-items:center;justify-content:space-between">
     <div style="font-size:12px;color:var(--text2)">Upload a clip to get AI coaching with timestamped feedback and voice coaching</div>
@@ -845,7 +848,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
           <div id="timeline-pips" style="position:relative;height:16px"></div>
         </div>
       </div>
-      <div id="obs-coaching-header" style="display:none;padding:10px 26px 0;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
+      <div id="obs-coaching-header" style="display:none;padding:10px 26px 0;align-items:center;justify-content:space-between;border-bottom:1px solid var(--border)">
         <div style="font-family:var(--fm);font-size:10px;color:var(--accent);letter-spacing:.14em;text-transform:uppercase;display:flex;align-items:center;gap:6px">
           <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block"></span>
           Coaching Observations
@@ -1624,17 +1627,9 @@ function show(p) {
   const nb = document.getElementById('nb-'+p);
   if (nb) nb.classList.add('active');
 
-  if (p === 'landing') {
-    // Landing page — scroll to top so hero is visible
-    window.scrollTo(0, 0);
-  } else {
-    // All other pages — scroll to bottom so user sees the content
-    // Use setTimeout to let the page render first before measuring height
-    window.scrollTo(0, 0);
-    setTimeout(() => {
-      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-    }, 50);
-  }
+  // Always scroll to top — never use document.body.scrollHeight
+  // (body includes all display:none pages so scrollHeight is misleading)
+  window.scrollTo(0, 0);
 }
 
 // ─── Upload ───────────────────────────────────
@@ -1699,8 +1694,20 @@ function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').s
 function checkUrl(v){hasClip=v.length>8;hasClip?enableAnalyze():disableAnalyze();}
 function enableAnalyze(){const b=document.getElementById('analyze-btn');b.textContent='ANALYZE CLIP →';b.style.background='var(--accent)';b.style.opacity='1';b.style.cursor='pointer';}
 function disableAnalyze(){const b=document.getElementById('analyze-btn');b.textContent='ADD A CLIP ABOVE';b.style.background='var(--bg3)';b.style.opacity='.4';b.style.cursor='not-allowed';}
-function showError(msg){playSound('error');const b=document.getElementById('error-box');b.textContent=msg;b.style.display='block';}
-function hideError(){document.getElementById('error-box').style.display='none';}
+function showError(msg){
+  playSound('error');
+  // Show on upload page error box
+  const b=document.getElementById('error-box');
+  if(b) { b.textContent=msg; b.style.display='block'; }
+  // Also show on dashboard error box
+  const db=document.getElementById('dash-error-box');
+  if(db) { db.textContent=msg; db.style.display='block'; }
+}
+function hideError(){
+  const b=document.getElementById('error-box'); if(b) b.style.display='none';
+  const db=document.getElementById('dash-error-box'); if(db) db.style.display='none';
+}
+
 
 
 // ─── Sound Effects ─────────────────────────────────────
@@ -1762,7 +1769,17 @@ function playSound(type) {
 }
 
 async function startAnalysis() {
-  if(!hasClip) return;
+  // Re-check if a file is actually selected even if hasClip wasn't set
+  const fileInput = document.getElementById('file-input');
+  if (!hasClip && fileInput && fileInput.files && fileInput.files[0]) {
+    handleFile(fileInput.files[0]);
+  }
+  if(!hasClip) {
+    // Navigate to upload page so user can select a file
+    show('upload');
+    showError('Please select a clip file or paste a YouTube URL before analyzing.');
+    return;
+  }
   playClickSound();
   hideError();
   const operator=document.getElementById('sel-operator').value || 'auto-detect';
@@ -2043,11 +2060,23 @@ function getPhaseLabel(ts) {
 const SEV_COL={critical:'#FF4444',warning:'#F59E0B',tip:'#3ECF8E'};
 
 function renderResults(data,operator,map,rank) {
+  show('dashboard'); // ensure dashboard is the active page
   playSound('loaded');  // success chime when coaching report loads
   setDashboardLoading(false);
   // operator may be 'auto-detect' — use detected_operators from report instead
-  const report=typeof data.report==='string'?JSON.parse(data.report):data.report;
-  if(!report) return;
+  let report;
+  try {
+    report = typeof data.report==='string' ? JSON.parse(data.report) : data.report;
+  } catch(e) {
+    console.error('[SiegeIQ] Failed to parse report:', e, data);
+    showError('Analysis data was corrupted. Please try analyzing again.');
+    return;
+  }
+  if(!report) {
+    console.error('[SiegeIQ] No report in data:', data);
+    showError('No coaching data received. Please try analyzing again.');
+    return;
+  }
   // Show map + rank + detected operators in header
   const rawOps = (report.detected_operators || []).filter(o => o && !['Unknown attacker','Unknown Attacker','unknown attacker','auto-detect','Unknown','Detecting...'].includes(o));
   const detectedOps = rawOps.join(', ') || (operator && operator !== 'auto-detect' ? operator : '');
@@ -3174,6 +3203,7 @@ async function runCounter() {
   if (enemySelected.size === 0) { ctError.textContent='Select at least one enemy operator.'; ctError.style.display='block'; return; }
   ctError.style.display='none';
 
+  playClickSound(); // tactile feedback on generate
   document.getElementById('ct-results').style.display='none';
   document.getElementById('ct-loading').style.display='block';
   document.getElementById('ct-btn').disabled = true;
@@ -3245,6 +3275,7 @@ Be highly specific — reference actual operator gadgets, map locations, and ran
     clearInterval(lv);
     const lb = document.getElementById('ct-load-bar');
     if (lb) lb.style.width = '100%';
+    playSound('loaded'); // completion chime when counter strategy ready
     setTimeout(() => { document.getElementById('ct-loading').style.display='none'; }, 350);
 
     if (!resp.ok) throw new Error('API error ' + resp.status);
