@@ -558,7 +558,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
 
 <!-- ═══════════ UPLOAD ═══════════ -->
 <div id="page-upload" class="page" style="padding-top:56px;background:var(--bg)">
-  <div style="max-width:620px;margin:0 auto;padding:16px 24px 60px">
+  <div style="max-width:620px;margin:0 auto;padding:10px 24px 40px">
     <div style="margin-bottom:20px">
       <h1 style="font-family:var(--fh);font-size:42px;font-weight:700;line-height:1;margin-bottom:6px">SUBMIT<br><span style="color:var(--accent)">YOUR CLIP</span></h1>
       <p style="color:var(--text2)">3 free reviews remaining this month.</p>
@@ -759,13 +759,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
 
 <!-- ═══════════ PRICING ═══════════ -->
 <div id="page-pricing" class="page" style="padding-top:56px;background:var(--bg)">
-  <div style="max-width:860px;margin:0 auto;padding:16px 24px 60px;text-align:center">
-    <h1 style="font-family:var(--fh);font-size:46px;font-weight:700;line-height:1;margin-bottom:10px">SIMPLE,<br><span style="color:var(--accent)">HONEST</span> PRICING</h1>
-    <div style="display:inline-flex;align-items:center;gap:8px;background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);border-radius:40px;padding:4px 14px;margin-bottom:12px">
-      <span style="font-size:12px">🏆</span>
-      <span style="font-size:11px;color:var(--accent);font-weight:700;letter-spacing:.04em">FIRST AI COACHING PLATFORM FOR RAINBOW SIX SIEGE</span>
-    </div>
-    <p style="color:var(--text2);margin-bottom:26px">Start free. Upgrade when SiegeIQ proves its value.</p>
+  <div style="max-width:860px;margin:0 auto;padding:10px 24px 40px;text-align:center">
+    <h1 style="font-family:var(--fh);font-size:32px;font-weight:700;line-height:1;margin-bottom:6px">SIMPLE, <span style="color:var(--accent)">HONEST</span> PRICING</h1>
+    <p style="color:var(--text2);margin-bottom:16px;font-size:13px">Start free. Upgrade when SiegeIQ proves its value.</p>
     <div style="display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:40px">
       <span id="ml" style="font-size:13px;color:var(--text)">Monthly</span>
       <div onclick="toggleAnnual()" style="width:38px;height:20px;background:var(--bg3);border:1px solid var(--border2);border-radius:10px;cursor:pointer;position:relative;transition:background .2s" id="ann-toggle">
@@ -774,6 +770,23 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
       <span id="al" style="font-size:13px;color:var(--text3)">Annual</span>
       <span id="save-badge" style="display:none;font-size:11px;font-weight:600;background:rgba(62,207,142,.12);color:var(--success);border:1px solid rgba(62,207,142,.2);border-radius:20px;padding:2px 10px">Save 20%</span>
     </div>
+    <!-- Founding Member Banner -->
+    <div id="founding-banner" style="background:linear-gradient(135deg,rgba(255,184,0,0.08),rgba(255,107,53,0.06));border:1px solid rgba(255,184,0,0.3);border-radius:var(--r);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;text-align:left">
+      <div style="display:flex;align-items:center;gap:12px">
+        <span style="font-size:24px;flex-shrink:0">⭐</span>
+        <div>
+          <div style="font-family:var(--fh);font-size:14px;font-weight:700;color:var(--warn);margin-bottom:3px">FOUNDING MEMBER OFFER — Limited Time</div>
+          <div style="font-size:12px;color:var(--text2);font-weight:300">Lock in <strong style="color:var(--warn)">$6.99/month for life</strong> — 30% off forever, never increases. First 100 subscribers only.</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+            <span style="font-size:11px;color:var(--text2)">Use code:</span>
+            <span onclick="navigator.clipboard.writeText('FOUNDING').then(()=>{this.textContent='✓ COPIED';setTimeout(()=>this.textContent='FOUNDING',1500)})" style="font-family:monospace;font-size:13px;font-weight:700;color:var(--accent);background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);border-radius:4px;padding:2px 10px;cursor:pointer;letter-spacing:.08em">FOUNDING</span>
+            <span style="font-size:10px;color:var(--text3)">click to copy · auto-applied on checkout button</span>
+          </div>
+        </div>
+      </div>
+      <button onclick="startCheckoutWithCode('pro_monthly','FOUNDING')" style="font-family:var(--fh);font-size:13px;font-weight:700;white-space:nowrap;color:#fff;background:var(--warn);border:none;padding:10px 18px;border-radius:var(--r);cursor:pointer;flex-shrink:0">CLAIM $6.99/MO →</button>
+    </div>
+
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;text-align:left">
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:22px 18px">
         <div style="font-family:var(--fh);font-size:13px;font-weight:600;color:var(--text3);letter-spacing:.08em;margin-bottom:3px">Free</div>
@@ -832,11 +845,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
 <!-- COUNTER TOOL PAGE                           -->
 <!-- ═══════════════════════════════════════════ -->
 <div id="page-counter" class="page" style="padding-top:56px;background:var(--bg)">
-  <div style="max-width:720px;margin:0 auto;padding:16px 24px 60px">
+  <div style="max-width:720px;margin:0 auto;padding:12px 24px 40px">
 
     <div style="margin-bottom:20px">
       <div style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Pre-match strategy</div>
-      <h1 style="font-family:var(--fh);font-size:46px;font-weight:700;line-height:1;margin-bottom:8px">OPERATOR<br><span style="color:var(--accent)">COUNTER TOOL</span></h1>
+      <h1 style="font-family:var(--fh);font-size:28px;font-weight:700;line-height:1;margin-bottom:6px">OPERATOR<br><span style="color:var(--accent)">COUNTER TOOL</span></h1>
       <p style="color:var(--text2);line-height:1.6">Enter the enemy team's operators and your map. SiegeIQ's AI generates a specific counter strategy tailored to your rank — before the match even starts.</p>
     </div>
 
@@ -975,7 +988,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
     <div style="margin-bottom:32px">
       <button onclick="show('landing')" style="font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0;margin-bottom:16px;display:flex;align-items:center;gap:6px">← Back to SiegeIQ</button>
       <div style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">Legal</div>
-      <h1 style="font-family:var(--fh);font-size:46px;font-weight:700;line-height:1;margin-bottom:8px">PRIVACY <span style="color:var(--accent)">POLICY</span></h1>
+      <h1 style="font-family:var(--fh);font-size:28px;font-weight:700;line-height:1;margin-bottom:6px">PRIVACY <span style="color:var(--accent)">POLICY</span></h1>
       <p style="font-size:13px;color:var(--text3)">Last updated: June 1, 2026</p>
     </div>
 
@@ -1090,7 +1103,7 @@ function show(p) {
   if (target) target.classList.add('active');
   const nb = document.getElementById('nb-'+p);
   if (nb) nb.classList.add('active');
-  // Always scroll to top so full page content is visible
+  // Scroll to top always
   window.scrollTo(0, 0);
 }
 
