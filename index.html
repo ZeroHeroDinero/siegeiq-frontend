@@ -821,7 +821,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
 </div>
 
 <!-- ═══════════ DASHBOARD ═══════════ -->
-<div id="page-dashboard" class="page" style="padding-top:56px;background:var(--bg)">
+<div id="page-dashboard" class="page" style="padding-top:56px;background:#0A0C0F;position:relative;z-index:1">
   <!-- Debug status bar — shows poll status, hidden by default, visible during analysis -->
   <div id="dash-status-bar" style="display:none;background:rgba(0,0,0,0.6);border-bottom:1px solid var(--border);padding:6px 24px;font-family:var(--fm);font-size:11px;color:var(--text3);display:flex;align-items:center;gap:8px">
     <span style="width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 1s infinite;flex-shrink:0"></span>
@@ -2090,11 +2090,18 @@ function getPhaseLabel(ts) {
 const SEV_COL={critical:'#FF4444',warning:'#F59E0B',tip:'#3ECF8E'};
 
 function renderResults(data,operator,map,rank) {
+  // ── FORCE dashboard visible — absolute guarantee ──
+  show('dashboard');
+  document.querySelectorAll('.page').forEach(p => {
+    if (p.id !== 'page-dashboard') { p.style.display = 'none'; p.style.visibility = 'hidden'; }
+  });
+  const dash = document.getElementById('page-dashboard');
+  if (dash) { dash.style.display = 'block'; dash.style.visibility = 'visible'; dash.style.opacity = '1'; }
+  window.scrollTo(0, 0);
+
   // Hide status bar - we have results
   const dsb2 = document.getElementById('dash-status-bar');
   if (dsb2) dsb2.style.display = 'none';
-  // Dashboard already shown by pollForResult - this is a safety backup
-  if(!document.getElementById('page-dashboard').classList.contains('active')) show('dashboard');
   playSound('loaded');  // success chime when coaching report loads
   setDashboardLoading(false);
   // operator may be 'auto-detect' — use detected_operators from report instead
