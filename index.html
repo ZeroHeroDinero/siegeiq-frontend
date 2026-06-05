@@ -204,7 +204,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
     <button class="nav-btn" id="nb-pricing" onclick="show('pricing')">Pricing</button>
     <button class="nav-btn" id="nb-upload" onclick="show('upload')">Upload</button>
     <button class="nav-btn" id="nb-dashboard" onclick="show('dashboard')">Dashboard</button>
-    <button onclick="show('upload')" style="font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:7px 16px;cursor:pointer;margin-left:4px">ANALYZE CLIP</button>
+    <button onclick="show('upload');setTimeout(()=>{const dz=document.getElementById('drop-zone');if(dz)dz.scrollIntoView({behavior:'smooth',block:'center'});},100)" style="font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:7px 16px;cursor:pointer;margin-left:4px">ANALYZE CLIP</button>
   </div>
 </nav>
 
@@ -229,7 +229,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
       Upload any Rainbow Six Siege clip. SiegeIQ's AI analyzes every decision, flags every mistake, and tells you exactly what to fix.
     </p>
     <div style="display:flex;gap:12px;animation:fadeUp .5s .3s ease both">
-      <button onclick="show('upload')" style="font-family:var(--fh);font-size:16px;font-weight:700;letter-spacing:.08em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:14px 32px;cursor:pointer">ANALYZE FREE CLIP →</button>
+      <button onclick="show('upload');setTimeout(()=>{const dz=document.getElementById('drop-zone');if(dz)dz.scrollIntoView({behavior:'smooth',block:'center'});},100)" style="font-family:var(--fh);font-size:16px;font-weight:700;letter-spacing:.08em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:14px 32px;cursor:pointer">ANALYZE FREE CLIP →</button>
     </div>
     <!-- Trust badges -->
     <div style="display:flex;align-items:center;justify-content:center;gap:20px;flex-wrap:wrap;margin-top:20px;animation:fadeUp .5s .4s ease both">
@@ -828,7 +828,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.
   <!-- Dashboard top bar — upload CTA -->
   <div style="background:rgba(255,107,53,0.06);border-bottom:1px solid rgba(255,107,53,0.2);padding:10px 24px;display:flex;align-items:center;justify-content:space-between">
     <div style="font-size:12px;color:var(--text2)">Upload a clip to get AI coaching with timestamped feedback and voice coaching</div>
-    <button onclick="show('upload')" style="font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:8px 20px;cursor:pointer;white-space:nowrap;flex-shrink:0">+ UPLOAD CLIP</button>
+    <button onclick="show('upload');setTimeout(()=>{const dz=document.getElementById('drop-zone');if(dz)dz.scrollIntoView({behavior:'smooth',block:'center'});},100)" style="font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:8px 20px;cursor:pointer;white-space:nowrap;flex-shrink:0">+ UPLOAD CLIP</button>
   </div>
   <div style="display:grid;grid-template-columns:1fr 296px;min-height:calc(100vh - 56px)">
     <div style="border-right:1px solid var(--border);overflow-y:auto">
@@ -1959,8 +1959,12 @@ function pollForResult(reviewId,operator,map,rank) {
         setTimeout(()=>{
           const ov=document.getElementById('analyzing');
           if(ov) ov.style.display='none';
+          // Force dashboard visible BEFORE rendering content
+          show('dashboard');
           setDashboardLoading(false);
           renderResults(data,operator,map,rank);
+          // Scroll to video player so user sees results
+          setTimeout(()=>{ const vc=document.getElementById('video-container'); if(vc) vc.scrollIntoView({behavior:'smooth',block:'start'}); }, 300);
         },600);
       } else if(data.status==='failed'){
         clearInterval(pollInterval);
@@ -2060,7 +2064,8 @@ function getPhaseLabel(ts) {
 const SEV_COL={critical:'#FF4444',warning:'#F59E0B',tip:'#3ECF8E'};
 
 function renderResults(data,operator,map,rank) {
-  show('dashboard'); // ensure dashboard is the active page
+  // Dashboard already shown by pollForResult - this is a safety backup
+  if(!document.getElementById('page-dashboard').classList.contains('active')) show('dashboard');
   playSound('loaded');  // success chime when coaching report loads
   setDashboardLoading(false);
   // operator may be 'auto-detect' — use detected_operators from report instead
