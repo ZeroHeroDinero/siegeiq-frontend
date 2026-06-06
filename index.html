@@ -129,6 +129,13 @@ nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;backgro
 .video-container{position:relative;width:100%;max-width:860px;margin:0 auto 0;border-radius:12px;overflow:hidden;border:1px solid var(--border2);box-shadow:0 0 80px rgba(255,107,53,0.15)}
 .video-container iframe{width:100%;aspect-ratio:16/9;display:block}
 </style>
+  <link rel="canonical" href="https://siegeiq.gg/" />
+  <script>
+    // Hard redirect www to non-www before any API calls
+    if (window.location.href.indexOf('www.siegeiq.gg') !== -1) {
+      window.location.replace(window.location.href.replace('www.siegeiq.gg', 'siegeiq.gg'));
+    }
+  </script>
 </head>
 <body>
 
@@ -147,7 +154,7 @@ const ELEVENLABS_KEY = _E1 + _E2;
 if (window.location.hostname === 'www.siegeiq.gg') {
   window.history.replaceState({}, '', window.location.href.replace('www.siegeiq.gg', 'siegeiq.gg'));
 }
-  const SITE_URL = 'https://siegeiq-frontend.vercel.app';
+  const SITE_URL = 'https://siegeiq.gg';
 </script>
 
 <!-- Theme switcher -->
