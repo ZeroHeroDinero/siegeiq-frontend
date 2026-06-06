@@ -519,6 +519,19 @@ const ELEVENLABS_KEY = _E1 + _E2;
 
     <div id="drop-zone" ondragover="event.preventDefault();this.style.borderColor='var(--accent)'" ondragleave="this.style.borderColor='var(--border2)'" ondrop="handleDrop(event)" onclick="document.getElementById('file-input').click()" style="border:1px dashed var(--border2);border-radius:var(--r);padding:52px 24px;text-align:center;background:var(--bg2);cursor:pointer;margin-bottom:18px;transition:all .15s">
       <input id="file-input" type="file" accept="video/*" style="display:none" onchange="handleFile(this.files[0])">
+      <!-- File size warning -->
+      <div id="file-size-tip" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:10px 14px;margin-top:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:12px;color:var(--text);font-weight:600">📦 File: <span id="file-size-display">--</span></span>
+          <span id="file-size-badge" style="font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px"></span>
+        </div>
+        <div id="file-size-advice" style="font-size:11px;color:var(--text2);line-height:1.5"></div>
+      </div>
+      <div id="compress-guide" style="display:none;background:rgba(245,158,11,0.06);border:1px solid rgba(245,158,11,0.25);border-radius:var(--r);padding:12px 14px;margin-top:6px">
+        <div style="font-size:12px;font-weight:700;color:var(--warn);margin-bottom:6px">⚡ Compress for faster upload</div>
+        <div style="font-size:11px;color:var(--text2);line-height:1.6"><strong style="color:var(--text)">Free tool:</strong> <a href="https://handbrake.fr" target="_blank" style="color:var(--accent)">Handbrake.fr</a> — drag clip in → select "Fast 720p30" → Start. Reduces 200MB to under 20MB in 60 seconds.</div>
+        <div style="font-size:11px;color:var(--text2);margin-top:4px"><strong style="color:var(--text)">Target:</strong> Under 20MB. AI quality is identical at 720p.</div>
+      </div>
       <div id="drop-icon" style="font-size:36px;margin-bottom:14px;color:var(--text3)">↑</div>
       <div id="drop-title" style="font-family:var(--fh);font-size:18px;font-weight:600;margin-bottom:6px">DROP CLIP HERE</div>
       <div id="drop-sub" style="font-size:12px;color:var(--text3)">MP4 · MOV · MKV · up to 500MB · max 10 min</div>
@@ -1139,6 +1152,28 @@ function setUpMode(m) {
 function handleFile(f) {
   if(!f) return;
   selectedFile=f; hasClip=true;
+  // Show file size feedback
+  var mb = f.size/1024/1024;
+  var tip = document.getElementById('file-size-tip');
+  var disp = document.getElementById('file-size-display');
+  var badge = document.getElementById('file-size-badge');
+  var advice = document.getElementById('file-size-advice');
+  var guide = document.getElementById('compress-guide');
+  if(tip) tip.style.display='block';
+  if(disp) disp.textContent = mb.toFixed(1)+' MB';
+  if(mb < 20) {
+    if(badge){badge.textContent='✓ Great';badge.style.background='rgba(62,207,142,.12)';badge.style.color='var(--success)';}
+    if(advice) advice.textContent='Upload will be fast. Expected analysis: 30–60 seconds.';
+    if(guide) guide.style.display='none';
+  } else if(mb < 60) {
+    if(badge){badge.textContent='~ Moderate';badge.style.background='rgba(245,158,11,.1)';badge.style.color='var(--warn)';}
+    if(advice) advice.textContent='Upload will take ~'+Math.round(mb/4)+'–'+Math.round(mb/2)+'s. Compress to under 20MB for faster results.';
+    if(guide) guide.style.display='none';
+  } else {
+    if(badge){badge.textContent='⚠ Large';badge.style.background='rgba(255,68,68,.1)';badge.style.color='var(--danger)';}
+    if(advice) advice.textContent=mb.toFixed(0)+'MB — upload may take '+Math.round(mb/3)+'–'+Math.round(mb/2)+'s. Compress first for best experience.';
+    if(guide) guide.style.display='block';
+  }
   // Store local object URL so we can play the video in the dashboard after analysis
   if(window.localVideoURL) URL.revokeObjectURL(window.localVideoURL);
   window.localVideoURL = URL.createObjectURL(f);
@@ -1438,7 +1473,7 @@ function renderHistory(){const h=document.getElementById('review-history');if(!r
 let voiceOn = false;
 let currentObservations = [];
 const ELEVENLABS_API_KEY = ELEVENLABS_KEY;
-const ELEVENLABS_VOICE_ID = 'pNInz6obpgDQGcFmaJgB'; // Adam - natural coaching voice
+const ELEVENLABS_VOICE_ID = '21m00Tcm4TlvDq8ikWAM'; // Rachel - natural coaching voice
 
 function toggleVoice() {
   voiceOn = !voiceOn;
@@ -1477,7 +1512,8 @@ async function speakObservation(index) {
         },
         body: JSON.stringify({
           text: text,
-          model_id: 'eleven_monolingual_v1',
+          model_id: 'eleven_multilingual_v2',
+            voice_settings: { stability: 0.45, similarity_boost: 0.80, style: 0.3, use_speaker_boost: true },
           voice_settings: {
             stability: 0.5,
             similarity_boost: 0.85
