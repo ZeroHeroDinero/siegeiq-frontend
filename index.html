@@ -116,7 +116,7 @@ select,input,button{font-family:var(--fb)}
 nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;background:rgba(10,12,15,0.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 28px;height:56px}
 .nav-btn{font-size:13px;font-weight:500;color:var(--text2);background:transparent;border:1px solid transparent;border-radius:var(--r);padding:5px 12px;cursor:pointer;transition:all .15s}
 .nav-btn:hover,.nav-btn.active{background:var(--bg3);color:var(--text);border-color:var(--border2)}
-.obs-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;cursor:pointer;transition:border-color .15s,background .15s;animation:fadeUp .35s ease both}
+.obs-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .15s;animation:fadeUp .35s ease both}
 .obs-card:hover{border-color:var(--border2)}
 .obs-card.open-critical{border-color:rgba(255,68,68,.4);background:rgba(255,68,68,.05)}
 .obs-card.open-warning{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.05)}
@@ -140,7 +140,6 @@ const ANTHROPIC_KEY = _K1 + _K2;
 const _E1 = 'sk_da1f2247bf87cf3b404ae7bd';
 const _E2 = '2f69bb8d7fc4c52215f483b4';
 const ELEVENLABS_KEY = _E1 + _E2;
-const ELEVENLABS_API_KEY = ELEVENLABS_KEY; // alias used by speakObservation
 
 
   const API_URL = 'https://siegeiq-backend-production.up.railway.app';
@@ -1419,53 +1418,15 @@ function renderResults(data,operator,map,rank) {
   const pips=document.getElementById('timeline-pips');
   pips.innerHTML=obs.map((o,i)=>{const pct=Math.round(((i+1)/(obs.length+1))*100);const col=SEV_COL[o.severity]||'#9B9890';return `<button onclick="scrollToObs(${i})" style="position:absolute;left:${pct}%;top:2px;width:12px;height:12px;border-radius:50%;background:${col};border:2px solid var(--bg);cursor:pointer;transform:translateX(-50%)" title="${o.timestamp}"></button>`;}).join('');
   const list=document.getElementById('obs-list');
-  list.innerHTML=obs.map((o,i)=>{
-  const col=SEV_COL[o.severity]||'#9B9890';
-  const phase=getPhaseLabel(o.timestamp);
-  const headline=getObsHeadline(o);
-  const hasVideo=()=>{ var lp=document.getElementById('local-player'); return lp && lp.src; };
-  return `<div style="margin-bottom:8px">
-    <!-- REPLAY row — always visible, separate from card -->
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;padding:0 2px">
-      <button onclick="jumpToTimestamp('${o.timestamp}',${i});speakObservation(${i})"
-        style="font-family:var(--fm);font-size:11px;font-weight:600;color:${col};background:none;border:none;cursor:pointer;padding:0;letter-spacing:.04em;text-decoration:underline dotted;text-underline-offset:2px"
-        title="Jump to ${o.timestamp}">${o.timestamp}</button>
-      <span style="font-size:10px;color:var(--text3)">·</span>
-      <button id="replay-btn-${i}" onclick="replayMoment(${i},event)"
-        style="font-family:var(--fh);font-size:10px;font-weight:700;color:#fff;background:#CC0000;border:none;padding:3px 10px;border-radius:3px;cursor:pointer;letter-spacing:.06em;display:flex;align-items:center;gap:4px">
-        ▶ REPLAY <span style="font-size:9px;font-weight:400;opacity:.75">12s</span>
-      </button>
-      <div style="flex:1"></div>
-      <span style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em">${phase}</span>
-    </div>
-    <!-- CARD — click to expand coaching text -->
-    <div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s;cursor:pointer">
-      <!-- Header: always visible -->
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
-        <div style="flex:1">
-          <div style="font-family:var(--fh);font-size:15px;font-weight:700;color:var(--text);line-height:1.25;margin-bottom:6px">${headline}</div>
-          <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">
-            <span class="tag ${o.severity}">${o.severity}</span>
-            <span style="font-size:10px;color:var(--text3)">${(o.category||'').replace(/_/g,' ')}</span>
-            ${(o.operator && o.operator !== 'Unknown attacker' && o.operator !== 'Unknown Attacker') ? `<span style="font-size:10px;font-weight:600;color:var(--accent);background:rgba(255,107,53,0.1);padding:1px 7px;border-radius:10px;border:1px solid rgba(255,107,53,0.2)">${o.operator}</span>` : ''}
-          </div>
-        </div>
-        <span id="chev-${i}" style="font-size:20px;color:var(--text3);transition:transform .2s;flex-shrink:0;margin-top:2px">›</span>
-      </div>
-      <!-- Expandable body -->
-      <div id="fix-${i}" style="display:none;margin-top:12px;border-top:1px solid var(--border);padding-top:12px">
-        <p style="font-size:13px;color:var(--text2);line-height:1.65;margin:0 0 10px">${o.observation}</p>
-        <div style="font-size:12px;color:var(--text);line-height:1.6;padding:10px 12px;background:var(--bg);border-radius:6px;border-left:2px solid ${col}">
-          <span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}
-        </div>
-        <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:10px">
-          <span style="font-size:11px;color:var(--text3)">Accurate?</span>
-          <button onclick="event.stopPropagation();rateFeedback(${i},1)" id="thumb-up-${i}" style="background:none;border:none;cursor:pointer;font-size:16px;opacity:.55;transition:opacity .15s;padding:2px" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.55">👍</button>
-          <button onclick="event.stopPropagation();rateFeedback(${i},-1)" id="thumb-dn-${i}" style="background:none;border:none;cursor:pointer;font-size:16px;opacity:.55;transition:opacity .15s;padding:2px" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.55">👎</button>
-        </div>
-      </div>
-    </div>
-  </div>`}).join('');
+  list.innerHTML=obs.map((o,i)=>{const col=SEV_COL[o.severity]||'#9B9890';const phase=getPhaseLabel(o.timestamp);const headline=getObsHeadline(o);return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s"><div style="display:flex;align-items:flex-start;gap:10px"><div style="min-width:36px;margin-top:1px"><button onclick="event.stopPropagation();jumpToTimestamp('${o.timestamp}',${i});speakObservation(${i})" title="Jump to ${o.timestamp} in video" style="font-family:var(--fh);font-size:13px;font-weight:700;color:${col};background:none;border:none;cursor:pointer;padding:0;text-decoration:underline dotted;text-underline-offset:2px">${o.timestamp}</button></div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="tag ${o.severity}">${o.severity}</span><span style="font-size:10px;color:var(--text3)">${(o.category||'').replace('_',' ')}</span>${(o.operator && o.operator !== 'Unknown attacker' && o.operator !== 'Unknown Attacker') ? `<span style="font-size:10px;font-weight:600;color:var(--accent);background:rgba(255,107,53,0.1);padding:1px 6px;border-radius:10px;border:1px solid rgba(255,107,53,0.2)">${o.operator}</span>` : ''}</div><div style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px">${headline}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">${phase.toUpperCase()}</div><div style="font-size:13px;color:var(--text2);line-height:1.5">${o.observation}</div><div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:8px">
+              <span style="font-size:11px;color:var(--text3)">Accurate?</span>
+              <button onclick="rateFeedback(${i},1)" id="thumb-up-${i}" style="background:none;border:none;cursor:pointer;font-size:16px;opacity:.6;transition:opacity .15s;padding:2px" title="Accurate" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.6">👍</button>
+              <button onclick="rateFeedback(${i},-1)" id="thumb-dn-${i}" style="background:none;border:none;cursor:pointer;font-size:16px;opacity:.6;transition:opacity .15s;padding:2px" title="Inaccurate" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.6">👎</button>
+            </div>
+            <div id="fix-${i}" style="display:none;margin-top:9px">
+              <div style="font-size:12px;color:var(--text);line-height:1.6;padding:9px 11px;background:var(--bg);border-radius:4px;border-left:2px solid ${col}"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}</div>
+              ${document.getElementById('local-player') && document.getElementById('local-player').src ? `<button id="replay-btn-${i}" onclick="event.stopPropagation();replayMoment(${i},event)" style="margin-top:7px;font-family:var(--fh);font-size:11px;font-weight:700;color:#fff;background:#E50000;border:none;padding:5px 14px;border-radius:4px;cursor:pointer;letter-spacing:.06em">▶ REPLAY</button><span style="font-size:10px;color:var(--text3);margin-left:8px">Loops 12s</span>` : ''}
+            </div></div><span id="chev-${i}" style="font-size:18px;color:var(--text3);transition:transform .15s">›</span></div></div>`}).join('');
   currentObservations=obs;
   reviewHistory.unshift({map,operator,rank,score:sc,date:'Just now'});
   renderHistory();
@@ -1483,7 +1444,9 @@ function toggleObs(i,sev){
   const clsMap={critical:'open-critical',warning:'open-warning',tip:'open-tip'};
   if(clsMap[sev])card.classList.toggle(clsMap[sev],!open);
   if(!open){
-    // Speak observation when opened — video does NOT jump (user clicks timestamp or REPLAY for that)
+    // Jump to timestamp in video AND speak the observation
+    const obs=currentObservations[i];
+    if(obs && obs.timestamp) jumpToTimestamp(obs.timestamp, i);
     speakObservation(i);
   }
 }
@@ -1529,16 +1492,11 @@ async function speakObservation(index) {
   if (!obs) return;
   stopVoice();
 
-  const cat = (obs.category || '').replace(/_/g, ' ');
-  const intros = {
-    critical: ["This is where things went wrong.", "Watch out, this cost you.", "Here is a critical mistake."],
-    warning:  ["Something to watch here.", "Here is a coaching note.", "Keep this in mind."],
-    tip:      ["Nice play here.", "Good decision.", "This is what you did well."]
-  };
-  const sev = obs.severity || 'warning';
-  const intro = intros[sev][Math.floor(Math.random() * intros[sev].length)];
-  const fix = obs.fix ? ' Here is what to do differently: ' + obs.fix : '';
-  const text = intro + ' ' + obs.observation + fix;
+  const sevLabel = obs.severity === 'critical' ? 'Critical mistake'
+                 : obs.severity === 'warning'  ? 'Warning'
+                 : 'Good play';
+  const cat  = (obs.category || '').replace(/_/g, ' ');
+  const text = sevLabel + ' at ' + obs.timestamp + '. ' + obs.observation + '. Fix: ' + obs.fix;
 
   document.getElementById('voice-reading').textContent = 'Speaking: ' + obs.timestamp + ' — ' + cat + '...';
 
@@ -1555,11 +1513,10 @@ async function speakObservation(index) {
         body: JSON.stringify({
           text: text,
           model_id: 'eleven_multilingual_v2',
+            voice_settings: { stability: 0.45, similarity_boost: 0.80, style: 0.3, use_speaker_boost: true },
           voice_settings: {
-            stability: 0.30,
-            similarity_boost: 0.90,
-            style: 0.45,
-            use_speaker_boost: true
+            stability: 0.5,
+            similarity_boost: 0.85
           }
         })
       });
