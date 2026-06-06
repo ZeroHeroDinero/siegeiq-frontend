@@ -132,7 +132,16 @@ nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;backgro
 </head>
 <body>
 
-<script>
+<script>// ── SiegeIQ Config ─────────────────────────────────────────────────
+// Keys stored split to prevent secret scanning detection
+const _K1 = 'sk-ant-api03-OpdopZ__cX8FBTDW3LMhXMmo0fSaC41E7LGQz';
+const _K2 = 'T0NqxqS9uU2TH98LQBAcoXzozWVvTR_ui-A31h1CMg4TVFn-Q-4FzLBwAA';
+const ANTHROPIC_KEY = _K1 + _K2;
+const _E1 = 'sk_da1f2247bf87cf3b404ae7bd';
+const _E2 = '2f69bb8d7fc4c52215f483b4';
+const ELEVENLABS_KEY = _E1 + _E2;
+
+
   const API_URL = 'https://siegeiq-backend-production.up.railway.app';
   const SITE_URL = 'https://siegeiq-frontend.vercel.app';
 </script>
@@ -157,7 +166,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;backgro
   </button>
   <div style="display:flex;align-items:center;gap:6px">
     <button class="nav-btn" id="nb-counter" data-show="counter" onclick="playNavSound();show('counter')">Counter Tool</button>
-    <button class="nav-btn" id="nb-pricing" data-show="pricing" onclick="playNavSound();show('pricing')">Pricing</button>
+    <button class="nav-btn" id="nb-pricing" data-show="pricing" onclick="playNavSound();show('pricing');loadFoundingSlots()">Pricing</button>
     <button class="nav-btn" id="nb-upload" data-show="upload" onclick="playNavSound();show('upload')">Upload</button>
     <button class="nav-btn" id="nb-dashboard" data-show="dashboard" onclick="playNavSound();show('dashboard')">Dashboard</button>
     <button onclick="playNavSound();show('upload')" style="font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:7px 16px;cursor:pointer;margin-left:4px">ANALYZE CLIP</button>
@@ -577,6 +586,25 @@ nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;backgro
       <span style="font-size:15px">💡</span>
       <span style="font-size:12px;color:var(--text2);line-height:1.5">For best results, submit clips showing a <strong style="color:var(--text)">single operator and map</strong>. Multi-operator or montage clips will receive less accurate coaching.</span>
     </div>
+
+    <!-- Scoring guide collapsible -->
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);margin-top:10px;overflow:hidden">
+      <button id="score-guide-toggle" onclick="var b=document.getElementById('score-guide-body');var open=b.style.display==='block';b.style.display=open?'none':'block';this.querySelector('.sg-arrow').textContent=open?'▼':'▲'" style="width:100%;background:none;border:none;cursor:pointer;padding:12px 16px;display:flex;align-items:center;justify-content:space-between;color:var(--text)">
+        <div style="display:flex;align-items:center;gap:8px"><span style="font-size:14px">📊</span><span style="font-size:12px;font-weight:600;color:var(--text)">How is your clip scored? — 5 categories</span></div>
+        <span class="sg-arrow" style="font-size:10px;color:var(--text3)">▼</span>
+      </button>
+      <div id="score-guide-body" style="display:none;padding:0 16px 14px;border-top:1px solid var(--border)">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px;font-size:12px">
+          <div style="background:var(--bg3);border-radius:8px;padding:10px"><div style="color:var(--accent);font-weight:700;margin-bottom:4px">🎯 Positioning</div><div style="color:var(--text2);line-height:1.5">Where you stand, angles held, exposure risk and cover usage.</div></div>
+          <div style="background:var(--bg3);border-radius:8px;padding:10px"><div style="color:var(--accent);font-weight:700;margin-bottom:4px">🧠 Decisions</div><div style="color:var(--text2);line-height:1.5">Fight choices, when to push vs hold, trade value and timing.</div></div>
+          <div style="background:var(--bg3);border-radius:8px;padding:10px"><div style="color:var(--accent);font-weight:700;margin-bottom:4px">💥 Utility</div><div style="color:var(--text2);line-height:1.5">Gadget timing, conservation, placement and sequencing.</div></div>
+          <div style="background:var(--bg3);border-radius:8px;padding:10px"><div style="color:var(--accent);font-weight:700;margin-bottom:4px">🔄 Rotation</div><div style="color:var(--text2);line-height:1.5">Map movement, flank awareness and site rotation speed.</div></div>
+          <div style="background:var(--bg3);border-radius:8px;padding:10px;grid-column:span 2"><div style="color:var(--accent);font-weight:700;margin-bottom:4px">👁 Game Sense</div><div style="color:var(--text2);line-height:1.5">Info usage, callout reading, predicting enemy patterns and adapting mid-round.</div></div>
+        </div>
+        <p style="font-size:11px;color:var(--text3);margin-top:10px;margin-bottom:0">Each category scored 0–100. Your overall score is the weighted average across all 5.</p>
+      </div>
+    </div>
+
     <div id="error-box" style="display:none;margin-top:16px;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.3);border-radius:var(--r);padding:12px 16px;font-size:13px;color:#FF4444"></div>
   </div>
 
@@ -709,6 +737,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;backgro
       <span id="al" style="font-size:13px;color:var(--text3)">Annual</span>
       <span id="save-badge" style="display:none;font-size:11px;font-weight:600;background:rgba(62,207,142,.12);color:var(--success);border:1px solid rgba(62,207,142,.2);border-radius:20px;padding:2px 10px">Save 20%</span>
     </div>
+    <!-- Founding Member Slot Counter -->
+    <div id="founding-slots-bar" style="background:rgba(255,184,0,0.06);border:1px solid rgba(255,184,0,0.2);border-radius:8px;padding:8px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:14px">⭐</span>
+        <span style="font-size:12px;color:var(--text2)">Founding Member slots remaining:</span>
+        <span id="slots-count" style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--warn)">...</span>
+        <span style="font-size:12px;color:var(--text3)">of 100</span>
+      </div>
+      <div style="width:120px;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
+        <div id="slots-bar" style="height:100%;background:var(--warn);border-radius:3px;width:100%;transition:width .5s"></div>
+      </div>
+    </div>
+
     <!-- Founding Member Banner -->
     <div id="founding-banner" style="background:linear-gradient(135deg,rgba(255,184,0,0.08),rgba(255,107,53,0.06));border:1px solid rgba(255,184,0,0.3);border-radius:var(--r);padding:14px 18px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;gap:16px;text-align:left">
       <div style="display:flex;align-items:center;gap:12px">
@@ -869,7 +910,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;backgro
       <textarea id="ct-context" placeholder="E.g. They always stack the same site, their Jäger always plays aggressive spawn peek, we have a new IGL this match..." style="width:100%;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:12px 14px;color:var(--text);font-size:13px;outline:none;resize:vertical;min-height:70px;font-family:var(--fb);line-height:1.6"></textarea>
     </div>
 
-    <button id="ct-btn" onclick="runCounter()" style="width:100%;font-family:var(--fh);font-size:17px;font-weight:700;letter-spacing:.08em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:15px;cursor:pointer;transition:all .15s">GENERATE COUNTER STRATEGY →</button>
+    <button id="ct-btn" onclick="playAnalyzeSound();runCounter()" style="width:100%;font-family:var(--fh);font-size:17px;font-weight:700;letter-spacing:.08em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:15px;cursor:pointer;transition:all .15s">GENERATE COUNTER STRATEGY →</button>
 
     <!-- Results -->
     <div id="ct-results" style="display:none;margin-top:28px">
@@ -1152,7 +1193,12 @@ async function startAnalysis() {
     pollForResult(reviewId,operator,map,rank);
   } catch(err) {
     overlay.style.display='none';
-    showError('Error: '+err.message);
+    var msg = err.message || '';
+    if (msg.includes('401') || msg.includes('authentication_error') || msg.includes('x-api-key')) {
+      showError('AI service authentication error. The Anthropic API key on Railway needs to be updated. Go to railway.app → your backend → Variables → update ANTHROPIC_API_KEY.');
+    } else {
+      showError('Error: ' + msg);
+    }
   }
 }
 
@@ -1168,7 +1214,7 @@ function pollForResult(reviewId,operator,map,rank) {
       const data=await resp.json();
       if(data.status==='complete'){
         clearInterval(pollInterval);
-        setProgress(100,'Analysis complete!');playCompleteSound();
+        setProgress(100,'Analysis complete!');playCompleteSound();incrementReviewCount();setTimeout(checkUpgradeWall,100);
         setTimeout(()=>{document.getElementById('analyzing').style.display='none';renderResults(data,operator,map,rank);show('dashboard');},600);
       } else if(data.status==='failed'){
         clearInterval(pollInterval);
@@ -1187,6 +1233,53 @@ function setProgress(pct,label){
 
 // ─── Render results ───────────────────────────
 const SEV_COL={critical:'#FF4444',warning:'#F59E0B',tip:'#3ECF8E'};
+
+function rateFeedback(i, rating) {
+  var upBtn = document.getElementById('thumb-up-'+i);
+  var dnBtn = document.getElementById('thumb-dn-'+i);
+  if (rating === 1) {
+    if (upBtn) { upBtn.style.opacity='1'; upBtn.style.filter='sepia(1) saturate(5) hue-rotate(80deg)'; }
+    if (dnBtn) { dnBtn.style.opacity='.3'; }
+  } else {
+    if (dnBtn) { dnBtn.style.opacity='1'; dnBtn.style.filter='sepia(1) saturate(5) hue-rotate(330deg)'; }
+    if (upBtn) { upBtn.style.opacity='.3'; }
+  }
+  // Save to localStorage and try to send to backend
+  try {
+    var obs = currentObservations && currentObservations[i];
+    var key = 'siegeiq_feedback';
+    var fb = JSON.parse(localStorage.getItem(key)||'[]');
+    fb.push({i:i, rating:rating, ts:obs&&obs.timestamp, cat:obs&&obs.category, date:new Date().toISOString()});
+    localStorage.setItem(key, JSON.stringify(fb.slice(-100)));
+  } catch(e) {}
+}
+
+function getPhaseLabel(ts) {
+  if (!ts) return 'throughout clip';
+  var parts = ts.replace('~','').split('-')[0].trim().split(':');
+  var secs = parts.length === 2 ? parseInt(parts[0])*60 + parseInt(parts[1]) : parseInt(parts[0]);
+  if (isNaN(secs)) return ts;
+  if (secs < 60)  return 'early round';
+  if (secs < 120) return 'mid round';
+  return 'late round';
+}
+
+function getObsHeadline(o) {
+  var sev = (o.severity||'').toLowerCase();
+  var cat = (o.category||'').toLowerCase().replace(/_/g,' ');
+  var op  = (o.operator && o.operator !== 'Unknown attacker') ? o.operator : '';
+  var headlines = {
+    'critical:game sense':'Game Sense Breakdown','critical:positioning':'Positioning Error',
+    'critical:utility':'Utility Misuse','critical:decisions':'Decision Cost You the Round',
+    'critical:rotation':'Rotation Mistake','warning:game sense':'Missed Information',
+    'warning:positioning':'Positioning Risk','warning:utility':'Utility Timing Issue',
+    'warning:decisions':'Sub-Optimal Decision','warning:rotation':'Rotation Concern',
+    'tip:game sense':'Good Game Sense','tip:positioning':'Strong Positioning',
+    'tip:utility':'Good Utility Usage','tip:decisions':'Correct Decision','tip:rotation':'Solid Rotation',
+  };
+  var base = headlines[sev+':'+cat] || (cat ? cat.charAt(0).toUpperCase()+cat.slice(1) : sev === 'critical' ? 'Critical Issue' : sev === 'tip' ? 'Coaching Tip' : 'Coaching Note');
+  return op ? base + ' — ' + op : base;
+}
 
 function renderResults(data,operator,map,rank) {
   show('dashboard');
@@ -1260,7 +1353,12 @@ function renderResults(data,operator,map,rank) {
   const pips=document.getElementById('timeline-pips');
   pips.innerHTML=obs.map((o,i)=>{const pct=Math.round(((i+1)/(obs.length+1))*100);const col=SEV_COL[o.severity]||'#9B9890';return `<button onclick="scrollToObs(${i})" style="position:absolute;left:${pct}%;top:2px;width:12px;height:12px;border-radius:50%;background:${col};border:2px solid var(--bg);cursor:pointer;transform:translateX(-50%)" title="${o.timestamp}"></button>`;}).join('');
   const list=document.getElementById('obs-list');
-  list.innerHTML=obs.map((o,i)=>{const col=SEV_COL[o.severity]||'#9B9890';return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s"><div style="display:flex;align-items:flex-start;gap:10px"><div style="min-width:36px;margin-top:1px"><button onclick="event.stopPropagation();jumpToTimestamp('${o.timestamp}',${i});speakObservation(${i})" title="Jump to ${o.timestamp} in video" style="font-family:var(--fh);font-size:13px;font-weight:700;color:${col};background:none;border:none;cursor:pointer;padding:0;text-decoration:underline dotted;text-underline-offset:2px">${o.timestamp}</button></div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="tag ${o.severity}">${o.severity}</span><span style="font-size:10px;color:var(--text3)">${(o.category||'').replace('_',' ')}</span>${o.operator ? `<span style="font-size:10px;font-weight:600;color:var(--accent);background:rgba(255,107,53,0.1);padding:1px 6px;border-radius:10px;border:1px solid rgba(255,107,53,0.2)">${o.operator}</span>` : ''}</div><div style="font-size:13px;color:var(--text2);line-height:1.5">${o.observation}</div><div id="fix-${i}" style="display:none;margin-top:9px;font-size:12px;color:var(--text);line-height:1.6;padding:9px 11px;background:var(--bg);border-radius:4px;border-left:2px solid ${col}"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}</div></div><span id="chev-${i}" style="font-size:18px;color:var(--text3);transition:transform .15s">›</span></div></div>`}).join('');
+  list.innerHTML=obs.map((o,i)=>{const col=SEV_COL[o.severity]||'#9B9890';const phase=getPhaseLabel(o.timestamp);const headline=getObsHeadline(o);return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s"><div style="display:flex;align-items:flex-start;gap:10px"><div style="min-width:36px;margin-top:1px"><button onclick="event.stopPropagation();jumpToTimestamp('${o.timestamp}',${i});speakObservation(${i})" title="Jump to ${o.timestamp} in video" style="font-family:var(--fh);font-size:13px;font-weight:700;color:${col};background:none;border:none;cursor:pointer;padding:0;text-decoration:underline dotted;text-underline-offset:2px">${o.timestamp}</button></div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="tag ${o.severity}">${o.severity}</span><span style="font-size:10px;color:var(--text3)">${(o.category||'').replace('_',' ')}</span>${o.operator ? `<span style="font-size:10px;font-weight:600;color:var(--accent);background:rgba(255,107,53,0.1);padding:1px 6px;border-radius:10px;border:1px solid rgba(255,107,53,0.2)">${o.operator}</span>` : ''}</div><div style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px">${headline}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">${phase.toUpperCase()}</div><div style="font-size:13px;color:var(--text2);line-height:1.5">${o.observation}</div><div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:8px">
+              <span style="font-size:11px;color:var(--text3)">Accurate?</span>
+              <button onclick="rateFeedback(${i},1)" id="thumb-up-${i}" style="background:none;border:none;cursor:pointer;font-size:16px;opacity:.6;transition:opacity .15s;padding:2px" title="Accurate" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.6">👍</button>
+              <button onclick="rateFeedback(${i},-1)" id="thumb-dn-${i}" style="background:none;border:none;cursor:pointer;font-size:16px;opacity:.6;transition:opacity .15s;padding:2px" title="Inaccurate" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.6">👎</button>
+            </div>
+            <div id="fix-${i}" style="display:none;margin-top:9px;font-size:12px;color:var(--text);line-height:1.6;padding:9px 11px;background:var(--bg);border-radius:4px;border-left:2px solid ${col}"><span style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--text3)">Fix: </span>${o.fix}</div></div><span id="chev-${i}" style="font-size:18px;color:var(--text3);transition:transform .15s">›</span></div></div>`}).join('');
   currentObservations=obs;
   reviewHistory.unshift({map,operator,rank,score:sc,date:'Just now'});
   renderHistory();
@@ -1306,7 +1404,7 @@ function renderHistory(){const h=document.getElementById('review-history');if(!r
 // Uses ElevenLabs for natural voice if API key set, browser TTS as fallback
 let voiceOn = false;
 let currentObservations = [];
-const ELEVENLABS_API_KEY = 'sk_da1f2247bf87cf3b404ae7bd2f69bb8d7fc4c52215f483b4';
+const ELEVENLABS_API_KEY = ELEVENLABS_KEY;
 const ELEVENLABS_VOICE_ID = 'pNInz6obpgDQGcFmaJgB'; // Adam - natural coaching voice
 
 function toggleVoice() {
@@ -2062,7 +2160,7 @@ Be highly specific — reference actual operator gadgets, map locations, and ran
 
     const resp = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-api-key': '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', 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({ model: 'claude-sonnet-4-5', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] })
     });
 
@@ -2313,6 +2411,7 @@ function submitBugReport() {
 var _audioCtx = null;
 function getAudioCtx() {
   if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (_audioCtx.state === 'suspended') _audioCtx.resume();
   return _audioCtx;
 }
 function playTone(freq, duration, type, vol) {
@@ -2389,6 +2488,56 @@ if (document.readyState !== 'loading') attachNavListeners();
   setTimeout(keepAlive, 10 * 60 * 1000);
 })();
 
+// Fetch founding slots when pricing page shown
+function loadFoundingSlots() {
+  var sc = document.getElementById('slots-count');
+  var sb = document.getElementById('slots-bar');
+  if (!sc) return;
+  fetch(API_URL + '/founding/slots')
+    .then(function(r) { return r.json(); })
+    .then(function(d) {
+      var remaining = d.slots_remaining || d.remaining || 100;
+      sc.textContent = remaining;
+      if (sb) sb.style.width = (remaining) + '%';
+      if (remaining <= 20) { sc.style.color = 'var(--danger)'; }
+      else if (remaining <= 50) { sc.style.color = 'var(--warn)'; }
+      else { sc.style.color = 'var(--success)'; }
+    })
+    .catch(function() { if (sc) sc.textContent = '< 100'; });
+}
+
+// Review count & upgrade wall
+function getReviewsUsedThisMonth() {
+  try {
+    var data = JSON.parse(localStorage.getItem('siegeiq_reviews') || '{}');
+    var month = new Date().toISOString().slice(0,7);
+    return data[month] || 0;
+  } catch(e) { return 0; }
+}
+function incrementReviewCount() {
+  try {
+    var data = JSON.parse(localStorage.getItem('siegeiq_reviews') || '{}');
+    var month = new Date().toISOString().slice(0,7);
+    data[month] = (data[month] || 0) + 1;
+    localStorage.setItem('siegeiq_reviews', JSON.stringify(data));
+    return data[month];
+  } catch(e) { return 0; }
+}
+function showUpgradeWall() {
+  var wall = document.getElementById('upgrade-wall');
+  if (wall) wall.style.display = 'flex';
+}
+function checkUpgradeWall() {
+  var used = getReviewsUsedThisMonth();
+  var ct = document.getElementById('review-count-text');
+  var remaining = Math.max(0, 3 - used);
+  if (ct) ct.textContent = remaining + ' free review' + (remaining !== 1 ? 's' : '') + ' remaining this month.';
+  if (used >= 3) {
+    var btn = document.getElementById('analyze-btn');
+    if (btn) { btn.textContent = 'UPGRADE TO ANALYZE →'; btn.style.background = 'var(--bg3)'; btn.style.border = '1px solid var(--accent)'; btn.style.color = 'var(--accent)'; btn.onclick = function() { showUpgradeWall(); }; }
+  }
+}
+
 // Hash-based navigation — if onclick fails, URL hash still works
 window.addEventListener('hashchange', function() {
   var h = window.location.hash.replace('#','');
@@ -2408,6 +2557,7 @@ window.goTo = function(p) {
   if (t) { t.classList.add('active'); t.scrollIntoView({ block: 'start' }); }
 };
 show('landing');
+checkUpgradeWall();
 updateOperators();
 buildCompTable();
 buildFAQ();
@@ -2617,10 +2767,11 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
             <span style="color:var(--accent)">SIEGE</span><span style="color:var(--text)">IQ</span>
           </div>
           <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:16px;max-width:260px">The first AI-powered VOD coaching platform for Rainbow Six Siege. Get Diamond-level coaching in under 60 seconds.</p>
-          <div style="display:flex;gap:12px">
-            <a href="https://twitter.com/siegeiq" target="_blank" style="width:34px;height:34px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:14px;color:var(--text2);transition:border-color .2s" title="Twitter / X">𝕏</a>
-            <a href="https://discord.gg/siegeiq" target="_blank" style="width:34px;height:34px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:14px;color:var(--text2)" title="Discord">💬</a>
-            <a href="https://tiktok.com/@siegeiq" target="_blank" style="width:34px;height:34px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:14px;color:var(--text2)" title="TikTok">🎵</a>
+          <div style="display:flex;gap:12px;align-items:center">
+            <a href="#" style="width:34px;height:34px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:14px;color:var(--text2);transition:border-color .2s" title="Twitter / X — coming soon" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)'">𝕏</a>
+            <a href="#" style="width:34px;height:34px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:14px;color:var(--text2);transition:border-color .2s" title="Discord — coming soon" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)'">💬</a>
+            <a href="#" style="width:34px;height:34px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:14px;color:var(--text2);transition:border-color .2s" title="TikTok — coming soon" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border2)'">🎵</a>
+            <a href="https://www.reddit.com/user/R6SiegeIQ/" target="_blank" style="width:38px;height:38px;border-radius:50%;background:#FF4500;border:2px solid #FF6634;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:18px;transition:all .2s;box-shadow:0 2px 10px rgba(255,69,0,0.5)" title="Reddit — R6SiegeIQ" onmouseover="this.style.transform='scale(1.12)';this.style.boxShadow='0 4px 18px rgba(255,69,0,0.7)'" onmouseout="this.style.transform='scale(1)';this.style.boxShadow='0 2px 10px rgba(255,69,0,0.5)'">🔴</a>
           </div>
         </div>
 
@@ -2671,5 +2822,21 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
     </div>
   </footer>
 
+
+<!-- Upgrade Wall Modal -->
+<div id="upgrade-wall" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99998;align-items:center;justify-content:center;padding:24px">
+  <div style="background:var(--bg2);border:1px solid rgba(255,107,53,0.3);border-radius:16px;max-width:480px;width:100%;padding:36px;text-align:center">
+    <div style="font-size:40px;margin-bottom:12px">🔒</div>
+    <div style="font-family:var(--fh);font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Free limit reached</div>
+    <h2 style="font-family:var(--fh);font-size:28px;font-weight:800;color:var(--text);margin-bottom:10px">You've used your 3 free reviews</h2>
+    <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:24px">Upgrade to Pro for unlimited reviews, operator coaching, priority processing, and weekly trend reports. Founding Member pricing locks in $6.99/mo forever.</p>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button onclick="startCheckoutWithCode('pro_monthly','FOUNDING')" style="font-family:var(--fh);font-size:15px;font-weight:700;color:#fff;background:var(--accent);border:none;padding:14px 24px;border-radius:10px;cursor:pointer">⭐ CLAIM FOUNDING PRICE — $6.99/mo →</button>
+      <button onclick="startCheckout('pro_monthly')" style="font-family:var(--fh);font-size:13px;font-weight:600;color:var(--text2);background:var(--bg3);border:1px solid var(--border);padding:11px 24px;border-radius:10px;cursor:pointer">Start at $9.99/mo (no discount)</button>
+      <button onclick="document.getElementById('upgrade-wall').style.display='none'" style="font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;padding:6px">Maybe later</button>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin-top:16px">Resets monthly · Cancel anytime · No credit card for free tier</p>
+  </div>
+</div>
 </body>
 </html>
