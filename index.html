@@ -1270,6 +1270,19 @@ function setProgress(pct,label){
 }
 
 // ─── Render results ───────────────────────────
+function formatTimestamp(ts) {
+  if (!ts) return '';
+  // Remove ~ prefix and clean up
+  var clean = ts.replace(/~/g,'').trim();
+  // Format range "0:05-0:10" → "0:05 – 0:10"
+  if (clean.indexOf('-') > 0 && !clean.startsWith('-')) {
+    var parts = clean.split('-');
+    return parts[0].trim() + ' – ' + parts[1].trim();
+  }
+  // Remove leading negative sign from malformed timestamps
+  return clean.replace(/^-/,'');
+}
+
 const SEV_COL={critical:'#FF4444',warning:'#F59E0B',tip:'#3ECF8E'};
 
 function replayMoment(i, e) {
@@ -1283,7 +1296,7 @@ function replayMoment(i, e) {
   if (isNaN(secs)) return;
   var lp = document.getElementById('local-player');
   if (!lp || !lp.src) { return; }
-  var start = Math.max(0, secs - 2);
+  var start = Math.max(0, secs);  // start exactly at the listed timestamp
   var end   = secs + 10;
   lp.currentTime = start;
   lp.play();
@@ -1343,7 +1356,7 @@ function getObsHeadline(o) {
     'tip:utility':'Good Utility Usage','tip:decisions':'Correct Decision','tip:rotation':'Solid Rotation',
   };
   var base = headlines[sev+':'+cat] || (cat ? cat.charAt(0).toUpperCase()+cat.slice(1) : sev === 'critical' ? 'Critical Issue' : sev === 'tip' ? 'Coaching Tip' : 'Coaching Note');
-  return op ? base + ' — ' + op : base;
+  return base; // operator shown separately in badge — don't duplicate in headline
 }
 
 function renderResults(data,operator,map,rank) {
@@ -1418,7 +1431,7 @@ function renderResults(data,operator,map,rank) {
   const pips=document.getElementById('timeline-pips');
   pips.innerHTML=obs.map((o,i)=>{const pct=Math.round(((i+1)/(obs.length+1))*100);const col=SEV_COL[o.severity]||'#9B9890';return `<button onclick="scrollToObs(${i})" style="position:absolute;left:${pct}%;top:2px;width:12px;height:12px;border-radius:50%;background:${col};border:2px solid var(--bg);cursor:pointer;transform:translateX(-50%)" title="${o.timestamp}"></button>`;}).join('');
   const list=document.getElementById('obs-list');
-  list.innerHTML=obs.map((o,i)=>{const col=SEV_COL[o.severity]||'#9B9890';const phase=getPhaseLabel(o.timestamp);const headline=getObsHeadline(o);return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s"><div style="display:flex;align-items:flex-start;gap:10px"><div style="min-width:36px;margin-top:1px"><button onclick="event.stopPropagation();jumpToTimestamp('${o.timestamp}',${i});speakObservation(${i})" title="Jump to ${o.timestamp} in video" style="font-family:var(--fh);font-size:13px;font-weight:700;color:${col};background:none;border:none;cursor:pointer;padding:0;text-decoration:underline dotted;text-underline-offset:2px">${o.timestamp}</button></div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="tag ${o.severity}">${o.severity}</span><span style="font-size:10px;color:var(--text3)">${(o.category||'').replace('_',' ')}</span>${(o.operator && o.operator !== 'Unknown attacker' && o.operator !== 'Unknown Attacker') ? `<span style="font-size:10px;font-weight:600;color:var(--accent);background:rgba(255,107,53,0.1);padding:1px 6px;border-radius:10px;border:1px solid rgba(255,107,53,0.2)">${o.operator}</span>` : ''}</div><div style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px">${headline}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">${phase.toUpperCase()}</div><div style="font-size:13px;color:var(--text2);line-height:1.5">${o.observation}</div><div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:8px">
+  list.innerHTML=obs.map((o,i)=>{const col=SEV_COL[o.severity]||'#9B9890';const phase=getPhaseLabel(o.timestamp);const headline=getObsHeadline(o);return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.07}s"><div style="display:flex;align-items:flex-start;gap:10px"><div style="min-width:36px;margin-top:1px"><button onclick="event.stopPropagation();jumpToTimestamp('${o.timestamp}',${i});speakObservation(${i})" title="Jump to ${o.timestamp} in video" style="font-family:var(--fm);font-size:11px;font-weight:700;color:${col};background:rgba(255,255,255,0.06);border:none;cursor:pointer;padding:2px 8px;border-radius:4px;letter-spacing:.04em">${formatTimestamp(o.timestamp)}</button></div><div style="flex:1"><div style="display:flex;align-items:center;gap:6px;margin-bottom:4px"><span class="tag ${o.severity}">${o.severity}</span><span style="font-size:10px;color:var(--text3)">${(o.category||'').replace('_',' ')}</span>${(o.operator && o.operator !== 'Unknown attacker' && o.operator !== 'Unknown Attacker') ? `<span style="font-size:10px;font-weight:600;color:var(--accent);background:rgba(255,107,53,0.1);padding:1px 6px;border-radius:10px;border:1px solid rgba(255,107,53,0.2)">${o.operator}</span>` : ''}</div><div style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--text);margin-bottom:3px">${headline}</div><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">${phase.toUpperCase()}</div><div style="font-size:13px;color:var(--text2);line-height:1.5">${o.observation}</div><div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-top:8px">
               <span style="font-size:11px;color:var(--text3)">Accurate?</span>
               <button onclick="rateFeedback(${i},1)" id="thumb-up-${i}" style="background:none;border:none;cursor:pointer;font-size:16px;opacity:.6;transition:opacity .15s;padding:2px" title="Accurate" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.6">👍</button>
               <button onclick="rateFeedback(${i},-1)" id="thumb-dn-${i}" style="background:none;border:none;cursor:pointer;font-size:16px;opacity:.6;transition:opacity .15s;padding:2px" title="Inaccurate" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.6">👎</button>
@@ -1491,6 +1504,9 @@ async function speakObservation(index) {
   if (!obs) return;
   stopVoice();
 
+  // Detect Brave browser - it blocks Web Speech API by default
+  const isBrave = navigator.brave && typeof navigator.brave.isBrave === 'function';
+
   const sev = obs.severity || 'warning';
   const intros = {
     critical: ["This is where it went wrong. ","Watch this moment. ","Here is what cost you the round. "],
@@ -1537,7 +1553,14 @@ async function speakObservation(index) {
   }
 
   // Browser TTS fallback — best available voice
-  if (!window.speechSynthesis) return;
+  if (!window.speechSynthesis) {
+    document.getElementById('voice-reading').textContent = 'Voice not supported in this browser.';
+    return;
+  }
+  // Brave may block speech - test it
+  if (isBrave) {
+    document.getElementById('voice-reading').textContent = 'Brave detected. If no voice plays: Settings → Privacy → enable Speech Synthesis.';
+  }
   const utter = new SpeechSynthesisUtterance(text);
   const trySpeak = () => {
     const voices = window.speechSynthesis.getVoices();
@@ -1549,6 +1572,11 @@ async function speakObservation(index) {
       || voices.find(v => v.lang.startsWith('en'))
       || voices[0];
     if (preferred) utter.voice = preferred;
+    if (preferred) {
+      document.getElementById('voice-reading').textContent = 'Speaking via ' + preferred.name + '...';
+    } else {
+      document.getElementById('voice-reading').textContent = 'Speaking...';
+    }
     utter.rate = 0.93; utter.pitch = 1.0; utter.volume = 1.0;
     const lp = document.getElementById('local-player');
     if (lp) lp.volume = 0.15;
