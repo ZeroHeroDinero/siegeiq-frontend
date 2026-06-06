@@ -2243,14 +2243,35 @@ Be highly specific — reference actual operator gadgets, map locations, and ran
     const text = data.content[0].text;
     lastCounterResult = text;
 
-    // Render with markdown-like formatting
-    const html = text
-      .replace(/\*\*(.+?)\*\*/g, '<div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--accent);margin:14px 0 6px;letter-spacing:.04em">$1</div>')
-      .replace(/\[(.+?)\]/g, '<div style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:8px">$1</div>')
-      .split('\n').map(l => l.trim()).filter(Boolean)
-      .map(l => l.startsWith('<') ? l : `<p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:6px">${l}</p>`)
-      .join('');
-
+    // Render with clean sectioned layout
+    const lines = text.split('\n');
+    let html = ''; let inList = false;
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) { if (inList) { html += '</div>'; inList = false; } continue; }
+      if (/^\*\*[A-Z][^*]+\*\*$/.test(line)) {
+        if (inList) { html += '</div>'; inList = false; }
+        const title = line.replace(/\*\*/g,'');
+        html += '<div style="display:flex;align-items:center;gap:8px;margin:20px 0 10px"><div style="height:1px;flex:1;background:var(--border)"></div><span style="font-family:var(--fh);font-size:10px;font-weight:700;color:var(--accent);letter-spacing:.12em">'+title+'</span><div style="height:1px;flex:1;background:var(--border)"></div></div>';
+        continue;
+      }
+      const opMatch = line.match(/^-?\s*\*\*([^*]{1,25})\*\*:?\s*(.*)/);
+      if (opMatch) {
+        if (inList) { html += '</div>'; inList = false; }
+        const desc = opMatch[2];
+        html += '<div style="background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:8px"><div style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--text);margin-bottom:'+(desc?'4px':'0')+'">'+opMatch[1]+'</div>'+(desc?'<div style="font-size:12px;color:var(--text2);line-height:1.6">'+desc+'</div>':'')+'</div>';
+        continue;
+      }
+      if (/^- /.test(line)) {
+        const item = line.replace(/^- /,'');
+        if (!inList) { html += '<div style="display:flex;flex-direction:column;gap:5px;margin-bottom:10px">'; inList = true; }
+        html += '<div style="display:flex;gap:8px;align-items:flex-start"><span style="color:var(--accent);font-size:14px;flex-shrink:0">›</span><span style="font-size:13px;color:var(--text2);line-height:1.6">'+item+'</span></div>';
+        continue;
+      }
+      if (inList) { html += '</div>'; inList = false; }
+      html += '<p style="font-size:13px;color:var(--text2);line-height:1.7;margin:0 0 8px">'+line+'</p>';
+    }
+    if (inList) html += '</div>';
     document.getElementById('ct-output').innerHTML = html;
     document.getElementById('ct-results').style.display = 'block';
 
@@ -2804,7 +2825,7 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
           <div style="font-size:13px;color:var(--text2);display:flex;gap:8px"><span style="color:var(--accent)">•</span>Genuine engagement — no scripted promotions</div>
         </div>
       </div>
-      <a href="mailto:partnerships@siegeiq.gg?subject=Creator%20Pro%20Application&body=Channel%20URL%3A%0ASubscriber%20count%3A%0AUpload%20frequency%3A%0AWhy%20I%20want%20to%20partner%3A" style="display:inline-block;background:var(--accent);color:#fff;text-decoration:none;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.05em;padding:13px 28px;border-radius:8px">APPLY FOR CREATOR PRO →</a>
+      <button onclick="goTo('contact')" style="font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;padding:13px 28px;border-radius:var(--r);cursor:pointer">APPLY FOR CREATOR PRO →</button>
     </div>
 
     <!-- Esports + Orgs -->
@@ -2813,13 +2834,13 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
         <div style="font-size:26px;margin-bottom:10px">🏆</div>
         <h3 style="font-family:var(--fh);font-size:18px;font-weight:700;margin-bottom:6px;color:var(--accent)">Esports Teams</h3>
         <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px;font-weight:300">Custom Squad plans for competitive teams. Shared review feed, IGL strategy tools, team analytics. Volume pricing for 5+ seats.</p>
-        <a href="mailto:partnerships@siegeiq.gg?subject=Esports%20Team%20Partnership" style="font-size:13px;color:var(--accent);text-decoration:none;font-weight:600">Get in touch →</a>
+        <button onclick="goTo('contact')" style="font-size:13px;color:var(--accent);background:none;border:none;cursor:pointer;font-weight:600;padding:0">Get in touch →</button>
       </div>
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:24px">
         <div style="font-size:26px;margin-bottom:10px">🏢</div>
         <h3 style="font-family:var(--fh);font-size:18px;font-weight:700;margin-bottom:6px;color:var(--accent)">Organisations</h3>
         <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:14px;font-weight:300">Gaming cafes, coaching academies, university esports. Custom licensing for 10+ players. White-label options available on request.</p>
-        <a href="mailto:partnerships@siegeiq.gg?subject=Organisation%20Partnership" style="font-size:13px;color:var(--accent);text-decoration:none;font-weight:600">Get in touch →</a>
+        <button onclick="goTo('contact')" style="font-size:13px;color:var(--accent);background:none;border:none;cursor:pointer;font-weight:600;padding:0">Get in touch →</button>
       </div>
     </div>
   </div>
