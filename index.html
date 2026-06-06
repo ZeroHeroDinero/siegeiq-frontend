@@ -140,6 +140,7 @@ const ANTHROPIC_KEY = _K1 + _K2;
 const _E1 = 'sk_da1f2247bf87cf3b404ae7bd';
 const _E2 = '2f69bb8d7fc4c52215f483b4';
 const ELEVENLABS_KEY = _E1 + _E2;
+const ELEVENLABS_API_KEY = ELEVENLABS_KEY; // alias used by speakObservation
 
 
   const API_URL = 'https://siegeiq-backend-production.up.railway.app';
@@ -1528,11 +1529,16 @@ async function speakObservation(index) {
   if (!obs) return;
   stopVoice();
 
-  const sevLabel = obs.severity === 'critical' ? 'Critical mistake'
-                 : obs.severity === 'warning'  ? 'Warning'
-                 : 'Good play';
-  const cat  = (obs.category || '').replace(/_/g, ' ');
-  const text = sevLabel + ' at ' + obs.timestamp + '. ' + obs.observation + '. Fix: ' + obs.fix;
+  const cat = (obs.category || '').replace(/_/g, ' ');
+  const intros = {
+    critical: ["This is where things went wrong.", "Watch out, this cost you.", "Here is a critical mistake."],
+    warning:  ["Something to watch here.", "Here is a coaching note.", "Keep this in mind."],
+    tip:      ["Nice play here.", "Good decision.", "This is what you did well."]
+  };
+  const sev = obs.severity || 'warning';
+  const intro = intros[sev][Math.floor(Math.random() * intros[sev].length)];
+  const fix = obs.fix ? ' Here is what to do differently: ' + obs.fix : '';
+  const text = intro + ' ' + obs.observation + fix;
 
   document.getElementById('voice-reading').textContent = 'Speaking: ' + obs.timestamp + ' — ' + cat + '...';
 
@@ -1549,10 +1555,11 @@ async function speakObservation(index) {
         body: JSON.stringify({
           text: text,
           model_id: 'eleven_multilingual_v2',
-            voice_settings: { stability: 0.45, similarity_boost: 0.80, style: 0.3, use_speaker_boost: true },
           voice_settings: {
-            stability: 0.5,
-            similarity_boost: 0.85
+            stability: 0.30,
+            similarity_boost: 0.90,
+            style: 0.45,
+            use_speaker_boost: true
           }
         })
       });
