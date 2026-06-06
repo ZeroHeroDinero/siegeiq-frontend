@@ -152,15 +152,15 @@ nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;backgro
 
 <!-- NAV -->
 <nav>
-  <button onclick="show('landing')" style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--text);letter-spacing:.04em;background:none;border:none;cursor:pointer">
+  <button onclick="playNavSound();show('landing')" style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--text);letter-spacing:.04em;background:none;border:none;cursor:pointer">
     SIEGE<span style="color:var(--accent)">IQ</span>
   </button>
   <div style="display:flex;align-items:center;gap:6px">
-    <button class="nav-btn" id="nb-counter" data-show="counter" onclick="show('counter')">Counter Tool</button>
-    <button class="nav-btn" id="nb-pricing" data-show="pricing" onclick="show('pricing')">Pricing</button>
-    <button class="nav-btn" id="nb-upload" data-show="upload" onclick="show('upload')">Upload</button>
-    <button class="nav-btn" id="nb-dashboard" data-show="dashboard" onclick="show('dashboard')">Dashboard</button>
-    <button onclick="show('upload')" style="font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:7px 16px;cursor:pointer;margin-left:4px">ANALYZE CLIP</button>
+    <button class="nav-btn" id="nb-counter" data-show="counter" onclick="playNavSound();show('counter')">Counter Tool</button>
+    <button class="nav-btn" id="nb-pricing" data-show="pricing" onclick="playNavSound();show('pricing')">Pricing</button>
+    <button class="nav-btn" id="nb-upload" data-show="upload" onclick="playNavSound();show('upload')">Upload</button>
+    <button class="nav-btn" id="nb-dashboard" data-show="dashboard" onclick="playNavSound();show('dashboard')">Dashboard</button>
+    <button onclick="playNavSound();show('upload')" style="font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:7px 16px;cursor:pointer;margin-left:4px">ANALYZE CLIP</button>
   </div>
 </nav>
 
@@ -571,7 +571,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;backgro
       <div style="font-size:11px;color:var(--text3);margin-top:5px">The more detail you add — timestamps, what went wrong, what you were trying to do — the more accurate and useful your coaching will be.</div>
     </div>
 
-    <button id="analyze-btn" onclick="startAnalysis()" style="width:100%;font-family:var(--fh);font-size:17px;font-weight:700;letter-spacing:.08em;color:#fff;background:var(--bg3);border:none;border-radius:var(--r);padding:15px;cursor:not-allowed;opacity:.4;transition:all .15s">ADD A CLIP ABOVE</button>
+    <button id="analyze-btn" onclick="playAnalyzeSound();startAnalysis()" style="width:100%;font-family:var(--fh);font-size:17px;font-weight:700;letter-spacing:.08em;color:#fff;background:var(--bg3);border:none;border-radius:var(--r);padding:15px;cursor:not-allowed;opacity:.4;transition:all .15s">ADD A CLIP ABOVE</button>
     <div style="font-size:12px;color:var(--text3);text-align:center;margin-top:10px">Free plan: ~15 min · Pro plan: ~2 min priority</div>
     <div style="display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r);padding:10px 14px;margin-top:12px">
       <span style="font-size:15px">💡</span>
@@ -602,7 +602,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;backgro
   <!-- Dashboard top bar — upload CTA -->
   <div style="background:rgba(255,107,53,0.06);border-bottom:1px solid rgba(255,107,53,0.2);padding:10px 24px;display:flex;align-items:center;justify-content:space-between">
     <div style="font-size:12px;color:var(--text2)">Upload a clip to get AI coaching with timestamped feedback and voice coaching</div>
-    <button onclick="show('upload')" style="font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:8px 20px;cursor:pointer;white-space:nowrap;flex-shrink:0">+ UPLOAD CLIP</button>
+    <button onclick="playNavSound();show('upload')" style="font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:8px 20px;cursor:pointer;white-space:nowrap;flex-shrink:0">+ UPLOAD CLIP</button>
   </div>
   <div style="display:grid;grid-template-columns:1fr 296px;min-height:calc(100vh - 56px)">
     <div style="border-right:1px solid var(--border)">
@@ -1168,12 +1168,12 @@ function pollForResult(reviewId,operator,map,rank) {
       const data=await resp.json();
       if(data.status==='complete'){
         clearInterval(pollInterval);
-        setProgress(100,'Analysis complete!');
+        setProgress(100,'Analysis complete!');playCompleteSound();
         setTimeout(()=>{document.getElementById('analyzing').style.display='none';renderResults(data,operator,map,rank);show('dashboard');},600);
       } else if(data.status==='failed'){
         clearInterval(pollInterval);
         document.getElementById('analyzing').style.display='none';
-        showError('Analysis failed: '+(data.error||'Unknown error. Check Railway logs.'));
+        playErrorSound();showError('Analysis failed: '+(data.error||'Unknown error. Check Railway logs.'));
       }
     } catch(e){}
   },8000);
@@ -1205,7 +1205,7 @@ function renderResults(data,operator,map,rank) {
   const vc = document.getElementById('video-container');
   const yt = (data.source || '').match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
 
-  if (window.localVideoURL && window.upMode === 'file') {
+  if (window.localVideoURL) { // show local video whenever available
     // LOCAL FILE — play directly from browser memory, no server needed
     window.currentYouTubeId = null;
     vc.style.minHeight = '0';
@@ -2309,6 +2309,48 @@ function submitBugReport() {
 }
 
 // ── Page scroll targets (updated with new pages) ──────────────
+// ─── Sound Effects ───────────────────────────────────────────────────
+var _audioCtx = null;
+function getAudioCtx() {
+  if (!_audioCtx) _audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  return _audioCtx;
+}
+function playTone(freq, duration, type, vol) {
+  try {
+    var ctx = getAudioCtx();
+    var osc = ctx.createOscillator();
+    var gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = type || 'sine';
+    osc.frequency.setValueAtTime(freq, ctx.currentTime);
+    gain.gain.setValueAtTime(vol || 0.15, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + duration);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + duration);
+  } catch(e) {}
+}
+// Nav click — soft tick
+function playNavSound() {
+  playTone(600, 0.08, 'sine', 0.08);
+}
+// Analyze click — rising two-tone
+function playAnalyzeSound() {
+  playTone(440, 0.12, 'sine', 0.12);
+  setTimeout(function() { playTone(660, 0.18, 'sine', 0.12); }, 80);
+}
+// Analysis complete — triumphant three-tone chime
+function playCompleteSound() {
+  playTone(523, 0.18, 'sine', 0.15);
+  setTimeout(function() { playTone(659, 0.18, 'sine', 0.15); }, 150);
+  setTimeout(function() { playTone(784, 0.35, 'sine', 0.15); }, 300);
+}
+// Error — low descending tone
+function playErrorSound() {
+  playTone(300, 0.2, 'sawtooth', 0.08);
+  setTimeout(function() { playTone(220, 0.3, 'sawtooth', 0.08); }, 150);
+}
+
 var PAGE_SCROLL_TARGETS = {
   'upload':       null,
   'pricing':      null,
