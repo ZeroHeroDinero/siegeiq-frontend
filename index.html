@@ -1486,7 +1486,7 @@ function pollForResult(reviewId,operator,map,rank) {
   activateStep(1);
   setTimeout(()=>{ completeStep(1); activateStep(2); stepPhase=2; }, 3000);
 
-  pollInterval=setInterval(async()=>{\
+  pollInterval=setInterval(async()=>{
     pct=Math.min(90,pct+Math.random()*4);
     if(pct>70 && stepPhase===2){ completeStep(2); activateStep(3); stepPhase=3; }
     setProgress(pct, pct<50?'Extracting frames & analyzing footage...':pct<75?'Claude evaluating tactics & positioning...':'Building your coaching report...');
