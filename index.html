@@ -1203,8 +1203,22 @@ async function startAnalysis() {
     if(window.upMode==='url') {
       const url=document.getElementById('url-input').value.trim();
       setProgress(15,'Sending to backend...');
-      const resp=await fetch(`${API_URL}/review/submit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:'demo-user',source:url,operator,map_name:map,rank,description,round_num:1})});
-      if(!resp.ok){const err=await resp.json();throw new Error(err.detail||'Submission failed');}
+      let resp, lastErr;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          resp = await fetch(`${API_URL}/review/submit`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id:'demo-user',source:url,operator,map_name:map,rank,description,round_num:1})});
+          lastErr = null;
+          break;
+        } catch(e) {
+          lastErr = e;
+          if (attempt < 3) {
+            setProgress(15, `Server waking up — retrying in 8 seconds (${attempt}/3)...`);
+            await new Promise(r => setTimeout(r, 8000));
+          }
+        }
+      }
+      if (lastErr) throw lastErr;
+      if(!resp.ok){const err=await resp.json().catch(()=>({detail:'Submission failed'}));throw new Error(err.detail||'Submission failed');}
       const data=await resp.json();
       reviewId=data.review_id;
     } else {
@@ -1216,8 +1230,24 @@ async function startAnalysis() {
       formData.append('map_name',map);
       formData.append('rank',rank);
       formData.append('description',description);
-      const resp=await fetch(`${API_URL}/review/upload`,{method:'POST',body:formData});
-      if(!resp.ok){const err=await resp.json();throw new Error(err.detail||'Upload failed');}
+      // Retry up to 3 times with 8 second gaps to handle Railway cold starts
+      let resp, lastErr;
+      for (let attempt = 1; attempt <= 3; attempt++) {
+        try {
+          setProgress(15, attempt === 1 ? 'Uploading video...' : `Connecting to server (attempt ${attempt}/3)...`);
+          resp = await fetch(`${API_URL}/review/upload`, {method:'POST', body:formData});
+          lastErr = null;
+          break;
+        } catch(e) {
+          lastErr = e;
+          if (attempt < 3) {
+            setProgress(15, `Server waking up — retrying in 8 seconds (${attempt}/3)...`);
+            await new Promise(r => setTimeout(r, 8000));
+          }
+        }
+      }
+      if (lastErr) throw lastErr;
+      if(!resp.ok){const err=await resp.json().catch(()=>({detail:'Upload failed'}));throw new Error(err.detail||'Upload failed');}
       const data=await resp.json();
       reviewId=data.review_id;
     }
@@ -1710,7 +1740,7 @@ function doSaveCard(card) {
 // ─── Stripe checkout ──────────────────────────
 // Direct Stripe payment links — instant, no backend required
 const STRIPE_DIRECT = {
-  'pro_monthly':  'https://buy.stripe.com/5kQcN559z1tB1h7ek393y00',
+  'pro_monthly':  'https://buy.stripe.com/4gMeVd1Xngov3pf5Nx93y05',
   'pro_annual':   'https://buy.stripe.com/14AaEX59za07f7Xb7R93y01',
   'team_monthly': 'https://buy.stripe.com/7sYbJ19pP5JRaRH6RB93y02',
   'team_annual':  'https://buy.stripe.com/28E28rbxX8W3e3T0td93y03',
