@@ -146,7 +146,19 @@ nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;backgro
 .obs-card.open-warning{border-color:var(--border2)}
 .obs-card.open-tip{border-color:var(--border2)}
 
-/* ── Mobile hamburger button ── */
+/* Mobile dashboard bottom tab bar */
+#mob-dash-tabs{display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;background:rgba(10,12,15,0.97);backdrop-filter:blur(12px);border-top:1px solid var(--border);padding:8px 0 12px}
+#mob-dash-tabs button{flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 8px;color:var(--text3);font-size:9px;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+#mob-dash-tabs button.mob-tab-active{color:var(--accent)}
+#mob-dash-tabs button span{font-size:18px;line-height:1}
+@media(max-width:768px){
+  #mob-dash-tabs{display:flex}
+  #page-dashboard{padding-bottom:70px!important}
+  .mob-section{display:none!important}
+  .mob-section.mob-active{display:block!important}
+  #dash-sidebar{display:none!important}
+  #dash-sidebar.mob-active{display:flex!important}
+}
 #mob-menu-btn{display:none;background:none;border:none;cursor:pointer;padding:6px;color:var(--text);font-size:22px}
 #mob-nav{display:none;position:fixed;top:56px;left:0;right:0;background:rgba(10,12,15,0.98);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);z-index:99998;padding:12px 20px;flex-direction:column;gap:6px}
 #mob-nav.open{display:flex}
@@ -972,8 +984,16 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
     <div style="font-size:12px;color:var(--text2)">Upload a clip to get AI coaching with timestamped feedback and voice coaching</div>
     <button onclick="playNavSound();show('upload')" style="font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:8px 20px;cursor:pointer;white-space:nowrap;flex-shrink:0">+ UPLOAD CLIP</button>
   </div>
+
+  <!-- Mobile bottom tab bar -->
+  <div id="mob-dash-tabs">
+    <button id="mob-tab-video" class="mob-tab-active" onclick="switchMobTab('video')"><span>🎮</span>Video</button>
+    <button id="mob-tab-coaching" onclick="switchMobTab('coaching')"><span>🎯</span>Coaching</button>
+    <button id="mob-tab-score" onclick="switchMobTab('score')"><span>📊</span>Score</button>
+  </div>
+
   <div style="display:grid;grid-template-columns:1fr 272px;min-height:calc(100vh - 56px)">
-    <div style="border-right:1px solid var(--border)">
+    <div id="mob-section-video" class="mob-section mob-active" style="border-right:1px solid var(--border)">
       <div id="dash-content-top" style="padding:12px 26px 0;border-bottom:1px solid var(--border)">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">
           <span id="review-meta" style="font-family:var(--fh);font-size:13px;font-weight:600;letter-spacing:.06em;color:var(--accent)">SUBMIT A CLIP TO SEE YOUR ANALYSIS</span>
@@ -990,7 +1010,7 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
           <div id="timeline-pips" style="position:relative;height:16px"></div>
         </div>
       </div>
-      <div id="obs-list" style="padding:14px 26px">
+      <div id="mob-section-coaching" class="mob-section" id="obs-list" style="padding:14px 26px">
         <div style="text-align:center;padding:48px 24px;color:var(--text3);font-size:13px;line-height:1.7">
           Upload a clip on the <button onclick="show('upload')" style="color:var(--accent);background:none;border:none;cursor:pointer;font-size:13px;text-decoration:underline">Upload page</button> to see your AI coaching report here.
         </div>
@@ -1067,6 +1087,13 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
         <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:12px">Recent reviews</div>
         <div id="review-history"><div style="font-size:12px;color:var(--text3)">No reviews yet.</div></div>
       </div>
+      <!-- Score trend chart -->
+      <div id="score-trend-section" style="display:none;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px">
+        <div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-weight:600">📈 Score Trend</div>
+        <canvas id="score-trend-chart" height="80" style="width:100%;display:block"></canvas>
+        <div id="score-trend-label" style="font-size:10px;color:var(--text3);text-align:center;margin-top:6px"></div>
+      </div>
+
       <div id="cert-btn-container" style="display:none"></div>
 
       <div style="background:rgba(255,107,53,.07);border:1px solid rgba(255,107,53,.22);border-radius:var(--r);padding:16px">
@@ -1440,6 +1467,18 @@ function updateOperators() {
 
 // ─── Navigation ───────────────────────────────
 const PAGES = ['landing','upload','dashboard','pricing','counter','privacy','terms','contact','partnerships','bug'];
+function switchMobTab(tab) {
+  ['video','coaching','score'].forEach(t => {
+    const sec = document.getElementById('mob-section-' + t);
+    const btn = document.getElementById('mob-tab-' + t);
+    if (sec) sec.classList.toggle('mob-active', t === tab);
+    if (btn) btn.classList.toggle('mob-tab-active', t === tab);
+  });
+  // Score tab shows sidebar
+  const sidebar = document.getElementById('dash-sidebar');
+  if (sidebar) sidebar.classList.toggle('mob-active', tab === 'score');
+}
+
 function toggleMobNav(){
   const m = document.getElementById('mob-nav');
   m.classList.toggle('open');
@@ -1981,6 +2020,7 @@ function renderResults(data,operator,map,rank) {
   currentObservations=obs;
   reviewHistory.unshift({map,operator,rank,score:sc,date:'Just now'});
   renderHistory();
+  renderScoreTrend();
   populateShareCard(report,operator,map,rank);
   checkForCertificate(report, operator, map, rank);
 }
@@ -2008,6 +2048,88 @@ function saveReviewToProgress(report, operator, map, rank) {
     existing.unshift(entry);
     localStorage.setItem('siegeiq_progress', JSON.stringify(existing.slice(0,50)));
   } catch(e) { console.warn('[SiegeIQ] saveReviewToProgress:', e.message); }
+}
+
+function renderScoreTrend() {
+  const section = document.getElementById('score-trend-section');
+  const canvas = document.getElementById('score-trend-chart');
+  const label = document.getElementById('score-trend-label');
+  if (!section || !canvas || reviewHistory.length < 2) return;
+
+  section.style.display = 'block';
+  const scores = reviewHistory.slice(0, 5).reverse().map(r => r.score);
+  const W = canvas.offsetWidth || 220;
+  const H = 80;
+  canvas.width = W * 2; canvas.height = H * 2;
+  canvas.style.width = W + 'px'; canvas.style.height = H + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(2, 2);
+
+  const min = Math.max(0, Math.min(...scores) - 10);
+  const max = Math.min(100, Math.max(...scores) + 10);
+  const pad = 12;
+  const chartW = W - pad * 2;
+  const chartH = H - pad * 2;
+
+  // Background
+  ctx.fillStyle = 'rgba(255,255,255,0.02)';
+  ctx.roundRect(0, 0, W, H, 6);
+  ctx.fill();
+
+  // Grid lines
+  ctx.strokeStyle = 'rgba(255,255,255,0.05)';
+  ctx.lineWidth = 0.5;
+  [25, 50, 75].forEach(v => {
+    const y = pad + chartH - ((v - min) / (max - min)) * chartH;
+    if (y > pad && y < H - pad) {
+      ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke();
+    }
+  });
+
+  if (scores.length < 2) return;
+  const pts = scores.map((s, i) => ({
+    x: pad + (i / (scores.length - 1)) * chartW,
+    y: pad + chartH - ((s - min) / (max - min)) * chartH
+  }));
+
+  // Fill area under line
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, H - pad);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.lineTo(pts[pts.length-1].x, H - pad);
+  ctx.closePath();
+  ctx.fillStyle = 'rgba(255,107,53,0.08)';
+  ctx.fill();
+
+  // Line
+  ctx.beginPath();
+  ctx.moveTo(pts[0].x, pts[0].y);
+  pts.forEach(p => ctx.lineTo(p.x, p.y));
+  ctx.strokeStyle = '#FF6B35';
+  ctx.lineWidth = 2;
+  ctx.lineJoin = 'round';
+  ctx.stroke();
+
+  // Dots
+  pts.forEach((p, i) => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, 3, 0, Math.PI * 2);
+    ctx.fillStyle = i === pts.length - 1 ? '#FF6B35' : 'rgba(255,107,53,0.5)';
+    ctx.fill();
+    // Score label
+    ctx.font = 'bold 9px Arial';
+    ctx.fillStyle = '#F0EEE8';
+    ctx.textAlign = 'center';
+    ctx.fillText(scores[i], p.x, p.y - 5);
+  });
+
+  // Trend label
+  const diff = scores[scores.length - 1] - scores[0];
+  if (label) {
+    label.textContent = diff > 0 ? `+${diff} improvement over ${scores.length} clips` :
+      diff < 0 ? `${diff} over ${scores.length} clips` : 'Consistent across clips';
+    label.style.color = diff > 0 ? 'var(--success)' : diff < 0 ? 'var(--danger)' : 'var(--text3)';
+  }
 }
 
 function renderHistory(){const h=document.getElementById('review-history');if(!reviewHistory.length){h.innerHTML='<div style="font-size:12px;color:var(--text3)">No reviews yet.</div>';return;}h.innerHTML=reviewHistory.slice(0,5).map((r,i)=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:7px 0;${i<reviewHistory.length-1?'border-bottom:1px solid var(--border)':''}"><div><div style="font-size:13px;font-weight:500">${r.map||'Unknown'} · ${r.operator||'Unknown'}</div><div style="font-size:11px;color:var(--text3)">${r.date}</div></div><div style="font-family:var(--fh);font-size:22px;font-weight:700;color:${r.score>=70?'var(--success)':r.score>=50?'var(--warn)':'var(--danger)'}">${r.score}</div></div>`).join('');}
