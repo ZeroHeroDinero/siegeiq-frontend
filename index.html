@@ -2645,7 +2645,25 @@ function attachNavListeners() {
 document.addEventListener('DOMContentLoaded', attachNavListeners);
 // Also run immediately in case DOM already loaded
 if (document.readyState !== 'loading') attachNavListeners();
-// ── Keep-alive ping — prevents Railway cold starts ──────────────
+// ── Developer bypass — Shift+D resets review count silently ─────
+document.addEventListener('keydown', function(e) {
+  if (e.shiftKey && e.key === 'D') {
+    try {
+      localStorage.removeItem('siegeiq_review_count');
+      localStorage.removeItem('siegeiq_review_month');
+      localStorage.removeItem('siegeiq_reviews_used');
+      localStorage.removeItem('siegeiq_review_reset');
+      reviewCount = 0;
+      updateReviewCounter();
+      var el = document.getElementById('reviews-remaining');
+      if (el) el.textContent = '3 free reviews remaining this month.';
+      // Brief silent flash on the page title to confirm it worked
+      var orig = document.title;
+      document.title = '✓ Dev reset';
+      setTimeout(function(){ document.title = orig; }, 1500);
+    } catch(err) {}
+  }
+});
 // Pings the backend every 10 minutes so it never goes to sleep
 (function keepAlive() {
   fetch(API_URL + '/health', { method: 'GET' }).catch(function(){});
