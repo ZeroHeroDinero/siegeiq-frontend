@@ -2649,18 +2649,28 @@ if (document.readyState !== 'loading') attachNavListeners();
 document.addEventListener('keydown', function(e) {
   if (e.shiftKey && e.key === 'D') {
     try {
+      // Clear the actual review counter object
+      localStorage.removeItem('siegeiq_reviews');
+      // Also clear any legacy keys
       localStorage.removeItem('siegeiq_review_count');
       localStorage.removeItem('siegeiq_review_month');
       localStorage.removeItem('siegeiq_reviews_used');
       localStorage.removeItem('siegeiq_review_reset');
-      reviewCount = 0;
-      updateReviewCounter();
-      var el = document.getElementById('reviews-remaining');
-      if (el) el.textContent = '3 free reviews remaining this month.';
-      // Brief silent flash on the page title to confirm it worked
+      // Reset the analyze button back to normal
+      var btn = document.getElementById('analyze-btn');
+      if (btn) {
+        btn.textContent = 'ANALYZE CLIP →';
+        btn.style.background = 'var(--accent)';
+        btn.style.border = 'none';
+        btn.style.color = '#fff';
+        btn.onclick = function() { submitClip(); };
+      }
+      // Update the counter text
+      checkUpgradeWall();
+      // Brief tab title flash to confirm
       var orig = document.title;
-      document.title = '✓ Dev reset';
-      setTimeout(function(){ document.title = orig; }, 1500);
+      document.title = '✓ Dev reset — 3 reviews restored';
+      setTimeout(function(){ document.title = orig; }, 2000);
     } catch(err) {}
   }
 });
