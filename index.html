@@ -131,26 +131,25 @@ nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;backgro
 #mob-analyze-btn{background:var(--accent)!important;color:#fff!important;font-family:var(--fh);font-weight:700;letter-spacing:.06em}
 
 @media(max-width:768px){
-  /* Nav */
-  nav{padding:0 16px}
-  #desk-nav{display:none}
+  /* Nav — hide all desktop buttons, show only logo + hamburger */
+  nav{padding:0 12px}
+  #desk-nav{display:none!important}
   #mob-menu-btn{display:block}
 
   /* Dashboard grid — stack vertically */
   #page-dashboard > div[style*="grid-template-columns:1fr 272px"]{
     display:block!important
   }
-  /* Dashboard sidebar */
   #dash-sidebar{
     border-left:none!important;
     border-top:1px solid var(--border);
     padding:16px!important;
-    display:grid!important;
-    grid-template-columns:1fr 1fr;
+    display:flex!important;
+    flex-direction:column!important;
     gap:12px
   }
 
-  /* Landing page grids */
+  /* All 3-col and 2-col grids collapse */
   div[style*="grid-template-columns:1fr 1fr 1fr"]{
     grid-template-columns:1fr!important
   }
@@ -164,43 +163,50 @@ nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;backgro
     grid-template-columns:1fr!important
   }
 
-  /* Upload page */
-  #page-upload > div{padding:16px!important}
+  /* Footer — 2 column on mobile */
+  footer div[style*="grid-template-columns:2fr 1fr 1fr 1fr"]{
+    grid-template-columns:1fr 1fr!important;
+    gap:24px!important
+  }
+  footer div[style*="grid-template-columns:2fr 1fr 1fr 1fr"] > div:first-child{
+    grid-column:1/-1
+  }
 
-  /* Pricing page */
+  /* Founding banner — stack vertically */
+  #founding-banner{
+    flex-direction:column!important;
+    align-items:flex-start!important;
+    gap:12px!important
+  }
+  #founding-banner button{
+    width:100%!important
+  }
+  #founding-banner > div:last-child{
+    font-size:11px!important
+  }
+
+  /* Pricing cards — single column */
   #page-pricing{padding:16px!important}
-
-  /* Counter tool */
-  #page-counter > div{padding:16px!important}
-
-  /* General padding */
-  .page{padding-left:0!important;padding-right:0!important}
 
   /* Video player */
   #local-player{max-height:240px!important}
 
-  /* Share card in sidebar — full width on mobile */
-  #dash-sidebar > *{min-width:0}
+  /* Upload page */
+  #page-upload > div{padding:12px!important}
+
+  /* Counter tool */
+  #page-counter > div{padding:12px!important}
+
+  /* Hero text scaling */
+  h1[style*="font-size:60px"]{font-size:36px!important;line-height:1.1!important}
+  h1[style*="font-size:52px"]{font-size:30px!important}
+  h1[style*="font-size:48px"]{font-size:26px!important}
 
   /* Obs cards */
   .obs-card{padding:12px}
 
-  /* Coach summary */
-  #obs-list > div:first-child{margin:0 0 12px}
-
-  /* Analyze clip button floating */
+  /* Analyze clip floating button */
   #analyze-float{bottom:16px!important;right:16px!important}
-
-  /* Hero text */
-  h1[style*="font-size:60px"]{font-size:36px!important;line-height:1.1!important}
-  h1[style*="font-size:52px"]{font-size:32px!important}
-  h1[style*="font-size:48px"]{font-size:28px!important}
-
-  /* Comparison table tabs */
-  div[style*="grid-template-columns:repeat(4,1fr)"].comp-tabs{
-    overflow-x:auto;
-    -webkit-overflow-scrolling:touch
-  }
 }
 .tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;letter-spacing:.05em;text-transform:uppercase;border:1px solid}
 .tag.critical{background:rgba(255,107,53,.1);color:var(--accent);border-color:rgba(255,107,53,.25)}
@@ -709,18 +715,48 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
 
   <!-- Analyzing overlay -->
   <div id="analyzing" style="display:none;position:fixed;inset:0;background:var(--bg);z-index:9000;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px">
-    <div style="position:relative;width:100px;height:100px;margin:0 auto 32px">
+    <div style="position:relative;width:80px;height:80px;margin:0 auto 28px">
       <div style="position:absolute;inset:0;border-radius:50%;border:1px solid var(--accent);animation:pulseRing 1.4s ease-out infinite;opacity:.4"></div>
       <div style="position:absolute;inset:10px;border-radius:50%;border:1px solid var(--accent);animation:pulseRing 1.4s .35s ease-out infinite;opacity:.3"></div>
-      <div style="position:absolute;inset:20px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:26px">◉</div>
+      <div style="position:absolute;inset:20px;border-radius:50%;background:var(--bg3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-size:22px">◉</div>
     </div>
-    <div style="font-family:var(--fh);font-size:28px;font-weight:700;margin-bottom:8px">ANALYZING CLIP</div>
-    <div id="prog-label" style="font-size:13px;color:var(--text2);margin-bottom:24px">Submitting to AI pipeline...</div>
-    <div style="width:300px;height:3px;background:var(--bg3);border-radius:2px;margin:0 auto 8px">
-      <div id="prog-bar" style="height:3px;background:var(--accent);border-radius:2px;width:0%;transition:width .5s ease"></div>
+    <div style="font-family:var(--fh);font-size:22px;font-weight:700;margin-bottom:6px;letter-spacing:.04em">ANALYZING YOUR CLIP</div>
+    <div id="prog-label" style="font-size:13px;color:var(--accent);margin-bottom:20px;min-height:20px;font-weight:500"></div>
+    <div style="width:min(340px,80vw);height:4px;background:var(--bg3);border-radius:2px;margin:0 auto 8px">
+      <div id="prog-bar" style="height:4px;background:linear-gradient(90deg,#FF6B35,#E8B84B);border-radius:2px;width:0%;transition:width .6s ease"></div>
     </div>
-    <div id="prog-pct" style="font-size:12px;color:var(--text3)">0%</div>
-    <div id="review-id-display" style="font-size:11px;color:var(--text3);margin-top:12px"></div>
+    <div id="prog-pct" style="font-size:11px;color:var(--text3);margin-bottom:24px">0%</div>
+
+    <!-- Step indicators -->
+    <div id="prog-steps" style="display:flex;flex-direction:column;gap:8px;width:min(320px,85vw);margin-bottom:28px">
+      <div class="prog-step" id="step-0" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);opacity:.4;transition:all .4s">
+        <span class="step-icon" style="font-size:16px">📤</span>
+        <span style="font-size:12px;color:var(--text2)">Uploading to secure storage</span>
+        <span class="step-check" style="margin-left:auto;font-size:12px;color:var(--success);display:none">✓</span>
+      </div>
+      <div class="prog-step" id="step-1" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);opacity:.4;transition:all .4s">
+        <span class="step-icon" style="font-size:16px">🎬</span>
+        <span style="font-size:12px;color:var(--text2)">Extracting 12 key frames</span>
+        <span class="step-check" style="margin-left:auto;font-size:12px;color:var(--success);display:none">✓</span>
+      </div>
+      <div class="prog-step" id="step-2" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);opacity:.4;transition:all .4s">
+        <span class="step-icon" style="font-size:16px">🧠</span>
+        <span style="font-size:12px;color:var(--text2)">Claude analyzing tactics & positioning</span>
+        <span class="step-check" style="margin-left:auto;font-size:12px;color:var(--success);display:none">✓</span>
+      </div>
+      <div class="prog-step" id="step-3" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;background:var(--bg2);border:1px solid var(--border);opacity:.4;transition:all .4s">
+        <span class="step-icon" style="font-size:16px">📋</span>
+        <span style="font-size:12px;color:var(--text2)">Building coaching report</span>
+        <span class="step-check" style="margin-left:auto;font-size:12px;color:var(--success);display:none">✓</span>
+      </div>
+    </div>
+
+    <!-- Rotating tip -->
+    <div style="max-width:300px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r)">
+      <div style="font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px;font-weight:700">💡 Siege Tip</div>
+      <div id="loading-tip" style="font-size:12px;color:var(--text2);line-height:1.6"></div>
+    </div>
+    <div id="review-id-display" style="font-size:10px;color:var(--text3);margin-top:12px"></div>
   </div>
 </div>
 
@@ -1303,6 +1339,9 @@ async function startAnalysis() {
   const description=document.getElementById('clip-description').value.trim();
   const overlay=document.getElementById('analyzing');
   overlay.style.display='flex';
+  resetSteps();
+  activateStep(0);
+  startLoadingTips();
   setProgress(5,'Submitting to AI pipeline...');
 
   try {
@@ -1360,6 +1399,7 @@ async function startAnalysis() {
     }
     document.getElementById('review-id-display').textContent=`Review ID: ${reviewId}`;
     setProgress(30,'Analysis queued — extracting frames...');
+    completeStep(0);
     pollForResult(reviewId,operator,map,rank);
   } catch(err) {
     overlay.style.display='none';
@@ -1376,24 +1416,105 @@ async function startAnalysis() {
   }
 }
 
+const SIEGE_TIPS = [
+  "Always drone before pushing — a 2-second drone can save your round.",
+  "Zofia's concussions are best used for intel, not just damage.",
+  "Anchoring on Clubhouse? Control Bar and the hatch above it.",
+  "Pre-fire common angles before peeking to reduce reaction time.",
+  "Save at least one utility for the post-plant — don't burn it all on entry.",
+  "Coordinate breach timing with your fraggers — simultaneous pressure wins rounds.",
+  "Check your minimap every 3-5 seconds to track rotations.",
+  "Wide peeks beat jiggle peeks against good defenders — commit fully.",
+  "A drone spotted mid-round is more valuable than saving it for later.",
+  "Reload behind cover — caught reloading is one of the most avoidable deaths."
+];
+
+let _loadingTipInterval = null;
+
+function startLoadingTips() {
+  const el = document.getElementById('loading-tip');
+  if (!el) return;
+  let idx = Math.floor(Math.random() * SIEGE_TIPS.length);
+  el.textContent = SIEGE_TIPS[idx];
+  _loadingTipInterval = setInterval(() => {
+    idx = (idx + 1) % SIEGE_TIPS.length;
+    el.style.opacity = '0';
+    setTimeout(() => {
+      el.textContent = SIEGE_TIPS[idx];
+      el.style.transition = 'opacity .4s';
+      el.style.opacity = '1';
+    }, 300);
+  }, 5000);
+}
+
+function stopLoadingTips() {
+  if (_loadingTipInterval) { clearInterval(_loadingTipInterval); _loadingTipInterval = null; }
+}
+
+function activateStep(i) {
+  const step = document.getElementById('step-'+i);
+  if (!step) return;
+  step.style.opacity = '1';
+  step.style.borderColor = 'rgba(255,107,53,0.4)';
+  step.style.background = 'rgba(255,107,53,0.05)';
+}
+
+function completeStep(i) {
+  const step = document.getElementById('step-'+i);
+  if (!step) return;
+  const check = step.querySelector('.step-check');
+  if (check) check.style.display = 'block';
+  step.style.borderColor = 'rgba(62,207,142,0.3)';
+  step.style.background = 'rgba(62,207,142,0.04)';
+}
+
+function resetSteps() {
+  for (let i = 0; i < 4; i++) {
+    const step = document.getElementById('step-'+i);
+    if (!step) continue;
+    step.style.opacity = '0.4';
+    step.style.borderColor = 'var(--border)';
+    step.style.background = 'var(--bg2)';
+    const check = step.querySelector('.step-check');
+    if (check) check.style.display = 'none';
+  }
+}
+
 function pollForResult(reviewId,operator,map,rank) {
   let pct=30;
-  const labels=['Extracting key frames...','Analyzing tactical decisions...','Scoring positioning...','Evaluating utility usage...','Building coaching report...'];
-  pollInterval=setInterval(async()=>{
-    pct=Math.min(90,pct+Math.random()*3);
-    setProgress(pct,labels[Math.min(4,Math.floor((pct-30)/12))]);
+  let stepPhase=1;
+  activateStep(1);
+  setTimeout(()=>{ completeStep(1); activateStep(2); stepPhase=2; }, 3000);
+
+  pollInterval=setInterval(async()=>{\
+    pct=Math.min(90,pct+Math.random()*4);
+    if(pct>70 && stepPhase===2){ completeStep(2); activateStep(3); stepPhase=3; }
+    setProgress(pct, pct<50?'Extracting frames & analyzing footage...':pct<75?'Claude evaluating tactics & positioning...':'Building your coaching report...');
     try {
       const resp=await fetch(`${API_URL}/review/${reviewId}?user_id=demo-user`);
       if(!resp.ok) return;
       const data=await resp.json();
       if(data.status==='complete'){
         clearInterval(pollInterval);
-        setProgress(100,'Analysis complete!');playCompleteSound();incrementReviewCount();setTimeout(checkUpgradeWall,100);
-        setTimeout(()=>{document.getElementById('analyzing').style.display='none';renderResults(data,operator,map,rank);show('dashboard');},600);
+        completeStep(2); completeStep(3);
+        setProgress(100,'Analysis complete!');
+        playCompleteSound();
+        incrementReviewCount();
+        setTimeout(checkUpgradeWall,100);
+        stopLoadingTips();
+        setTimeout(()=>{
+          document.getElementById('analyzing').style.display='none';
+          resetSteps();
+          renderResults(data,operator,map,rank);
+          show('dashboard');
+        },800);
       } else if(data.status==='failed'){
         clearInterval(pollInterval);
+        stopLoadingTips();
         document.getElementById('analyzing').style.display='none';
-        playErrorSound();showError('Analysis failed: '+(data.error||'Unknown error. Check Railway logs.'));
+        resetSteps();
+        playErrorSound();
+        showError('Analysis failed: '+(data.error||'Unknown error. Check Railway logs.'));
       }
     } catch(e){}
   },8000);
