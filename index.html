@@ -1571,7 +1571,7 @@ function toggleVoice() {
   document.getElementById('voice-thumb').style.left = voiceOn ? '22px' : '2px';
   document.getElementById('voice-status').style.display = voiceOn ? 'block' : 'none';
   if (!voiceOn) { stopVoice(); return; }
-  const msg = ELEVENLABS_API_KEY ? 'Premium voice ON — click any observation to hear it' : 'Voice ON — click any observation to hear it';
+  const msg = 'Premium voice ON — click any observation to hear it';
   document.getElementById('voice-reading').textContent = msg;
 }
 
@@ -1596,38 +1596,32 @@ async function speakObservation(index) {
 
   document.getElementById('voice-reading').textContent = 'Speaking...';
 
-  // Try ElevenLabs
-  if (typeof ELEVENLABS_KEY !== 'undefined' && ELEVENLABS_KEY) {
-    try {
-      const resp = await fetch('https://api.elevenlabs.io/v1/text-to-speech/' + ELEVENLABS_VOICE_ID, {
-        method: 'POST',
-        headers: { 'xi-api-key': ELEVENLABS_KEY, 'Content-Type': 'application/json', 'Accept': 'audio/mpeg' },
-        body: JSON.stringify({
-          text: text,
-          model_id: 'eleven_multilingual_v2',
-          voice_settings: { stability: 0.28, similarity_boost: 0.92, style: 0.50, use_speaker_boost: true }
-        })
-      });
-      if (resp.ok) {
-        const buf = await resp.arrayBuffer();
-        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-        const decoded  = await audioCtx.decodeAudioData(buf);
-        const source   = audioCtx.createBufferSource();
-        source.buffer  = decoded;
-        source.connect(audioCtx.destination);
-        window._siegeSource = source;
-        window._siegeCtx    = audioCtx;
-        const lp = document.getElementById('local-player');
-        if (lp) lp.volume = 0.15;
-        source.onended = () => {
-          if (lp) lp.volume = 1;
-          document.getElementById('voice-reading').textContent = 'Done. Click another card.';
-        };
-        source.start(0);
-        return;
-      }
-    } catch(e) { console.warn('[SiegeIQ Voice] ElevenLabs failed, using browser TTS:', e.message); }
-  }
+  // Try ElevenLabs via Railway proxy (keeps API key secure)
+  try {
+    const resp = await fetch(API_URL + '/voice/speak', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ text: text, voice_id: ELEVENLABS_VOICE_ID })
+    });
+    if (resp.ok) {
+      const buf = await resp.arrayBuffer();
+      const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const decoded  = await audioCtx.decodeAudioData(buf);
+      const source   = audioCtx.createBufferSource();
+      source.buffer  = decoded;
+      source.connect(audioCtx.destination);
+      window._siegeSource = source;
+      window._siegeCtx    = audioCtx;
+      const lp = document.getElementById('local-player');
+      if (lp) lp.volume = 0.15;
+      source.onended = () => {
+        if (lp) lp.volume = 1;
+        document.getElementById('voice-reading').textContent = 'Done. Click another card.';
+      };
+      source.start(0);
+      return;
+    }
+  } catch(e) { console.warn('[SiegeIQ Voice] ElevenLabs proxy failed, using browser TTS:', e.message); }
 
   // Browser TTS fallback — best available voice
   if (!window.speechSynthesis) {
