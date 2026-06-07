@@ -5,6 +5,30 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%230A0C0F'/><text x='16' y='22' text-anchor='middle' font-family='Arial Black' font-weight='900' font-size='14' fill='%23FF6B35'>IQ</text></svg>">
 <title>SiegeIQ — The First AI Coaching Platform for Rainbow Six Siege</title>
+
+<!-- SEO -->
+<meta name="description" content="SiegeIQ analyzes your Rainbow Six Siege gameplay and delivers Diamond-level AI coaching in under 60 seconds. Upload your clip and get timestamped feedback, operator-specific fixes, and a score report.">
+<meta name="keywords" content="Rainbow Six Siege coaching, R6S AI coach, Siege clip analysis, R6 improvement, SiegeIQ, operator coaching, VOD review">
+<meta name="author" content="SiegeIQ">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://siegeiq.gg">
+
+<!-- Open Graph (Discord, Facebook, LinkedIn) -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://siegeiq.gg">
+<meta property="og:title" content="SiegeIQ — AI Coaching for Rainbow Six Siege">
+<meta property="og:description" content="Upload your Siege clip. Get Diamond-level coaching in 60 seconds. Timestamped feedback, operator fixes, and a full scoring report — powered by Claude AI.">
+<meta property="og:image" content="https://siegeiq.gg/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="SiegeIQ">
+
+<!-- Twitter / X Card -->
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:url" content="https://siegeiq.gg">
+<meta name="twitter:title" content="SiegeIQ — AI Coaching for Rainbow Six Siege">
+<meta name="twitter:description" content="Upload your Siege clip. Get Diamond-level AI coaching in 60 seconds. Timestamped feedback, operator-specific fixes, and a full score report.">
+<meta name="twitter:image" content="https://siegeiq.gg/og-image.png">
 <!-- cache-bust: 20260605202458 -->
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
@@ -298,6 +322,113 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
     </div>
   </div>
 
+  <!-- Animated Dashboard Mockup -->
+  <div style="padding:60px 24px;background:var(--bg);border-top:1px solid var(--border);overflow:hidden">
+    <div style="max-width:960px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:40px">
+        <div style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">See it in action</div>
+        <h2 style="font-family:var(--fh);font-size:clamp(32px,5vw,48px);font-weight:700;line-height:1">YOUR COACHING<br><span style="color:var(--accent)">DASHBOARD</span></h2>
+        <p style="font-size:14px;color:var(--text2);margin-top:12px;max-width:400px;margin-left:auto;margin-right:auto">Every clip you upload generates a full coaching report with timestamped observations, fixes, and a score.</p>
+      </div>
+
+      <!-- Mockup container -->
+      <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:12px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.6);position:relative">
+        <!-- Fake browser bar -->
+        <div style="background:var(--bg3);padding:10px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:8px">
+          <div style="width:10px;height:10px;border-radius:50%;background:#FF5F57"></div>
+          <div style="width:10px;height:10px;border-radius:50%;background:#FFBD2E"></div>
+          <div style="width:10px;height:10px;border-radius:50%;background:#28C840"></div>
+          <div style="flex:1;background:var(--bg);border-radius:4px;padding:4px 12px;margin:0 12px;font-size:11px;color:var(--text3)">siegeiq.gg/dashboard</div>
+        </div>
+
+        <!-- Mock dashboard content -->
+        <div style="display:grid;grid-template-columns:1fr 260px;min-height:360px">
+          <!-- Left: video + coaching cards -->
+          <div style="padding:16px;border-right:1px solid var(--border)">
+            <!-- Mock video -->
+            <div style="background:#000;border-radius:6px;height:180px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;position:relative;overflow:hidden">
+              <div style="position:absolute;inset:0;background:linear-gradient(135deg,#1a1a2e,#16213e,#0f3460);opacity:.8"></div>
+              <div style="position:relative;text-align:center">
+                <div style="font-size:32px;margin-bottom:6px">🎮</div>
+                <div style="font-family:var(--fh);font-size:13px;color:rgba(255,255,255,0.7)">Clubhouse · Zofia · Platinum III</div>
+              </div>
+              <!-- Fake video progress bar -->
+              <div style="position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.1)">
+                <div style="height:100%;width:35%;background:var(--accent)"></div>
+              </div>
+            </div>
+
+            <!-- Coach summary mock -->
+            <div style="background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.25);border-radius:6px;padding:10px 12px;margin-bottom:10px">
+              <div style="font-size:10px;color:var(--accent);font-weight:700;text-transform:uppercase;letter-spacing:.08em;margin-bottom:5px">🎯 Coach Summary</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.6">Your mechanical skill is solid for Platinum III but utility management is holding you back. Focus on droning before entry and treating your concussions as executional utility.</div>
+            </div>
+
+            <!-- Animated obs cards -->
+            <div id="mock-cards" style="display:flex;flex-direction:column;gap:6px">
+              <div class="mock-card" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 12px;animation:fadeUp .4s ease both">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+                  <span style="font-size:9px;font-weight:700;color:#FF4444;background:rgba(255,68,68,0.1);border:1px solid rgba(255,68,68,0.2);padding:1px 6px;border-radius:10px">⚠ CRITICAL</span>
+                  <span style="font-size:10px;color:var(--text3)">positioning</span>
+                </div>
+                <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px">Pushed into CCTV without droning</div>
+                <div style="font-size:10px;color:var(--text2)">Walked directly into Kapkan trap on doorframe — always drone before entry at Platinum level.</div>
+              </div>
+              <div class="mock-card" style="background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:10px 12px;animation:fadeUp .4s .15s ease both">
+                <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px">
+                  <span style="font-size:9px;font-weight:700;color:#F59E0B;background:rgba(245,158,11,0.1);border:1px solid rgba(245,158,11,0.2);padding:1px 6px;border-radius:10px">◆ WARNING</span>
+                  <span style="font-size:10px;color:var(--text3)">utility</span>
+                </div>
+                <div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px">Both concussions used on soft wall</div>
+                <div style="font-size:10px;color:var(--text2)">Save at least one for plant denial or confirmed enemy positions — intel first, utility second.</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: score sidebar -->
+          <div style="padding:16px;display:flex;flex-direction:column;gap:12px">
+            <!-- Score -->
+            <div>
+              <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:4px">Round Score</div>
+              <div style="font-family:var(--fh);font-size:48px;font-weight:700;color:var(--warn);line-height:1" id="mock-score">62</div>
+              <div style="font-size:11px;color:var(--text3)">Needs work</div>
+            </div>
+            <!-- Category bars -->
+            <div style="display:flex;flex-direction:column;gap:6px">
+              <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Categories</div>
+              ${['positioning:55','utility:48','decision_making:60','communication:65','mechanical:72'].map(c=>{
+                const[n,v]=c.split(':');
+                const col=parseInt(v)>=70?'#3ECF8E':parseInt(v)>=50?'#F59E0B':'#FF6B35';
+                return `<div style="display:flex;align-items:center;gap:6px">
+                  <div style="font-size:9px;color:var(--text3);width:72px;flex-shrink:0">${n.replace('_',' ')}</div>
+                  <div style="flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:2px">
+                    <div style="height:100%;width:${v}%;background:${col};border-radius:2px;transition:width 1s ease"></div>
+                  </div>
+                  <div style="font-size:9px;color:${col};width:20px;text-align:right">${v}</div>
+                </div>`;
+              }).join('')}
+            </div>
+            <!-- Top fixes -->
+            <div>
+              <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px">Top 3 Things to Fix</div>
+              <div style="display:flex;flex-direction:column;gap:5px">
+                <div style="display:flex;gap:6px;font-size:10px;color:var(--text2)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">1</span>Drone CCTV and Bar before every push</div>
+                <div style="display:flex;gap:6px;font-size:10px;color:var(--text2)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">2</span>Save one concussion for post-plant</div>
+                <div style="display:flex;gap:6px;font-size:10px;color:var(--text2)"><span style="color:var(--accent);font-weight:700;flex-shrink:0">3</span>Isolate angles — one at a time</div>
+              </div>
+            </div>
+            <!-- CTA -->
+            <button onclick="show('upload')" style="font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:9px;cursor:pointer;margin-top:auto">GET YOUR COACHING REPORT →</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;margin-top:20px">
+        <button onclick="show('upload')" style="font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:var(--accent);background:none;border:1px solid rgba(255,107,53,0.3);border-radius:var(--r);padding:10px 28px;cursor:pointer">Try it free — upload your first clip →</button>
+      </div>
+    </div>
+  </div>
+
   <!-- How it works — 3 steps -->
   <div style="padding:40px 24px;border-top:1px solid var(--border);background:var(--bg2)">
     <div style="max-width:720px;margin:0 auto">
@@ -507,6 +638,60 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
     </div>
   </div>
 
+  <!-- Testimonials -->
+  <div style="padding:64px 24px;background:var(--bg);border-top:1px solid var(--border)">
+    <div style="max-width:900px;margin:0 auto">
+      <div style="text-align:center;margin-bottom:48px">
+        <div style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px">Real players, real results</div>
+        <h2 style="font-family:var(--fh);font-size:clamp(32px,5vw,46px);font-weight:700;line-height:1">WHAT PLAYERS<br><span style="color:var(--accent)">ARE SAYING</span></h2>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px">
+
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:24px;position:relative">
+          <div style="font-size:28px;color:var(--accent);font-family:Georgia,serif;line-height:1;margin-bottom:12px">"</div>
+          <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px">The timestamp feedback is insane. It paused exactly at 0:45 where I pushed without droning and called it out instantly. My human coach never caught that specific habit.</p>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#FF6B35,#E8B84B);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:14px;font-weight:700;color:#fff">XR</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text)">xRaiderSix</div>
+              <div style="font-size:11px;color:var(--text3)">Platinum II · 847 hours</div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:2px">★★★★★</div>
+          </div>
+        </div>
+
+        <div style="background:var(--bg2);border:1px solid rgba(255,107,53,0.3);border-radius:var(--r);padding:24px;position:relative">
+          <div style="position:absolute;top:-1px;left:50%;transform:translateX(-50%);background:var(--accent);color:#fff;font-family:var(--fh);font-size:9px;font-weight:700;padding:3px 12px;border-radius:0 0 6px 6px;letter-spacing:.06em;white-space:nowrap">FOUNDING MEMBER</div>
+          <div style="font-size:28px;color:var(--accent);font-family:Georgia,serif;line-height:1;margin-bottom:12px">"</div>
+          <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px">Went from Gold I to Platinum III in 3 weeks. SiegeIQ identified that I was wasting Zofia's utility every round. One fix, huge rank difference. Worth every cent.</p>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#3ECF8E,#1a7a50);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:14px;font-weight:700;color:#fff">NK</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text)">NocturnalKapkan</div>
+              <div style="font-size:11px;color:var(--text3)">Platinum III · 1,240 hours</div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:2px">★★★★★</div>
+          </div>
+        </div>
+
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:24px;position:relative">
+          <div style="font-size:28px;color:var(--accent);font-family:Georgia,serif;line-height:1;margin-bottom:12px">"</div>
+          <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px">The operator-specific coaching is what separates this from anything else. It knows Ash's role, Zofia's kit, the map callouts. It's not generic advice — it's actually useful.</p>
+          <div style="display:flex;align-items:center;gap:10px">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6B3FA0,#4a2870);display:flex;align-items:center;justify-content:center;font-family:var(--fh);font-size:14px;font-weight:700;color:#fff">DF</div>
+            <div>
+              <div style="font-size:13px;font-weight:600;color:var(--text)">DroneFather99</div>
+              <div style="font-size:11px;color:var(--text3)">Diamond I · 2,100 hours</div>
+            </div>
+            <div style="margin-left:auto;display:flex;gap:2px">★★★★★</div>
+          </div>
+        </div>
+
+      </div>
+      <p style="text-align:center;font-size:11px;color:var(--text3);margin-top:20px">* Placeholder testimonials — replace with real player quotes when available</p>
+    </div>
+  </div>
+
   <!-- FAQ -->
   <div style="padding:48px 24px;border-top:1px solid var(--border);background:var(--bg2)">
     <div style="max-width:720px;margin:0 auto">
@@ -710,7 +895,18 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
       </div>
     </div>
 
-    <div id="error-box" style="display:none;margin-top:16px;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.3);border-radius:var(--r);padding:12px 16px;font-size:13px;color:#FF4444"></div>
+    <div id="error-box" style="display:none;margin-top:16px;background:rgba(255,68,68,.08);border:1px solid rgba(255,68,68,.3);border-radius:var(--r);padding:14px 16px">
+      <div style="display:flex;align-items:flex-start;gap:10px">
+        <span style="font-size:16px;flex-shrink:0">⚠</span>
+        <div style="flex:1">
+          <div id="error-msg" style="font-size:13px;color:#FF4444;line-height:1.5;margin-bottom:10px"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button onclick="retryAnalysis()" style="font-family:var(--fh);font-size:11px;font-weight:700;letter-spacing:.06em;color:#fff;background:#FF4444;border:none;border-radius:4px;padding:6px 14px;cursor:pointer">↺ RETRY</button>
+            <button onclick="hideError()" style="font-size:11px;color:var(--text3);background:none;border:1px solid var(--border);border-radius:4px;padding:6px 14px;cursor:pointer">Dismiss</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- Analyzing overlay -->
@@ -843,6 +1039,17 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
         <div style="display:flex;gap:8px">
           <button onclick="copyShareText()" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.05em;color:var(--text);background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:8px;cursor:pointer">📋 COPY TEXT</button>
           <button onclick="saveCard()" style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:600;letter-spacing:.05em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:8px;cursor:pointer">📸 SAVE IMAGE</button>
+        </div>
+        <!-- Social share buttons -->
+        <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px">
+          <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Share your result</div>
+          <div style="display:flex;gap:6px">
+            <button onclick="shareToTwitter()" style="flex:1;font-size:10px;font-weight:600;color:#fff;background:#000;border:1px solid var(--border2);border-radius:4px;padding:6px 4px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px">𝕏 Twitter</button>
+            <button onclick="shareToReddit()" style="flex:1;font-size:10px;font-weight:600;color:#fff;background:#FF4500;border:none;border-radius:4px;padding:6px 4px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px">Reddit</button>
+            <button onclick="shareToDiscord()" style="flex:1;font-size:10px;font-weight:600;color:#fff;background:#5865F2;border:none;border-radius:4px;padding:6px 4px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px">Discord</button>
+            <button onclick="shareToTikTok()" style="flex:1;font-size:10px;font-weight:600;color:#fff;background:linear-gradient(135deg,#010101,#69C9D0);border:none;border-radius:4px;padding:6px 4px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:4px">TikTok</button>
+          </div>
+        </div>
         </div>
         <div id="share-copied" style="display:none;text-align:center;font-size:11px;color:var(--success);margin-top:6px">✓ Copied to clipboard!</div>
       </div>
@@ -1306,10 +1513,10 @@ function handleFile(f) {
   } else if(mb < 60) {
     if(badge){badge.textContent='~ Moderate';badge.style.background='rgba(245,158,11,.1)';badge.style.color='var(--warn)';}
     if(advice) advice.textContent='Upload will take ~'+Math.round(mb/4)+'–'+Math.round(mb/2)+'s. Compress to under 20MB for faster results.';
-    if(guide) guide.style.display='none';
+    if(guide) guide.style.display='block';
   } else {
-    if(badge){badge.textContent='⚠ Large';badge.style.background='rgba(255,68,68,.1)';badge.style.color='var(--danger)';}
-    if(advice) advice.textContent=mb.toFixed(0)+'MB — upload may take '+Math.round(mb/3)+'–'+Math.round(mb/2)+'s. Compress first for best experience.';
+    if(badge){badge.textContent='⚠ Too Large';badge.style.background='rgba(255,68,68,.1)';badge.style.color='var(--danger)';}
+    if(advice) advice.textContent=mb.toFixed(0)+'MB is very large — compress first or analysis may fail. Target: under 20MB.';
     if(guide) guide.style.display='block';
   }
   // Store local object URL so we can play the video in the dashboard after analysis
@@ -1327,8 +1534,28 @@ function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').s
 function checkUrl(v){hasClip=v.length>8;hasClip?enableAnalyze():disableAnalyze();}
 function enableAnalyze(){const b=document.getElementById('analyze-btn');b.textContent='ANALYZE CLIP →';b.style.background='var(--accent)';b.style.opacity='1';b.style.cursor='pointer';}
 function disableAnalyze(){const b=document.getElementById('analyze-btn');b.textContent='ADD A CLIP ABOVE';b.style.background='var(--bg3)';b.style.opacity='.4';b.style.cursor='not-allowed';}
-function showError(msg){const b=document.getElementById('error-box');b.textContent=msg;b.style.display='block';}
-function hideError(){document.getElementById('error-box').style.display='none';}
+function showError(msg){
+  const b=document.getElementById('error-box');
+  const m=document.getElementById('error-msg');
+  if(m) m.textContent=msg;
+  else if(b) b.textContent=msg;
+  if(b) b.style.display='block';
+  b.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function hideError(){
+  const b=document.getElementById('error-box');
+  if(b) b.style.display='none';
+}
+function retryAnalysis(){
+  hideError();
+  // Re-trigger the analyze button if a file is selected
+  if(selectedFile || document.getElementById('url-input')?.value){
+    submitClip();
+  } else {
+    // Just scroll to the upload area
+    document.getElementById('file-drop')?.scrollIntoView({behavior:'smooth'});
+  }
+}
 
 async function startAnalysis() {
   if(!hasClip) return;
@@ -1784,7 +2011,45 @@ let currentObservations = [];
 const ELEVENLABS_API_KEY = ELEVENLABS_KEY;
 const ELEVENLABS_VOICE_ID = 'hbdLfaIj2uL2NimPQh6e'; // Ben - Confident, Clear and Engaging
 
-async function testVoice() {
+async function getShareText() {
+  const sc = document.getElementById('overall-score');
+  const score = sc ? sc.textContent : '?';
+  const meta = document.getElementById('sc-meta');
+  const details = meta ? meta.textContent : '';
+  return `I just got AI coaching on my R6S clip — scored ${score}/100! ${details}\n\nGet your free coaching report at siegeiq.gg 🎮`;
+}
+
+function shareToTwitter() {
+  const text = encodeURIComponent(getShareText());
+  window.open(`https://twitter.com/intent/tweet?text=${text}&url=${encodeURIComponent('https://siegeiq.gg')}`, '_blank');
+}
+
+function shareToReddit() {
+  const title = encodeURIComponent('SiegeIQ gave me AI coaching on my R6S clip — pretty impressive breakdown');
+  const url = encodeURIComponent('https://siegeiq.gg');
+  window.open(`https://reddit.com/r/Rainbow6/submit?type=link&title=${title}&url=${url}`, '_blank');
+}
+
+function shareToDiscord() {
+  // Discord doesn't have a share URL — copy to clipboard instead
+  const text = getShareText() + '\nhttps://siegeiq.gg';
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('button[onclick="shareToDiscord()"]');
+    if (btn) { const orig = btn.textContent; btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = orig, 2000); }
+  }).catch(() => {});
+}
+
+function shareToTikTok() {
+  // TikTok has no web share URL — open their site and copy text
+  const text = getShareText();
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.querySelector('button[onclick="shareToTikTok()"]');
+    if (btn) { const orig = btn.textContent; btn.textContent = '✓ Copied!'; setTimeout(() => btn.textContent = orig, 2000); }
+  }).catch(() => {});
+  window.open('https://www.tiktok.com/upload', '_blank');
+}
+
+function testVoice() {
   const obs = { severity:'tip', observation:'Voice test — SiegeIQ AI coaching is active and ready.', fix:'' };
   const savedObs = currentObservations;
   currentObservations = [obs];
@@ -2309,6 +2574,18 @@ const FAQS = [
   {
     q: 'What ranks does SiegeIQ work best for?',
     a: 'SiegeIQ is most valuable for Gold through Diamond players — the ranks where individual decision-making, utility usage, and tactical awareness have the highest impact on results. Copper and Bronze players also benefit but may need to focus on fundamentals before tactical coaching. Champion-level players will find the coaching less surprising but useful for identifying blind spots.'
+  },
+  {
+    q: 'Will it work for my operator?',
+    a: 'SiegeIQ supports all Rainbow Six Siege operators. When you select your operator before submitting, the AI tailors every observation to that operator\'s specific kit — Zofia\'s Lifeline charges, Ash\'s Breaching Round, Jäger\'s ADS placements, and so on. Operator-specific coaching is one of the biggest differentiators from generic VOD review tools.'
+  },
+  {
+    q: 'Can I submit ranked and unranked clips?',
+    a: 'Yes — both work. Ranked clips tend to give the most actionable coaching since opponents are playing seriously. Unranked and standard mode clips also work well. The coaching quality depends more on what happened in the round than the playlist you were playing.'
+  },
+  {
+    q: 'How is SiegeIQ different from just watching my own replay?',
+    a: 'Watching your own replay, you see what happened but rarely know why it was wrong or what to do differently. SiegeIQ tells you the specific moment, the specific mistake, the specific fix, and the tactical principle behind it — anchored to your operator and map. It\'s the difference between knowing you died and knowing exactly how to not die next time.'
   },
 ];
 
@@ -2980,15 +3257,18 @@ function loadFoundingSlots() {
   fetch(API_URL + '/founding/slots')
     .then(function(r) { return r.json(); })
     .then(function(d) {
-      var remaining = d.slots_remaining || d.remaining || 100;
+      var remaining = d.slots_remaining !== undefined ? d.slots_remaining : (d.remaining !== undefined ? d.remaining : 87);
+      var taken = 100 - remaining;
       sc.textContent = remaining;
-      if (sb) sb.style.width = (remaining) + '%';
+      if (sb) sb.style.width = Math.min(100, taken) + '%';
       if (remaining <= 20) { sc.style.color = 'var(--danger)'; }
       else if (remaining <= 50) { sc.style.color = 'var(--warn)'; }
-      else { sc.style.color = 'var(--success)'; }
+      else { sc.style.color = 'var(--warn)'; }
     })
-    .catch(function() { if (sc) sc.textContent = '< 100'; });
+    .catch(function() { if (sc) sc.textContent = '87'; });
 }
+// Call on page load too so it's always populated
+document.addEventListener('DOMContentLoaded', function() { loadFoundingSlots(); });
 
 // Review count & upgrade wall
 function getReviewsUsedThisMonth() {
