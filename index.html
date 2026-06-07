@@ -138,7 +138,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;backgro
 const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Railway if needed.
 
   const API_URL = 'https://siegeiq-backend-production.up.railway.app';
-  const SITE_URL = 'https://siegeiq-frontend.vercel.app';
+  const SITE_URL = 'https://siegeiq.gg';
 </script>
 
 <!-- Theme switcher -->
@@ -707,7 +707,7 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
             </div>
             <div id="sc-bars" style="display:flex;flex-direction:column;gap:4px;margin-bottom:10px"></div>
             <div id="sc-fix1" style="font-size:10px;color:#9B9890;line-height:1.5;border-top:1px solid rgba(255,255,255,0.07);padding-top:8px"></div>
-            <div style="margin-top:8px;font-size:9px;color:#5C5A55;text-align:right">siegeiq-frontend.vercel.app</div>
+            <div style="margin-top:8px;font-size:9px;color:#5C5A55;text-align:right">siegeiq.gg</div>
           </div>
         </div>
         <div style="display:flex;gap:8px">
@@ -1050,7 +1050,7 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
       <h2 style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--text);margin:28px 0 10px">10. Contact</h2>
       <p style="margin-bottom:10px">For privacy questions or data requests, contact us at:<br>
         <span style="color:var(--accent)">privacy@siegeiq.gg</span><br>
-        SiegeIQ — siegeiq-frontend.vercel.app
+        SiegeIQ — siegeiq.gg
       </p>
 
     </div>
@@ -1744,7 +1744,7 @@ function copyShareText() {
   const mp = currentReportMeta.map || '';
   const rk = currentReportMeta.rank || '';
   const fixes = (currentReport.top_fixes || []).slice(0,2);
-  const parts = ['My SiegeIQ Analysis','', mp.toUpperCase() + ' - ' + op + ' - ' + rk, 'Round Score: ' + sc + '/100',''].concat(fixes.map((f,i)=>(i+1)+'. '+f)).concat(['','Get your own AI coaching -> siegeiq-frontend.vercel.app']);
+  const parts = ['My SiegeIQ Analysis','', mp.toUpperCase() + ' - ' + op + ' - ' + rk, 'Round Score: ' + sc + '/100',''].concat(fixes.map((f,i)=>(i+1)+'. '+f)).concat(['','Get your own AI coaching -> siegeiq.gg']);
   navigator.clipboard.writeText(parts.join('\n')).then(()=>{
     document.getElementById('share-copied').style.display='block';
     setTimeout(()=>{document.getElementById('share-copied').style.display='none';},3000);
@@ -2475,7 +2475,7 @@ function generateCertificate(playerName, operator, map, oldScore, newScore, week
   ctx.fillRect(60, 460, 780, 1);
   ctx.fillStyle = '#3C3A35';
   ctx.font = '11px Arial';
-  ctx.fillText('Verified by SiegeIQ AI Coaching  ·  siegeiq-frontend.vercel.app', 60, 480);
+  ctx.fillText('Verified by SiegeIQ AI Coaching  ·  siegeiq.gg', 60, 480);
   ctx.textAlign = 'right';
   ctx.fillText(new Date().toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'}), 820, 480);
 
@@ -2492,19 +2492,33 @@ function downloadCertificate(playerName, operator, map, oldScore, newScore, week
 
 // Call cert from dashboard when improvement detected
 function checkForCertificate(report, operator, map, rank) {
-  // This would compare against stored previous scores
-  // For now show cert button if score is above 70
-  const sc = report.overall_score || 0;
-  if (sc >= 65) {
-    const certBtn = document.getElementById('cert-btn-container');
-    if (certBtn) {
-      certBtn.style.display = 'block';
-      certBtn.innerHTML = `<button onclick="downloadCertificate('', '${operator}', '${map}', ${Math.max(0,sc-12)}, ${sc}, 2)"
-        style="width:100%;font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,#FF6B35,#E8B84B);border:none;border-radius:var(--r);padding:10px;cursor:pointer">
-        🏆 DOWNLOAD IMPROVEMENT CERTIFICATE</button>
-        <div style="font-size:11px;color:var(--text3);text-align:center;margin-top:5px">Share your progress on Reddit, Discord, or Twitter</div>`;
-    }
-  }
+  const sc = report.score || report.overall_score || 0;
+  if (!sc) return;
+  const certBtn = document.getElementById('cert-btn-container');
+  if (!certBtn) return;
+
+  // Compare vs previous clip (reviewHistory[1] since current was just unshifted to [0])
+  const prev = reviewHistory.length >= 2 ? reviewHistory[1] : null;
+  const oldScore = prev ? prev.score : null;
+  const hasImprovement = oldScore !== null && sc > oldScore;
+  const improvement = hasImprovement ? sc - oldScore : null;
+  const weeks = hasImprovement ? Math.max(1, Math.round((reviewHistory.length - 1) * 0.5)) : 1;
+  const beforeScore = oldScore !== null ? oldScore : Math.max(0, sc - 10);
+
+  certBtn.style.display = 'block';
+  certBtn.innerHTML = '<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px">'
+    + '<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-weight:600">🏆 Improvement Certificate</div>'
+    + (hasImprovement
+        ? '<div style="font-size:12px;color:var(--success);margin-bottom:10px">+' + improvement + ' point improvement vs last clip</div>'
+        : '<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Score: ' + sc + ' / 100</div>')
+    + '<input id="cert-name-input" type="text" placeholder="Your name or gamertag"'
+    + ' style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:7px 10px;color:var(--text);font-size:12px;outline:none;margin-bottom:8px;box-sizing:border-box"'
+    + ' oninput="this.style.borderColor='var(--accent)'" />'
+    + '<button onclick="var n=document.getElementById('cert-name-input').value.trim()||'SIEGE PLAYER';downloadCertificate(n,'' + operator + '','' + map + '',' + beforeScore + ',' + sc + ',' + weeks + ')"'
+    + ' style="width:100%;font-family:var(--fh);font-size:12px;font-weight:700;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,#FF6B35,#E8B84B);border:none;border-radius:var(--r);padding:9px;cursor:pointer">'
+    + '📥 DOWNLOAD CERTIFICATE</button>'
+    + '<div style="font-size:10px;color:var(--text3);text-align:center;margin-top:6px">Saves as PNG · Share on Discord, Reddit, Twitter</div>'
+    + '</div>';
 }
 
 // ─── Newsletter ───────────────────────────────
