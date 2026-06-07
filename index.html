@@ -1476,10 +1476,10 @@ function renderResults(data,operator,map,rank) {
   const obs=report.observations||[];
   document.getElementById('obs-count').textContent=`${obs.length} moments flagged`;
   const pips=document.getElementById('timeline-pips');
-  pips.innerHTML=obs.map((o,i)=>{const pct=Math.round(((i+1)/(obs.length+1))*100);return `<button onclick="scrollToObs(${i})" style="position:absolute;left:${pct}%;top:2px;width:10px;height:10px;border-radius:50%;background:var(--accent);border:2px solid var(--bg);cursor:pointer;transform:translateX(-50%)" title="${o.timestamp}"></button>`;}).join('');
+  pips.innerHTML=obs.map((o,i)=>{const pct=Math.round(((i+1)/(obs.length+1))*100);const sevDot=o.severity==='critical'?'#FF4444':o.severity==='warning'?'#F59E0B':'#3ECF8E';return `<button onclick="scrollToObs(${i})" title="${o.severity.toUpperCase()}: ${(o.observation||'').slice(0,60)}..." style="position:absolute;left:${pct}%;top:2px;width:12px;height:12px;border-radius:50%;background:${sevDot};border:2px solid var(--bg);cursor:pointer;transform:translateX(-50%);transition:transform .15s" onmouseover="this.style.transform='translateX(-50%) scale(1.5)'" onmouseout="this.style.transform='translateX(-50%) scale(1)'"></button>`;}).join('');
 
   const list=document.getElementById('obs-list');
-  const summaryHtml=report.summary?`<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:16px"><div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:7px;font-weight:600">Coach Summary</div><div style="font-size:13px;color:var(--text2);line-height:1.7">${report.summary}</div></div>`:'';
+  const summaryHtml=report.summary?`<div style="background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.25);border-radius:var(--r);padding:16px 18px;margin-bottom:16px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:9px"><span style="font-size:14px">🎯</span><span style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;font-weight:700">Coach Summary</span></div><div style="font-size:13.5px;color:var(--text);line-height:1.75;font-weight:400">${report.summary}</div></div>`:'';
   list.innerHTML=summaryHtml+obs.map((o,i)=>{
     const phase=getPhaseLabel(o.timestamp);
     const headline=getObsHeadline(o);
@@ -1497,8 +1497,8 @@ function renderResults(data,operator,map,rank) {
           <div style="font-size:12.5px;color:var(--text2);line-height:1.65">${o.observation}</div>
           <div style="display:flex;align-items:center;gap:6px;margin-top:9px">
             <span style="font-size:10px;color:var(--text3)">Accurate?</span>
-            <button onclick="rateFeedback(${i},1)" id="thumb-up-${i}" style="background:none;border:none;cursor:pointer;font-size:14px;opacity:.5;transition:opacity .15s;padding:2px" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">👍</button>
-            <button onclick="rateFeedback(${i},-1)" id="thumb-dn-${i}" style="background:none;border:none;cursor:pointer;font-size:14px;opacity:.5;transition:opacity .15s;padding:2px" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.5">👎</button>
+            <button onclick="rateFeedback(${i},1)" id="thumb-up-${i}" style="background:rgba(62,207,142,0.12);border:1px solid rgba(62,207,142,0.25);border-radius:6px;cursor:pointer;font-size:15px;padding:3px 8px;transition:all .15s" onmouseover="this.style.background='rgba(62,207,142,0.25)'" onmouseout="this.style.background='rgba(62,207,142,0.12)'">👍</button>
+            <button onclick="rateFeedback(${i},-1)" id="thumb-dn-${i}" style="background:rgba(255,68,68,0.12);border:1px solid rgba(255,68,68,0.25);border-radius:6px;cursor:pointer;font-size:15px;padding:3px 8px;transition:all .15s" onmouseover="this.style.background='rgba(255,68,68,0.25)'" onmouseout="this.style.background='rgba(255,68,68,0.12)'">👎</button>
           </div>
           <div id="fix-${i}" style="display:none;margin-top:11px">
             <div style="border-left:2px solid var(--accent);padding:10px 12px;background:rgba(255,107,53,0.04);border-radius:0 6px 6px 0;margin-bottom:8px">
@@ -1584,8 +1584,18 @@ async function speakObservation(index) {
 
   document.getElementById('voice-reading').textContent = 'Speaking...';
 
+  // Unlock AudioContext on first user gesture (required by browsers)
+  if (!window._audioCtxUnlocked) {
+    try {
+      const tmpCtx = new (window.AudioContext || window.webkitAudioContext)();
+      await tmpCtx.resume();
+      window._audioCtxUnlocked = true;
+    } catch(e) {}
+  }
+
   // Try ElevenLabs via Railway proxy (keeps API key secure)
   try {
+    document.getElementById('voice-reading').textContent = 'Loading premium voice...';
     const resp = await fetch(API_URL + '/voice/speak', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1593,8 +1603,10 @@ async function speakObservation(index) {
     });
     if (resp.ok) {
       const buf = await resp.arrayBuffer();
+      if (buf.byteLength < 100) throw new Error('Empty audio response');
       const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const decoded  = await audioCtx.decodeAudioData(buf);
+      await audioCtx.resume();
+      const decoded  = await audioCtx.decodeAudioData(buf.slice(0));
       const source   = audioCtx.createBufferSource();
       source.buffer  = decoded;
       source.connect(audioCtx.destination);
@@ -1607,9 +1619,17 @@ async function speakObservation(index) {
         document.getElementById('voice-reading').textContent = 'Done. Click another card.';
       };
       source.start(0);
+      document.getElementById('voice-reading').textContent = 'Playing...';
       return;
+    } else {
+      const errText = await resp.text().catch(()=>'');
+      throw new Error('HTTP ' + resp.status + ': ' + errText.slice(0,80));
     }
-  } catch(e) { console.warn('[SiegeIQ Voice] ElevenLabs proxy failed, using browser TTS:', e.message); }
+  } catch(e) {
+    console.warn('[SiegeIQ Voice] ElevenLabs failed:', e.message);
+    document.getElementById('voice-reading').textContent = 'Voice error: ' + e.message.slice(0,60);
+    setTimeout(()=>{ document.getElementById('voice-reading').textContent = 'Using browser voice instead...'; }, 2000);
+  }
 
   // Browser TTS fallback — best available voice
   if (!window.speechSynthesis) {
@@ -2456,13 +2476,13 @@ function generateCertificate(playerName, operator, map, oldScore, newScore, week
   ctx.fillText(`After: ${newScore}`, 820, barY - 8);
   ctx.textAlign = 'left';
 
-  // Big improvement number
+  // Big improvement number — stacked layout to avoid overlap
   ctx.fillStyle = '#FF6B35';
-  ctx.font = 'bold 72px Arial';
-  ctx.fillText(`+${improvement}`, 60, 400);
+  ctx.font = 'bold 80px Arial';
+  ctx.fillText(`+${improvement}`, 60, 405);
   ctx.fillStyle = '#9B9890';
-  ctx.font = '18px Arial';
-  ctx.fillText('point improvement', 60 + ctx.measureText(`+${improvement}`).width + 12, 388);
+  ctx.font = '16px Arial';
+  ctx.fillText('POINT IMPROVEMENT', 60, 435);
 
   // Details row
   ctx.fillStyle = '#5C5A55';
