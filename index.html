@@ -117,14 +117,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;backgro
 .nav-btn{font-size:13px;font-weight:500;color:var(--text2);background:transparent;border:1px solid transparent;border-radius:var(--r);padding:5px 12px;cursor:pointer;transition:all .15s}
 .nav-btn:hover,.nav-btn.active{background:var(--bg3);color:var(--text);border-color:var(--border2)}
 .obs-card{background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .15s;animation:fadeUp .35s ease both}
-.obs-card:hover{border-color:var(--border2)}
-.obs-card.open-critical{border-color:rgba(255,68,68,.4);background:rgba(255,68,68,.05)}
-.obs-card.open-warning{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.05)}
-.obs-card.open-tip{border-color:rgba(62,207,142,.4);background:rgba(62,207,142,.05)}
+.obs-card:hover{border-color:rgba(255,107,53,0.35);background:rgba(255,107,53,0.04)}
+.obs-card.open-critical{border-color:rgba(255,107,53,0.35);background:rgba(255,107,53,0.04)}
+.obs-card.open-warning{border-color:rgba(255,107,53,0.35);background:rgba(255,107,53,0.04)}
+.obs-card.open-tip{border-color:rgba(255,107,53,0.35);background:rgba(255,107,53,0.04)}
 .tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;letter-spacing:.05em;text-transform:uppercase;border:1px solid}
-.tag.critical{background:rgba(255,68,68,.12);color:#FF4444;border-color:rgba(255,68,68,.3)}
-.tag.warning{background:rgba(245,158,11,.12);color:#F59E0B;border-color:rgba(245,158,11,.3)}
-.tag.tip{background:rgba(62,207,142,.12);color:#3ECF8E;border-color:rgba(62,207,142,.3)}
+.tag.critical{background:rgba(255,107,53,.1);color:var(--accent);border-color:rgba(255,107,53,.25)}
+.tag.warning{background:rgba(255,107,53,.07);color:var(--accent);border-color:rgba(255,107,53,.2)}
+.tag.tip{background:rgba(255,107,53,.05);color:var(--text2);border-color:rgba(255,107,53,.15)}
 .bar-fill{height:4px;border-radius:2px;width:0%;transition:width 1.2s ease}
 .video-container{position:relative;width:100%;max-width:860px;margin:0 auto 0;border-radius:12px;overflow:hidden;border:1px solid var(--border2);box-shadow:0 0 80px rgba(255,107,53,0.15)}
 .video-container iframe{width:100%;aspect-ratio:16/9;display:block}
@@ -1318,27 +1318,45 @@ function replayMoment(i, e) {
   if (e) e.stopPropagation();
   var obs = currentObservations && currentObservations[i];
   if (!obs || !obs.timestamp) return;
+  var lp = document.getElementById('local-player');
+  if (!lp || !lp.src) return;
+
   // Parse timestamp e.g. "1:24" or "~0:45-1:00" → take first time
   var ts = obs.timestamp.replace('~','').split('-')[0].trim();
   var parts = ts.split(':');
   var secs = parts.length === 2 ? parseInt(parts[0])*60 + parseInt(parts[1]) : parseInt(parts[0]);
   if (isNaN(secs)) return;
-  var lp = document.getElementById('local-player');
-  if (!lp || !lp.src) { return; }
-  var start = Math.max(0, secs);  // start exactly at the listed timestamp
-  var end   = secs + 10;
+
+  // Cap to video duration — never seek past end
+  var duration = lp.duration || 0;
+  var start = duration > 0 ? Math.min(Math.max(0, secs), Math.max(0, duration - 10)) : Math.max(0, secs);
+
+  // Clear any existing timer
+  if (window._replayTimer) { clearTimeout(window._replayTimer); window._replayTimer = null; }
+
   lp.currentTime = start;
   lp.play();
-  // Stop after 12 seconds
-  if (window._replayTimer) clearTimeout(window._replayTimer);
+
+  // Stop after exactly 10 seconds
   window._replayTimer = setTimeout(function() {
     lp.pause();
-    lp.currentTime = start;
-  }, 12000);
-  // Visual feedback on button
+    window._replayTimer = null;
+    var btn = document.getElementById('replay-btn-'+i);
+    if (btn) { btn.textContent = '▶ REPLAY'; btn.onclick = function(ev){ev.stopPropagation();replayMoment(i,ev);}; }
+  }, 10000);
+
+  // Update button to show STOP
   var btn = document.getElementById('replay-btn-'+i);
-  if (btn) { btn.textContent = '⏹ STOP'; btn.onclick = function(ev) { ev.stopPropagation(); clearTimeout(window._replayTimer); lp.pause(); btn.textContent = '▶ REPLAY'; btn.onclick = function(ev2){ev2.stopPropagation();replayMoment(i,ev2);}; }; }
-  setTimeout(function() { if (btn) { btn.textContent = '▶ REPLAY'; btn.onclick = function(ev){ev.stopPropagation();replayMoment(i,ev);}; } }, 12500);
+  if (btn) {
+    btn.textContent = '⏹ STOP';
+    btn.onclick = function(ev) {
+      ev.stopPropagation();
+      if (window._replayTimer) { clearTimeout(window._replayTimer); window._replayTimer = null; }
+      lp.pause();
+      btn.textContent = '▶ REPLAY';
+      btn.onclick = function(ev2){ev2.stopPropagation();replayMoment(i,ev2);};
+    };
+  }
 }
 
 function rateFeedback(i, rating) {
@@ -1442,13 +1460,13 @@ function renderResults(data,operator,map,rank) {
     if (cn) cn.textContent = 'Clip analyzed by SiegeIQ AI';
   }
 
-  const sc=report.overall_score||0;
+  const sc=report.score||report.overall_score||0;
   const el=document.getElementById('overall-score');
   el.textContent=sc;
   el.style.color=sc>=70?'var(--success)':sc>=50?'var(--warn)':'var(--danger)';
   document.getElementById('score-label').textContent=sc>=70?'Strong':sc>=50?'Needs work':'Struggling';
   const sb=document.getElementById('score-bars');
-  sb.innerHTML=Object.entries(report.category_scores||{}).map(([cat,val])=>{
+  sb.innerHTML=Object.entries(report.categories||report.category_scores||{}).map(([cat,val])=>{
     const col=val>=70?'var(--success)':val>=50?'var(--warn)':'var(--danger)';
     return `<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px"><span style="color:var(--text2)">${cat}</span><span style="color:${col};font-weight:600">${val}</span></div><div style="height:4px;background:var(--bg3);border-radius:2px"><div class="bar-fill" data-w="${val}" style="background:${col}"></div></div></div>`;
   }).join('');
@@ -1641,12 +1659,17 @@ if (window.speechSynthesis) {
 // Clicking a timestamp BOTH seeks the video AND reads the observation aloud
 function jumpToTimestamp(timeStr, obsIndex) {
   // Convert M:SS to seconds
-  const parts = timeStr.split(':').map(Number);
-  const secs  = parts.length === 2 ? parts[0]*60 + parts[1] : parts[0];
+  const clean = (timeStr||'').replace('~','').split('-')[0].trim();
+  const parts = clean.split(':').map(Number);
+  let secs = parts.length === 2 ? parts[0]*60 + parts[1] : parts[0];
+  if (isNaN(secs)) return;
 
   // Seek local video player if file was uploaded
   const localPlayer = document.getElementById('local-player');
   if (localPlayer) {
+    // Cap to video duration so we never seek past the end
+    const dur = localPlayer.duration || 0;
+    if (dur > 0) secs = Math.min(secs, Math.max(0, dur - 1));
     localPlayer.currentTime = secs;
     localPlayer.play();
   }
