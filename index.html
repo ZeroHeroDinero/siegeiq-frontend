@@ -396,17 +396,26 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
             <!-- Category bars -->
             <div style="display:flex;flex-direction:column;gap:6px">
               <div style="font-size:9px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:2px">Categories</div>
-              ${['positioning:55','utility:48','decision_making:60','communication:65','mechanical:72'].map(c=>{
-                const[n,v]=c.split(':');
-                const col=parseInt(v)>=70?'#3ECF8E':parseInt(v)>=50?'#F59E0B':'#FF6B35';
-                return `<div style="display:flex;align-items:center;gap:6px">
-                  <div style="font-size:9px;color:var(--text3);width:72px;flex-shrink:0">${n.replace('_',' ')}</div>
-                  <div style="flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:2px">
-                    <div style="height:100%;width:${v}%;background:${col};border-radius:2px;transition:width 1s ease"></div>
-                  </div>
-                  <div style="font-size:9px;color:${col};width:20px;text-align:right">${v}</div>
-                </div>`;
-              }).join('')}
+              <div style="display:flex;align-items:center;gap:6px">
+              <div style="font-size:9px;color:var(--text3);width:72px;flex-shrink:0">positioning</div>
+              <div style="flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:2px"><div style="height:100%;width:55%;background:#F59E0B;border-radius:2px"></div></div>
+              <div style="font-size:9px;color:#F59E0B;width:20px;text-align:right">55</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="font-size:9px;color:var(--text3);width:72px;flex-shrink:0">utility</div>
+              <div style="flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:2px"><div style="height:100%;width:48%;background:#FF6B35;border-radius:2px"></div></div>
+              <div style="font-size:9px;color:#FF6B35;width:20px;text-align:right">48</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="font-size:9px;color:var(--text3);width:72px;flex-shrink:0">decisions</div>
+              <div style="flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:2px"><div style="height:100%;width:60%;background:#F59E0B;border-radius:2px"></div></div>
+              <div style="font-size:9px;color:#F59E0B;width:20px;text-align:right">60</div>
+            </div>
+            <div style="display:flex;align-items:center;gap:6px">
+              <div style="font-size:9px;color:var(--text3);width:72px;flex-shrink:0">mechanical</div>
+              <div style="flex:1;height:3px;background:rgba(255,255,255,0.06);border-radius:2px"><div style="height:100%;width:72%;background:#3ECF8E;border-radius:2px"></div></div>
+              <div style="font-size:9px;color:#3ECF8E;width:20px;text-align:right">72</div>
+            </div>
             </div>
             <!-- Top fixes -->
             <div>
@@ -2049,7 +2058,7 @@ function shareToTikTok() {
   window.open('https://www.tiktok.com/upload', '_blank');
 }
 
-function testVoice() {
+async function testVoice() {
   const obs = { severity:'tip', observation:'Voice test — SiegeIQ AI coaching is active and ready.', fix:'' };
   const savedObs = currentObservations;
   currentObservations = [obs];
