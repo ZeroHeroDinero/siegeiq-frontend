@@ -2435,6 +2435,8 @@ const STRIPE_DIRECT = {
   'team_monthly': 'https://buy.stripe.com/9B6dR91Xn1tBaRH1xh93y08',
   'team_annual':  'https://buy.stripe.com/9B65kD7hH3BJ2lb7VF93y09',
 };
+// Founding link — same product but no free trial, promo code applies
+const STRIPE_FOUNDING = 'https://buy.stripe.com/00w6oHatT2xFbVL3Fp93y0a';
 function normalizePlan(p) {
   return {'pro':'pro_monthly','diamond':'pro_monthly','squad':'team_monthly','team':'team_monthly'}[p] || p;
 }
@@ -2445,6 +2447,11 @@ function startCheckout(plan) {
   else alert('Unknown plan: ' + plan);
 }
 function startCheckoutWithCode(plan, code) {
+  // Founding offer uses a dedicated link with no free trial
+  if (code && code.toUpperCase() === 'FOUNDING') {
+    window.location.href = STRIPE_FOUNDING + '?prefilled_promo_code=FOUNDING';
+    return;
+  }
   plan = normalizePlan(plan);
   const base = STRIPE_DIRECT[plan];
   if (!base) { alert('Unknown plan: ' + plan); return; }
