@@ -1982,6 +1982,31 @@ function getObsHeadline(o) {
   return base; // operator shown separately in badge — don't duplicate in headline
 }
 
+async function getDrillPlan(){
+  var out=document.getElementById('drill-out'); if(!out) return;
+  out.style.display='block'; out.textContent='Building your 7-day plan\u2026';
+  try{ var r=await fetch(API_URL+'/drills/plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({report:window.lastReport||{}})}); var d=await r.json(); out.textContent=d.text||'No plan returned.'; }
+  catch(e){ out.textContent='Could not build plan. Try again.'; }
+}
+window._chatHist=[];
+async function askClip(){
+  var inp=document.getElementById('chat-q'); var log=document.getElementById('chat-log');
+  if(!inp||!log) return; var q=inp.value.trim(); if(!q) return; inp.value='';
+  log.insertAdjacentHTML('beforeend','<div style="font-size:12.5px;color:var(--text);margin-bottom:6px"><b style="color:var(--accent)">You:</b> '+q.replace(/</g,"&lt;")+'</div>');
+  var t=document.createElement('div'); t.style.cssText='font-size:12.5px;color:var(--text3);margin-bottom:8px'; t.textContent='SiegeIQ is thinking\u2026'; log.appendChild(t);
+  try{
+    var r=await fetch(API_URL+'/review/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({report:window.lastReport||{},question:q,history:window._chatHist})});
+    var d=await r.json(); t.remove(); var ans=(d.text||'No answer.');
+    log.insertAdjacentHTML('beforeend','<div style="font-size:12.5px;color:var(--text2);line-height:1.6;margin-bottom:10px;white-space:pre-wrap"><b style="color:var(--text)">Coach:</b> '+ans.replace(/</g,"&lt;")+'</div>');
+    window._chatHist.push({role:'user',text:q}); window._chatHist.push({role:'coach',text:ans});
+  }catch(e){ t.remove(); log.insertAdjacentHTML('beforeend','<div style="font-size:12px;color:var(--danger);margin-bottom:8px">Could not reach the coach.</div>'); }
+}
+async function emailDigest(btn){
+  if(btn){ btn.textContent='Sending\u2026'; btn.disabled=true; }
+  try{ var tk=await siegeAuth.token(); var r=await fetch(API_URL+'/digest/me',{method:'POST',headers:{'Authorization':'Bearer '+tk}}); var d=await r.json(); if(btn) btn.textContent=d.sent?'\u2713 Sent!':'No reviews yet'; }
+  catch(e){ if(btn){ btn.textContent='Failed'; btn.disabled=false; } }
+}
+
 async function loadTrends(){
   try{
     if(!window.siegeAuth || !siegeAuth.isSignedIn()) return;
@@ -1999,7 +2024,8 @@ async function loadTrends(){
     var spark=pts.length>1?('<svg viewBox="0 0 '+w+' '+h+'" preserveAspectRatio="none" style="width:100%;height:54px;margin-bottom:10px"><path d="'+path+'" fill="none" stroke="var(--accent)" stroke-width="2"/></svg>'):'';
     var cats=d.categories||{};
     var catHtml=Object.keys(cats).map(function(k){var v=cats[k];var col=v>=70?'var(--success)':v>=50?'var(--warn)':'var(--danger)';return '<div style="margin-bottom:6px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--text2)">'+k.replace(/_/g,' ')+'</span><span style="color:'+col+';font-weight:600">'+v+'</span></div><div style="height:4px;background:var(--bg3);border-radius:2px"><div style="height:100%;border-radius:2px;width:'+v+'%;background:'+col+'"></div></div></div>';}).join('');
-    box.innerHTML='<div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:8px">Your progress \u00B7 '+d.count+' reviews \u00B7 avg '+(d.avg_score||0)+'</div>'+spark+catHtml;
+    var focus=d.focus?('<span style="color:var(--text2);text-transform:none;letter-spacing:0;font-weight:400"> \u00B7 focus: <b style="color:var(--accent)">'+d.focus.replace(/_/g," ")+'</b></span>'):'';
+    box.innerHTML='<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:8px"><div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;font-weight:700">Rank-Up Score '+(d.avg_score||0)+' \u00B7 '+d.count+' reviews'+focus+'</div><button onclick="emailDigest(this)" style="font-size:11px;font-weight:700;color:var(--text2);background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:4px 12px;cursor:pointer;white-space:nowrap">\u2709 Email my weekly digest</button></div>'+spark+catHtml;
   }catch(e){}
 }
 
@@ -2175,6 +2201,9 @@ function renderResults(data,operator,map,rank) {
       </div>
     </div>`;
   }).join('');
+  window.lastReport = report;
+  (function(){ var c=report.categories||{}; var ks=Object.keys(c); if(ks.length){ var lo=ks.reduce(function(a,b){return c[b]<c[a]?b:a;}); list.insertAdjacentHTML('afterbegin','<div style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3);border-radius:var(--r);padding:12px 14px;margin-bottom:14px"><div style="font-size:10px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:4px">This week\u2019s focus</div><div style="font-size:13px;color:var(--text)">Your weakest area is <b style="color:var(--accent)">'+lo.replace(/_/g," ")+'</b> \u2014 drill it this week.</div></div>'); } })();
+  list.insertAdjacentHTML('beforeend','<div style="margin-top:18px;border-top:1px solid var(--border);padding-top:16px"><button onclick="getDrillPlan()" style="width:100%;font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.05em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:11px;cursor:pointer;margin-bottom:12px">\uD83C\uDFCB GET MY 7-DAY DRILL PLAN</button><div id="drill-out" style="display:none;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px;font-size:12.5px;color:var(--text2);line-height:1.7;white-space:pre-wrap;margin-bottom:14px"></div><div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:8px">Ask SiegeIQ about this clip</div><div id="chat-log" style="margin-bottom:8px"></div><div style="display:flex;gap:8px"><input id="chat-q" placeholder="e.g. why did I lose that gunfight?" style="flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 11px;color:var(--text);font-size:12.5px;outline:none"><button onclick="askClip()" style="font-family:var(--fh);font-size:12px;font-weight:700;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:9px 16px;cursor:pointer">ASK</button></div></div>');
   currentObservations=obs;
   reviewHistory.unshift({map,operator,rank,score:sc,date:'Just now'});
   renderHistory();
