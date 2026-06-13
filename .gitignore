@@ -1,0 +1,6 @@
+# Local-only backup snapshots (kept on your machine, not deployed)
+backups/
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+*.lock
