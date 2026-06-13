@@ -1753,6 +1753,7 @@ async function runAnalysis() {
         }
       }
       if (lastErr) throw lastErr;
+      if(resp.status===403){const ed=await resp.json().catch(()=>({}));const e=new Error(ed.detail||'limit_reached');e._limit=(ed.reason==='limit_reached'||/limit|free review/i.test(ed.detail||''));throw e;}
       if(!resp.ok){const err=await resp.json().catch(()=>({detail:'Submission failed'}));throw new Error(err.detail||'Submission failed');}
       const data=await resp.json();
       reviewId=data.review_id;
@@ -1785,6 +1786,7 @@ async function runAnalysis() {
         }
       }
       if (lastErr) throw lastErr;
+      if(resp.status===403){const ed=await resp.json().catch(()=>({}));const e=new Error(ed.detail||'limit_reached');e._limit=(ed.reason==='limit_reached'||/limit|free review/i.test(ed.detail||''));throw e;}
       if(!resp.ok){const err=await resp.json().catch(()=>({detail:'Upload failed'}));throw new Error(err.detail||'Upload failed');}
       const data=await resp.json();
       reviewId=data.review_id;
@@ -1795,6 +1797,8 @@ async function runAnalysis() {
     pollForResult(reviewId,operator,map,rank);
   } catch(err) {
     overlay.style.display='none';
+    stopLoadingTips();
+    if (err && err._limit) { if (window._anonRun) { showSignupWall(); } else { showUpgradeWall(); } return; }
     var msg = err.message || '';
     if (msg.includes('401') || msg.includes('authentication_error') || msg.includes('x-api-key')) {
       showError('AI service error: API key issue. Go to railway.app → Variables → check ANTHROPIC_API_KEY.');
@@ -3962,7 +3966,10 @@ function checkUpgradeWall() {
     }
     return;
   }
-  var used = getReviewsUsedThisMonth();
+  var _sm = (window.siegeAuth && siegeAuth.me) ? siegeAuth.me() : null;
+  var used = (siegeAuth.isSignedIn() && !devPlanSet() && _sm && typeof _sm.reviews_this_month === 'number')
+    ? _sm.reviews_this_month
+    : getReviewsUsedThisMonth();
   var remaining = Math.max(0, 3 - used);
   if (ct) ct.textContent = remaining + ' free review' + (remaining !== 1 ? 's' : '') + ' remaining this month.';
   if (used >= 3) {
