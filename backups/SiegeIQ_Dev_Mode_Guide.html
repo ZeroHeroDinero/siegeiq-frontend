@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SiegeIQ — Developer Mode Guide</title>
+<style>
+  :root{--accent:#ff7a2f;--ink:#1c2027;--grey:#5b6470;--line:#e3e7ec;--bg:#fafbfc;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;line-height:1.6}
+  .wrap{max-width:780px;margin:0 auto;padding:40px 28px 64px}
+  h1{font-size:30px;margin:0 0 2px}
+  .sub{color:var(--accent);font-weight:600;margin:0 0 18px}
+  .rule{height:3px;background:var(--accent);border-radius:2px;width:100%;margin:0 0 26px}
+  h2{color:var(--accent);font-size:19px;margin:30px 0 8px;border-left:4px solid var(--accent);padding-left:10px}
+  p{margin:0 0 10px}
+  ul,ol{margin:6px 0 12px;padding-left:22px}
+  li{margin-bottom:6px}
+  code{background:#eef1f4;border:1px solid var(--line);border-radius:4px;padding:1px 6px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px}
+  kbd{background:#222;color:#fff;border-radius:5px;padding:2px 8px;font-size:12px;font-weight:700;font-family:inherit}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:10px 0 4px}
+  .card{border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+  .card.do{background:#eafaf1}
+  .card.dont{background:#fdeee6}
+  .card h3{margin:0 0 6px;font-size:14px}
+  .card p{font-size:13.5px;color:#39414b;margin:0}
+  .foot{margin-top:34px;border-top:1px solid var(--line);padding-top:12px;color:var(--grey);font-size:12.5px}
+  @media(max-width:560px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>SiegeIQ — Developer Mode</h1>
+  <p class="sub">Test the Free, Pro &amp; Squad experience without paying</p>
+  <div class="rule"></div>
+
+  <h2>What it is</h2>
+  <p>Developer Mode is a hidden, browser-only panel that lets you preview the site exactly as a <strong>Free</strong>, <strong>Pro</strong>, or <strong>Squad</strong> member would see it — instantly, with no payment and no test accounts. It changes only what <em>your</em> browser shows. It never touches real billing, your Stripe account, or other visitors.</p>
+
+  <h2>Opening Developer Mode</h2>
+  <ul>
+    <li><strong>Keyboard:</strong> press <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd> (Windows) or <kbd>Cmd</kbd> + <kbd>Shift</kbd> + <kbd>D</kbd> (Mac). Press again to close.</li>
+    <li><strong>No keyboard (phone/tablet):</strong> add <code>?dev=1</code> to the address, e.g. <code>https://siegeiq.gg/?dev=1</code></li>
+    <li>The panel appears in the <strong>bottom-left corner</strong> of the screen.</li>
+  </ul>
+
+  <h2>The panel</h2>
+  <ul>
+    <li><strong>View site as:</strong> Free · Pro · Squad</li>
+    <li><strong>Free reviews used:</strong> 0 · 1 · 2 · 3</li>
+    <li><strong>Exit dev mode:</strong> returns you to your real account</li>
+    <li>A status line shows what you are currently simulating.</li>
+  </ul>
+  <p>Each choice reloads the page so every part of the site updates correctly.</p>
+
+  <h2>Test the FREE plan (3 reviews / month)</h2>
+  <ol>
+    <li>Open Dev Mode and click <strong>Free</strong>.</li>
+    <li>Click <strong>0</strong> under “Free reviews used” — you now have all 3 reviews available.</li>
+    <li>Go to the <strong>Upload</strong> page. The Analyze button works normally.</li>
+    <li>Reopen Dev Mode and click <strong>3</strong>. The site now behaves as if all 3 free reviews are used: the Analyze button becomes <strong>“UPGRADE TO ANALYZE”</strong> and the upgrade wall appears.</li>
+    <li>Try <strong>1</strong> and <strong>2</strong> to see the in-between states.</li>
+  </ol>
+
+  <h2>Test the PRO plan</h2>
+  <ol>
+    <li>Open Dev Mode and click <strong>Pro</strong>. The page reloads.</li>
+    <li>The badge at the top-right shows <strong>PRO · DEV</strong>.</li>
+    <li>Reviews are <strong>unlimited</strong> — no upgrade wall.</li>
+    <li>Pro-only interface unlocks — including the <strong>“Ask SiegeIQ about this clip” follow-up chatbot</strong> on the dashboard and premium AI voice coaching.</li>
+    <li>The Pricing page reflects a Pro subscriber.</li>
+  </ol>
+
+  <h2>Test the SQUAD plan</h2>
+  <ol>
+    <li>Open Dev Mode and click <strong>Squad</strong>. The page reloads.</li>
+    <li>The badge shows <strong>SQUAD · DEV</strong>.</li>
+    <li>Everything in Pro, plus the team / Squad features.</li>
+  </ol>
+
+  <h2>Returning to normal</h2>
+  <p>Open Dev Mode and click <strong>“Exit dev mode (use real account)”</strong>. The override clears and the site behaves according to your real signed-in account.</p>
+
+  <h2>What Dev Mode does &amp; does NOT do</h2>
+  <div class="grid">
+    <div class="card do">
+      <h3>Dev Mode DOES</h3>
+      <p>Simulate the front-end experience for each tier — what each plan <strong>sees</strong>: upgrade walls, plan badge, unlocked toggles, the clip chatbot, and the 3-review limit.</p>
+    </div>
+    <div class="card dont">
+      <h3>Dev Mode does NOT</h3>
+      <p>Grant real <strong>backend</strong> entitlements. Server-gated features — actual ElevenLabs AI voice audio, real clip-processing limits, and true subscription status — still follow your <strong>real</strong> login.</p>
+    </div>
+  </div>
+  <p style="font-size:13.5px;color:#39414b">So “Pro” in Dev Mode shows the Pro <em>interface</em>, but a server-enforced Pro feature only fully works if your real account is Pro (or a demo account). For true end-to-end paid testing — real checkout plus backend unlock — use <strong>Stripe TEST mode</strong> with test cards and a backend test/demo account.</p>
+
+  <h2>Resetting the free-review counter</h2>
+  <p>Inside the panel, click <strong>0</strong> under “Free reviews used” to instantly restore all 3 free reviews. (Once dev mode is active you can also press <kbd>Shift</kbd> + <kbd>D</kbd> anywhere as a shortcut — this is now disabled for normal visitors so the free limit can’t be abused.)</p>
+
+  <h2>Good to know</h2>
+  <ul>
+    <li>Dev Mode is invisible to normal visitors — there is no on-screen button; it opens only with the shortcut or the <code>?dev=1</code> URL.</li>
+    <li>It is stored only in your browser (localStorage key <code>siegeiq_dev_plan</code>).</li>
+  </ul>
+
+  <div class="foot">SiegeIQ · Developer Mode Guide · generated June 13, 2026</div>
+</div>
+</body>
+</html>
