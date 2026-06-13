@@ -36,10 +36,27 @@ no conflicts.
 - Worst case, copy a file out of `backups/` over `index.html` and publish.
 
 ## Staging / preview (optional, for backend-affecting changes)
-A `Dev` branch already exists on GitHub. It can be wired to a separate Railway
-environment that gives a test URL (e.g. dev.siegeiq.gg). Then backend-affecting
-changes go to `Dev` first, you test the real thing, and only then publish to `main`.
-This is a one-time setup — ask Claude to walk you through it when you want it.
+The `Dev` branch is for testing backend/API-affecting changes on a Railway staging
+URL before they hit `main` (production).
+
+**Keep `Dev` a true mirror of `main`.** It once drifted badly (it was built via
+github.com web uploads and fell dozens of commits behind `main`), which made staging
+useless and risked a messy merge. The safe routine:
+1. Always publish finished work to `main` first (the 2-click loop above).
+2. Branch a *new* change off an up-to-date `Dev`, push it, test on staging.
+3. Merge `Dev` → `main` only when `Dev` is current with `main`.
+
+**To reset `Dev` so it mirrors `main`** (do this whenever they've diverged):
+1. Publish/Push the latest `main` first.
+2. On github.com → **Branches** page, delete `Dev` (trash icon), then **New branch**
+   named `Dev` from source `main`. (This is branch management, NOT the forbidden
+   file-edit pencil / "Add files via upload" — it never touches `index.html`.)
+3. In GitHub Desktop, **Fetch origin**. If your local `Dev` looks stale next time you
+   use it, ask Claude to swap it for the fresh remote copy.
+
+**Note (June 2026):** email-first first-clip flow + Stripe portal wiring were applied
+to `main` behind an off-by-default flag (`window.SIEGEIQ_EMAIL_FIRST` / `?emailfirst=1`).
+The old stale `Dev` staging commit was abandoned; reset `Dev` from `main` per above.
 
 ## Never do these
 - Don't edit index.html on github.com.

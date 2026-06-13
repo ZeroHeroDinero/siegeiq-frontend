@@ -811,10 +811,11 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
 
     <div style="display:flex;align-items:center;gap:10px;margin-bottom:16px;flex-wrap:wrap">
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text2)">
-        <input type="checkbox" id="team-mode-chk" onchange="window.teamMode=this.checked" style="width:15px;height:15px;accent-color:var(--accent);cursor:pointer">
+        <input type="checkbox" id="team-mode-chk" onchange="toggleTeamMode(this)" style="width:15px;height:15px;accent-color:var(--gold);cursor:pointer">
         Analyze as full-team scrim &rarr; <strong style="color:var(--text)">IGL report</strong>
-        <span style="font-size:10px;font-weight:700;letter-spacing:.05em;color:#fff;background:var(--accent);border-radius:20px;padding:2px 8px">PRO</span>
+        <span style="font-size:10px;font-weight:700;letter-spacing:.05em;color:#0A0C0F;background:var(--gold);border-radius:20px;padding:2px 8px">SQUAD</span>
       </label>
+      <button onclick="renderSampleIGL()" style="font-size:11px;color:var(--gold);background:none;border:none;text-decoration:underline;cursor:pointer;padding:0">See a sample IGL report</button>
       <span id="meta-badge" style="font-size:11px;color:var(--text3);margin-left:auto"></span>
     </div>
 
@@ -1191,10 +1192,10 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
           <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>Unlimited reviews</div>
           <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>Priority (~2 min)</div>
           <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>Operator coaching</div>
-          <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>AI voice coaching</div>
+          <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>Premium AI voice coaching</div>
+          <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>Follow-up clip chatbot</div>
           <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>Weekly trend reports</div>
-          <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>YouTube links</div>
-          <div style="display:flex;gap:7px;color:var(--text3)"><span>✕</span>Team features</div>
+          <div style="display:flex;gap:7px;color:var(--text3)"><span>✕</span>Team / IGL report</div>
         </div>
         <button id="pro-cta-btn" onclick="playNavSound();startCheckout(annualOn ? 'pro_annual' : 'pro_monthly')" style="width:100%;font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:10px;cursor:pointer">START 7-DAY FREE TRIAL →</button>
       </div>
@@ -1209,7 +1210,7 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
           <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>Shared review feed</div>
           <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>Discord bot</div>
           <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>Monthly PDF report</div>
-          <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>IGL strategy notes</div>
+          <div style="display:flex;gap:7px;color:var(--text2)"><span style="color:var(--success)">✓</span>Full-team IGL scrim report</div>
         </div>
         <button id="team-cta-btn" onclick="playNavSound();startCheckout(annualOn ? 'team_annual' : 'team_monthly')" style="width:100%;font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:var(--text);background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:10px;cursor:pointer">GET SQUAD PLAN</button>
         <div style="font-size:10px;color:var(--text3);text-align:center;margin-top:8px">⏳ Team features rolling out Q3 2026</div>
@@ -1714,6 +1715,7 @@ function submitClip() { return startAnalysis(); }
 
 async function runAnalysis() {
   if(!hasClip) return;
+  if (window.teamMode && !isSquad()) { showSquadGate(); return; }   // IGL report = Squad plan only
   const _id = reviewIdentity();              // { user_id, email, device_id, anon }
   window._anonRun = _id.anon;
   window._reviewUserId = _id.user_id;        // poll uses this same identity
@@ -2141,6 +2143,50 @@ function renderTeamResults(data){
   var rounds=(report.round_notes||[]);
   var roundsHtml=rounds.length?('<div style="font-size:11px;color:var(--accent);text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin-bottom:8px">Round Notes</div>'+rounds.map(function(r){var rc=r.result==='win'?'var(--success)':'var(--danger)';return '<div class="obs-card" style="margin-bottom:8px"><div style="display:flex;align-items:center;gap:8px;margin-bottom:5px"><span style="font-family:var(--fh);font-size:12px;font-weight:700;color:var(--text)">Round '+(r.round||'')+'</span><span style="font-size:10px;color:var(--text3);text-transform:uppercase">'+(r.side||'')+'</span><span style="font-size:10px;font-weight:700;color:'+rc+';text-transform:uppercase">'+(r.result||'')+'</span></div><div style="font-size:12.5px;color:var(--text2);line-height:1.6">'+(r.observation||'')+'</div>'+(r.fix?'<div style="font-size:12.5px;color:var(--success);margin-top:5px"><strong>\u2713 Adjust:</strong> '+r.fix+'</div>':'')+'</div>';}).join('')):'';
   var list=document.getElementById('obs-list'); if(list) list.innerHTML=summaryHtml+sitesHtml+roundsHtml;
+  // Hide single-player-only sidebar panels that don't apply to a team report
+  ['share-section','cert-btn-container'].forEach(function(id){var e=document.getElementById(id);if(e)e.style.display='none';});
+}
+
+// ─── IGL report (Squad plan only) ───
+function isSquad(){
+  var m=(window.siegeAuth&&siegeAuth.me)?siegeAuth.me():null;
+  return !!(m && m.plan==='team');
+}
+function toggleTeamMode(cb){
+  if(cb.checked && !isSquad()){ cb.checked=false; window.teamMode=false; showSquadGate(); return; }
+  window.teamMode=cb.checked;
+}
+function showSquadGate(){ var w=document.getElementById('squad-gate'); if(w) w.style.display='flex'; }
+function closeSquadGate(){ var w=document.getElementById('squad-gate'); if(w) w.style.display='none'; }
+
+// Realistic example so owners/prospects can see the finished IGL report. Pure render — no backend, not counted.
+function renderSampleIGL(){
+  closeSquadGate();
+  window.localVideoURL=null; window.currentYouTubeId=null;
+  var sample={
+    detected_map:'Clubhouse',
+    team_score:63,
+    metrics:{ entry_trades:58, utility_usage:71, site_execution:60, map_control:49, post_plant:67 },
+    summary:'SAMPLE REPORT (example data). Your squad wins its fundamentals fights — utility and post-plant discipline are strong — but you are losing rounds to predictability. Attack defaults repeat the same Gym hit and get pre-walled from round 3 on, and defensive rotations over-commit to Church, opening the Kitchen hatch flank. Vary your executes and hold one anchor and this roster climbs.',
+    igl_recommendations:[
+      'Stop dry-pushing CCTV — you lost 3 entries there with no intel. Clear it with a Twitch drone or Zero camera before anyone commits to Construction.',
+      'On Basement defense you over-rotate to Church; keep one anchor in Cash so the fast Kitchen-hatch flank stops costing you the round.',
+      'Default to a 2-1-2 map split on Gym/Memorial hits — your stacked Gym entries got read and walled every round after round 3.'
+    ],
+    site_distribution:[
+      { site:'Gym / Memorial', picks:5, win_rate:40, note:'Heavily read after R3 — vary the approach or pick elsewhere.' },
+      { site:'Bar / Stock', picks:3, win_rate:67, note:'Your cleanest executes — lean into these.' },
+      { site:'Basement (CCTV/Cash)', picks:2, win_rate:50, note:'Flank coverage is the deciding factor here.' }
+    ],
+    round_notes:[
+      { round:1, side:'attack', result:'win', observation:'Clean 2-1-2 onto Bar, traded the first entry instantly.', fix:'Repeat this spacing — it worked because nobody over-peeked.' },
+      { round:3, side:'defense', result:'loss', observation:'Three defenders rotated to Church on the first sound cue; Kitchen hatch dropped behind you.', fix:'Hold one anchor in Cash until the plant is committed.' },
+      { round:6, side:'attack', result:'loss', observation:'Stacked Gym again; enemy Bandit/Mute wall was pre-placed and you had no vertical play.', fix:'Open Memorial hatch or split through Construction to punish the stack read.' },
+      { round:8, side:'attack', result:'win', observation:'Faked Bar, swung Stock late — defenders were rotated wrong.', fix:'This mid-round adapt is your win condition; build more defaults around it.' }
+    ]
+  };
+  renderTeamResults({ report: sample, source:'' });
+  var meta=document.getElementById('review-meta'); if(meta) meta.textContent='SAMPLE · IGL REPORT · CLUBHOUSE';
 }
 
 function renderResults(data,operator,map,rank) {
@@ -3455,8 +3501,9 @@ function copyCounter() {
 }
 
 // ─── Improvement Certificate Generator ────────
-function generateCertificate(playerName, operator, map, oldScore, newScore, weeks) {
-  const improvement = newScore - oldScore;
+function generateCertificate(playerName, operator, map, oldScore, newScore, weeks, mode) {
+  const isImprovement = (mode === 'improvement') && (oldScore != null) && (newScore > oldScore);
+  const improvement = isImprovement ? (newScore - oldScore) : 0;
   const canvas = document.createElement('canvas');
   canvas.width  = 900;
   canvas.height = 520;
@@ -3502,7 +3549,7 @@ function generateCertificate(playerName, operator, map, oldScore, newScore, week
   ctx.fillStyle = '#9B9890';
   ctx.font = '12px Arial';
   ctx.letterSpacing = '0.1em';
-  ctx.fillText('OFFICIAL IMPROVEMENT CERTIFICATE', 170, 115);
+  ctx.fillText(isImprovement ? 'OFFICIAL IMPROVEMENT CERTIFICATE' : 'OFFICIAL SCORE CERTIFICATE', 170, 115);
 
   // Player name
   ctx.fillStyle = '#F0EEE8';
@@ -3512,39 +3559,34 @@ function generateCertificate(playerName, operator, map, oldScore, newScore, week
   // Achievement text
   ctx.fillStyle = '#9B9890';
   ctx.font = '16px Arial';
-  ctx.fillText('has demonstrated measurable improvement through AI-powered coaching', 60, 232);
+  ctx.fillText(isImprovement ? 'has demonstrated measurable improvement through AI-powered coaching' : 'completed an AI-powered coaching analysis with this result', 60, 232);
 
-  // Score improvement visual
+  // Score visual
   const barY = 280;
-  // Old score bar
   ctx.fillStyle = 'rgba(255,255,255,0.05)';
   ctx.fillRect(60, barY, 760, 32);
-  ctx.fillStyle = '#5C5A55';
-  ctx.fillRect(60, barY, (oldScore/100)*760, 32);
-  ctx.fillStyle = '#FF6B35';
-  ctx.fillRect(60, barY, (newScore/100)*760, 32);
-
-  // Score labels
-  ctx.fillStyle = '#5C5A55';
-  ctx.font = 'bold 14px Arial';
-  ctx.fillText(`Before: ${oldScore}`, 60, barY - 8);
-  ctx.fillStyle = '#FF6B35';
-  ctx.textAlign = 'right';
-  ctx.fillText(`After: ${newScore}`, 820, barY - 8);
-  ctx.textAlign = 'left';
-
-  // Big improvement number — clean stacked layout
-  ctx.fillStyle = '#FF6B35';
-  ctx.font = 'bold 80px Arial';
-  ctx.fillText(`+${improvement}`, 60, 390);
-  ctx.fillStyle = '#9B9890';
-  ctx.font = '14px Arial';
-  ctx.fillText('POINT IMPROVEMENT', 60, 415);
+  if (isImprovement) {
+    ctx.fillStyle = '#5C5A55'; ctx.fillRect(60, barY, (oldScore/100)*760, 32);
+    ctx.fillStyle = '#FF6B35'; ctx.fillRect(60, barY, (newScore/100)*760, 32);
+    ctx.fillStyle = '#5C5A55'; ctx.font = 'bold 14px Arial'; ctx.fillText('Before: ' + oldScore, 60, barY - 8);
+    ctx.fillStyle = '#FF6B35'; ctx.textAlign = 'right'; ctx.fillText('After: ' + newScore, 820, barY - 8); ctx.textAlign = 'left';
+    ctx.fillStyle = '#FF6B35'; ctx.font = 'bold 80px Arial'; ctx.fillText('+' + improvement, 60, 390);
+    ctx.fillStyle = '#9B9890'; ctx.font = '14px Arial'; ctx.fillText('POINT IMPROVEMENT', 60, 415);
+  } else {
+    const col = newScore >= 70 ? '#3ECF8E' : newScore >= 50 ? '#F59E0B' : '#FF6B35';
+    const verdict = newScore >= 70 ? 'STRONG PERFORMANCE' : newScore >= 50 ? 'SOLID — ROOM TO GROW' : 'KEEP GRINDING';
+    ctx.fillStyle = col; ctx.fillRect(60, barY, (newScore/100)*760, 32);
+    ctx.fillStyle = '#5C5A55'; ctx.font = 'bold 14px Arial'; ctx.fillText('ROUND SCORE', 60, barY - 8);
+    ctx.fillStyle = col; ctx.font = 'bold 80px Arial'; ctx.fillText(String(newScore), 60, 390);
+    const numW = ctx.measureText(String(newScore)).width;
+    ctx.fillStyle = '#5C5A55'; ctx.font = 'bold 26px Arial'; ctx.fillText(' / 100', 60 + numW, 390);
+    ctx.fillStyle = col; ctx.font = '14px Arial'; ctx.fillText(verdict, 60, 415);
+  }
 
   // Details row — well below the number
   ctx.fillStyle = '#5C5A55';
   ctx.font = '13px Arial';
-  const details = [operator && `Operator: ${operator}`, map && `Map: ${map}`, weeks && `Over ${weeks} weeks`].filter(Boolean).join('   ·   ');
+  const details = [operator && `Operator: ${operator}`, map && `Map: ${map}`, isImprovement && weeks && `Over ${weeks} weeks`].filter(Boolean).join('   ·   ');
   ctx.fillText(details, 60, 445);
 
   // Footer
@@ -3559,8 +3601,8 @@ function generateCertificate(playerName, operator, map, oldScore, newScore, week
   return canvas;
 }
 
-function downloadCertificate(playerName, operator, map, oldScore, newScore, weeks) {
-  const canvas = generateCertificate(playerName, operator, map, oldScore, newScore, weeks);
+function downloadCertificate(playerName, operator, map, oldScore, newScore, weeks, mode) {
+  const canvas = generateCertificate(playerName, operator, map, oldScore, newScore, weeks, mode);
   const link = document.createElement('a');
   link.download = `siegeiq-certificate-${(playerName||'player').toLowerCase().replace(/\s/g,'-')}.png`;
   link.href = canvas.toDataURL('image/png');
@@ -3580,16 +3622,15 @@ function checkForCertificate(report, operator, map, rank) {
   const hasImprovement = oldScore !== null && sc > oldScore;
   const improvement = hasImprovement ? sc - oldScore : null;
   const weeks = hasImprovement ? Math.max(1, Math.round((reviewHistory.length - 1) * 0.5)) : 1;
-  const beforeScore = oldScore !== null ? oldScore : Math.max(0, sc - 10);
 
   certBtn.style.display = 'block';
   const certHTML = [];
   certHTML.push('<div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px">');
-  certHTML.push('<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-weight:600">&#x1F3C6; Improvement Certificate</div>');
+  certHTML.push('<div style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:10px;font-weight:600">&#x1F3C6; Shareable Certificate</div>');
   if (hasImprovement) {
-    certHTML.push('<div style="font-size:12px;color:var(--success);margin-bottom:10px">+' + improvement + ' point improvement vs last clip</div>');
+    certHTML.push('<div style="font-size:12px;color:var(--success);margin-bottom:10px">+' + improvement + ' point improvement vs last clip — download &amp; flex it.</div>');
   } else {
-    certHTML.push('<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Score: ' + sc + ' / 100</div>');
+    certHTML.push('<div style="font-size:12px;color:var(--text2);margin-bottom:10px">Your round score: <strong style="color:var(--text)">' + sc + ' / 100</strong>. Download a shareable card.</div>');
   }
   certHTML.push('<input id="cert-name-input" type="text" placeholder="Your name or gamertag" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:4px;padding:7px 10px;color:var(--text);font-size:12px;outline:none;margin-bottom:8px;box-sizing:border-box" />');
   certHTML.push('<button id="cert-dl-btn" style="width:100%;font-family:var(--fh);font-size:12px;font-weight:700;letter-spacing:.06em;color:#fff;background:linear-gradient(135deg,#FF6B35,#E8B84B);border:none;border-radius:var(--r);padding:9px;cursor:pointer">&#x1F4E5; DOWNLOAD CERTIFICATE</button>');
@@ -3600,7 +3641,7 @@ function checkForCertificate(report, operator, map, rank) {
   if (dlBtn) {
     dlBtn.addEventListener('click', function() {
       var n = (document.getElementById('cert-name-input').value.trim()) || 'SIEGE PLAYER';
-      downloadCertificate(n, operator, map, beforeScore, sc, weeks);
+      downloadCertificate(n, operator, map, oldScore, sc, weeks, hasImprovement ? 'improvement' : 'score');
     });
   }
 }
@@ -4272,6 +4313,21 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
   <span style="font-size:12.5px;color:var(--text2);line-height:1.5;flex:1">Your free review is ready below. <strong style="color:var(--text)">Create a free account</strong> to save it and analyze more clips.</span>
   <button onclick="playNavSound&&playNavSound();anonSignUp()" style="flex-shrink:0;font-family:var(--fh);font-size:12px;font-weight:700;color:#fff;background:var(--accent);border:none;padding:9px 14px;border-radius:8px;cursor:pointer">Save it →</button>
   <button onclick="hideAnonSaveCTA()" aria-label="Dismiss" style="flex-shrink:0;font-size:16px;color:var(--text3);background:none;border:none;cursor:pointer;padding:2px 4px">✕</button>
+</div>
+
+<!-- Squad gate — IGL report is a Squad-plan feature -->
+<div id="squad-gate" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99998;align-items:center;justify-content:center;padding:24px">
+  <div style="background:var(--bg2);border:1px solid rgba(232,184,75,0.4);border-radius:16px;max-width:460px;width:100%;padding:36px;text-align:center">
+    <div style="font-size:40px;margin-bottom:12px">🎖</div>
+    <div style="font-family:var(--fh);font-size:11px;color:var(--gold);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Squad plan feature</div>
+    <h2 style="font-family:var(--fh);font-size:26px;font-weight:800;color:var(--text);margin-bottom:10px">IGL reports are part of Squad</h2>
+    <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:24px">Full-team scrim analysis — team score, per-round notes, site distribution, and IGL recommendations — is included in the <strong style="color:var(--text)">Squad</strong> plan. Want to see what it looks like first?</p>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button onclick="playNavSound&&playNavSound();renderSampleIGL()" style="font-family:var(--fh);font-size:14px;font-weight:700;color:var(--text);background:var(--bg3);border:1px solid var(--border2);padding:12px 24px;border-radius:10px;cursor:pointer">👁 VIEW A SAMPLE IGL REPORT</button>
+      <button onclick="playNavSound&&playNavSound();closeSquadGate();show('pricing')" style="font-family:var(--fh);font-size:15px;font-weight:700;color:#0A0C0F;background:var(--gold);border:none;padding:14px 24px;border-radius:10px;cursor:pointer">GET SQUAD →</button>
+      <button onclick="closeSquadGate()" style="font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;padding:6px">Maybe later</button>
+    </div>
+  </div>
 </div>
 <script>
 // ════════════════ SiegeIQ Auth (Clerk) ════════════════
