@@ -4084,6 +4084,184 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
 </script>
 <script>
 (function(){ try{ fetch(`${API_URL}/meta`).then(function(r){return r.ok?r.json():null;}).then(function(m){ if(m&&m.season){ var b=document.getElementById('meta-badge'); if(b) b.textContent='\uD83D\uDEE1 Coaching tuned for '+m.season; } }).catch(function(){}); }catch(e){} })();
-</script>
+<!-- Settings & Tricks Lab Page -->
+<div id="page-optimize" class="page active" style="padding-top:56px;background:var(--bg)">
+  <div style="max-width:720px;margin:0 auto;padding:12px 24px 40px">
+    <div style="margin-bottom:20px">
+      <div style="font-size:11px;color:var(--accent);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">Fundamentals &amp; setup</div>
+      <h1 style="font-family:var(--fh);font-size:28px;font-weight:700;line-height:1;margin-bottom:6px">SETTINGS &amp; <span style="color:var(--accent)">TRICKS LAB</span></h1>
+      <p style="color:var(--text2);line-height:1.6">Dial in your sens, keybinds and controller config, and learn legit Siege tech — patch-current AI guidance.</p>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:24px">
+      <div style="font-family:var(--fh);font-size:16px;font-weight:700;margin-bottom:4px">🎫 Settings &amp; Keybind Optimizer</div>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Enter what you know — leave blanks and the AI fills in recommended defaults.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <select id="set-platform" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none"><option value="">Platform…</option><option>PC</option><option>PlayStation</option><option>Xbox</option></select>
+        <select id="set-input" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none"><option value="">Input…</option><option>Mouse &amp; Keyboard</option><option>Controller</option></select>
+        <select id="set-rank" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none"><option value="">Rank…</option><option>Copper</option><option>Bronze</option><option>Silver</option><option>Gold</option><option>Platinum</option><option>Diamond</option><option>Champion</option></select>
+        <input id="set-dpi" placeholder="Mouse DPI (e.g. 800)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none">
+        <input id="set-sens" placeholder="In-game sens (e.g. 12)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none">
+        <input id="set-fov" placeholder="FOV (e.g. 84)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none">
+        <input id="set-ctrlsens" placeholder="Controller sensitivity (if applicable)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none">
+        <input id="set-deadzone" placeholder="Dead zone (if applicable)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none">
+      </div>
+      <textarea id="set-issues" placeholder="What feels off? e.g. 'my aim feels floaty', 'flicks overshoot', 'can't find a comfy lean bind'..." style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:11px 12px;color:var(--text);font-size:13px;outline:none;resize:vertical;min-height:64px;font-family:var(--fb);line-height:1.6;margin-bottom:10px"></textarea>
+      <button id="set-btn" onclick="runSettingsAdvisor()" style="position:relative;width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:12px;cursor:pointer;overflow:hidden">
+        <span id="set-btn-text">GET MY OPTIMIZED SETUP →</span>
+        <div id="set-progress" style="position:absolute;top:0;left:0;height:100%;background:rgba(0,0,0,0.2);width:0%;transition:width .15s linear;pointer-events:none;border-radius:var(--r)"></div>
+      </button>
+      <div id="set-result" style="display:none;margin-top:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;font-size:12.5px;color:var(--text2);line-height:1.7"></div>
+    </div>
+    <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:18px">
+      <div style="font-family:var(--fh);font-size:16px;font-weight:700;margin-bottom:4px">🧠 Tricks &amp; Tech</div>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:14px">Run-outs, vault &amp; rappel tech, gadget tech, drone spots, movement &amp; peeking tech. Legit techniques only.</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <input id="trick-op" placeholder="Operator (optional)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none">
+        <input id="trick-map" placeholder="Map (optional)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none">
+      </div>
+      <textarea id="trick-q" placeholder="e.g. 'How do I run-out on Oregon basement?' or 'Best vault tech to deny a claymore on Ace'..." style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:11px 12px;color:var(--text);font-size:13px;outline:none;resize:vertical;min-height:64px;font-family:var(--fb);line-height:1.6;margin-bottom:10px"></textarea>
+      <button id="trick-btn" onclick="runTricksAsk()" style="position:relative;width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:12px;cursor:pointer;overflow:hidden">
+        <span id="trick-btn-text">ASK SIEGEIQ →</span>
+        <div id="trick-progress" style="position:absolute;top:0;left:0;height:100%;background:rgba(0,0,0,0.2);width:0%;transition:width .15s linear;pointer-events:none;border-radius:var(--r)"></div>
+      </button>
+      <div id="trick-result" style="display:none;margin-top:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;font-size:12.5px;color:var(--text2);line-height:1.7"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+function formatResponse(text) {
+  if (!text) return '';
+  const sections = text.split(/\n\n+/);
+  let html = '';
+  sections.forEach(section => {
+    const lines = section.split('\n').map(l => l.trim()).filter(l => l);
+    if (lines.length === 0) return;
+    if (lines[0].startsWith('#')) {
+      const titleText = lines[0].replace(/^#+\s*/, '');
+      html += `<div style="font-weight:700;color:var(--text);margin:12px 0 6px;font-size:13px">${titleText}</div>`;
+      lines.shift();
+    }
+    lines.forEach(line => {
+      const cleanLine = line.replace(/^[-•*]\s*/, '');
+      html += `<div style="margin-bottom:6px">${cleanLine}</div>`;
+    });
+  });
+  return html || text;
+}
+
+function animateProgress(progressBar, duration = 3000) {
+  let startTime = Date.now();
+  let progress = 0;
+  function frame() {
+    const elapsed = Date.now() - startTime;
+    const ratio = Math.min(elapsed / duration, 1);
+    progress = ratio < 0.7 ? ratio * 100 : 70 + (ratio - 0.7) * 100;
+    progressBar.style.width = progress + '%';
+    if (ratio < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+async function runSettingsAdvisor() {
+  const btn = document.getElementById('set-btn');
+  const btnText = document.getElementById('set-btn-text');
+  const resultDiv = document.getElementById('set-result');
+  const progressBar = document.getElementById('set-progress');
+  const platform = document.getElementById('set-platform').value || '';
+  const input = document.getElementById('set-input').value || '';
+  const rank = document.getElementById('set-rank').value || '';
+  const dpi = document.getElementById('set-dpi').value || '';
+  const sens = document.getElementById('set-sens').value || '';
+  const fov = document.getElementById('set-fov').value || '';
+  const ctrlsens = document.getElementById('set-ctrlsens').value || '';
+  const deadzone = document.getElementById('set-deadzone').value || '';
+  const issues = document.getElementById('set-issues').value || '';
+  if (!issues.trim()) {
+    alert('Please describe what feels off about your settings.');
+    return;
+  }
+  playTone(440, 0.12, 'sine', 0.12);
+  setTimeout(() => { playTone(660, 0.18, 'sine', 0.12); }, 80);
+  btn.disabled = true;
+  btnText.textContent = 'Analyzing...';
+  resultDiv.style.display = 'none';
+  progressBar.style.width = '0%';
+  animateProgress(progressBar, 3000);
+  try {
+    const token = window.siegeAuth ? await window.siegeAuth.token() : null;
+    const response = await fetch(`${API_URL}/settings/advise`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+      },
+      body: JSON.stringify({ platform, input, rank, dpi, sens, fov, ctrlsens, deadzone, issues })
+    });
+    if (!response.ok) throw new Error('Failed to get advice');
+    const data = await response.json();
+    progressBar.style.width = '100%';
+    playCompleteSound();
+    const formattedResult = formatResponse(data.advice || data.text || JSON.stringify(data));
+    resultDiv.innerHTML = formattedResult;
+    resultDiv.style.display = 'block';
+    btnText.textContent = 'GET MY OPTIMIZED SETUP →';
+    btn.disabled = false;
+  } catch (error) {
+    console.error('Settings advisor error:', error);
+    resultDiv.innerHTML = '<div style="color:var(--danger)">Could not get advice. Please try again.</div>';
+    resultDiv.style.display = 'block';
+    btnText.textContent = 'GET MY OPTIMIZED SETUP →';
+    btn.disabled = false;
+  }
+}
+
+async function runTricksAsk() {
+  const btn = document.getElementById('trick-btn');
+  const btnText = document.getElementById('trick-btn-text');
+  const resultDiv = document.getElementById('trick-result');
+  const progressBar = document.getElementById('trick-progress');
+  const operator = document.getElementById('trick-op').value || '';
+  const map = document.getElementById('trick-map').value || '';
+  const question = document.getElementById('trick-q').value || '';
+  if (!question.trim()) {
+    alert('Please ask a question about Siege tech or tricks.');
+    return;
+  }
+  playTone(440, 0.12, 'sine', 0.12);
+  setTimeout(() => { playTone(660, 0.18, 'sine', 0.12); }, 80);
+  btn.disabled = true;
+  btnText.textContent = 'Thinking...';
+  resultDiv.style.display = 'none';
+  progressBar.style.width = '0%';
+  animateProgress(progressBar, 3000);
+  try {
+    const token = window.siegeAuth ? await window.siegeAuth.token() : null;
+    const response = await fetch(`${API_URL}/tricks/ask`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': 'Bearer ' + token } : {})
+      },
+      body: JSON.stringify({ operator, map, question })
+    });
+    if (!response.ok) throw new Error('Failed to get answer');
+    const data = await response.json();
+    progressBar.style.width = '100%';
+    playCompleteSound();
+    const formattedResult = formatResponse(data.answer || data.text || JSON.stringify(data));
+    resultDiv.innerHTML = formattedResult;
+    resultDiv.style.display = 'block';
+    btnText.textContent = 'ASK SIEGEIQ →';
+    btn.disabled = false;
+  } catch (error) {
+    console.error('Tricks advisor error:', error);
+    resultDiv.innerHTML = '<div style="color:var(--danger)">Could not get an answer. Please try again.</div>';
+    resultDiv.style.display = 'block';
+    btnText.textContent = 'ASK SIEGEIQ →';
+    btn.disabled = false;
+  }
+}
+</script></script>
 </body>
 </html>
