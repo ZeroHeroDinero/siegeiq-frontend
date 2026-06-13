@@ -16,7 +16,7 @@
 <!-- Open Graph (Discord, Facebook, LinkedIn) -->
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://siegeiq.gg">
-<meta property="og:title" content="SiegeIQ — AI Coaching for Rainbow Six Siege">
+<meta property="og:title" content="SiegeIQ — AI VOD Coaching for Rainbow Six Siege">
 <meta property="og:description" content="Upload your Siege clip. Get Diamond-level coaching in 60 seconds. Timestamped feedback, operator fixes, and a full scoring report — powered by Claude AI.">
 <meta property="og:image" content="https://siegeiq.gg/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -26,7 +26,7 @@
 <!-- Twitter / X Card -->
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:url" content="https://siegeiq.gg">
-<meta name="twitter:title" content="SiegeIQ — AI Coaching for Rainbow Six Siege">
+<meta name="twitter:title" content="SiegeIQ — AI VOD Coaching for Rainbow Six Siege">
 <meta name="twitter:description" content="Upload your Siege clip. Get Diamond-level AI coaching in 60 seconds. Timestamped feedback, operator-specific fixes, and a full score report.">
 <meta name="twitter:image" content="https://siegeiq.gg/og-image.png">
 <!-- cache-bust: 20260605202458 -->
@@ -1109,6 +1109,7 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
         <div style="font-family:var(--fh);font-size:18px;font-weight:700;margin-bottom:5px">Unlock unlimited reviews</div>
         <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:12px">Go Pro for unlimited reviews, priority processing, operator coaching, and weekly trend reports.</div>
         <button onclick="show('pricing')" style="width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:10px;cursor:pointer">GO PRO — $9.99/MO →</button>
+        <button onclick="openBillingPortal()" style="width:100%;margin-top:8px;background:transparent;border:1px solid var(--border2);color:var(--text2);font-size:11px;font-weight:600;border-radius:var(--r);padding:8px;cursor:pointer">Already a member? Manage subscription</button>
       </div>
     </div>
   </div>
@@ -1245,7 +1246,7 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
         <input id="set-deadzone" placeholder="Dead zone (if applicable)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none">
       </div>
       <textarea id="set-issues" placeholder="What feels off? e.g. 'my aim feels floaty', 'flicks overshoot', 'can't find a comfy lean bind'..." style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:11px 12px;color:var(--text);font-size:13px;outline:none;resize:vertical;min-height:64px;font-family:var(--fb);line-height:1.6;margin-bottom:10px"></textarea>
-      <button onclick="runSettingsAdvisor()" style="width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:12px;cursor:pointer">GET MY OPTIMIZED SETUP &rarr;</button>
+      <button id="set-btn" onclick="runSettingsAdvisor()" style="position:relative;overflow:hidden;width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:12px;cursor:pointer"><span style="position:relative;z-index:1">GET MY OPTIMIZED SETUP &rarr;</span><div id="set-progress" style="position:absolute;top:0;left:0;height:100%;width:0%;background:rgba(255,255,255,0.24);z-index:0;border-radius:var(--r);transition:width .12s linear;pointer-events:none"></div></button>
       <div id="set-result" style="display:none;margin-top:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;font-size:12.5px;color:var(--text2);line-height:1.7;white-space:pre-wrap"></div>
     </div>
 
@@ -1257,7 +1258,7 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
         <input id="trick-map" placeholder="Map (optional)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none">
       </div>
       <textarea id="trick-q" placeholder="e.g. 'How do I run-out on Oregon basement?' or 'Best vault tech to deny a claymore on Ace'..." style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:11px 12px;color:var(--text);font-size:13px;outline:none;resize:vertical;min-height:64px;font-family:var(--fb);line-height:1.6;margin-bottom:10px"></textarea>
-      <button onclick="runTricksAsk()" style="width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:12px;cursor:pointer">ASK SIEGEIQ &rarr;</button>
+      <button id="trick-btn" onclick="runTricksAsk()" style="position:relative;overflow:hidden;width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:12px;cursor:pointer"><span style="position:relative;z-index:1">ASK SIEGEIQ &rarr;</span><div id="trick-progress" style="position:absolute;top:0;left:0;height:100%;width:0%;background:rgba(255,255,255,0.24);z-index:0;border-radius:var(--r);transition:width .12s linear;pointer-events:none"></div></button>
       <div id="trick-result" style="display:none;margin-top:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;font-size:12.5px;color:var(--text2);line-height:1.7;white-space:pre-wrap"></div>
     </div>
   </div>
@@ -1991,7 +1992,19 @@ async function getDrillPlan(){
 window._chatHist=[];
 async function askClip(){
   var inp=document.getElementById('chat-q'); var log=document.getElementById('chat-log');
-  if(!inp||!log) return; var q=inp.value.trim(); if(!q) return; inp.value='';
+  if(!inp||!log) return; var q=inp.value.trim(); if(!q) return;
+  // Pro/Squad gate — follow-up clip chat is a paid feature.
+  // (To open it to everyone, set window.CHAT_PRO_ONLY = false.)
+  if (window.CHAT_PRO_ONLY !== false) {
+    var _cm=(window.siegeAuth&&siegeAuth.me)?siegeAuth.me():null;
+    var _paid=!!(_cm&&(_cm.plan==='pro'||_cm.plan==='team'||_cm.is_demo));
+    if(!_paid){
+      inp.value='';
+      log.insertAdjacentHTML('beforeend','<div style="background:var(--bg3);border:1px solid var(--accent);border-radius:var(--r);padding:12px;margin-bottom:8px"><div style="font-size:12.5px;color:var(--text);margin-bottom:8px"><b>Follow-up coaching is a Pro feature.</b> Upgrade to ask unlimited questions about your clips and get instant answers from your coach.</div><button onclick="show(\'pricing\')" style="font-family:var(--fh);font-size:12px;font-weight:700;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:8px 16px;cursor:pointer">GO PRO →</button></div>');
+      return;
+    }
+  }
+  inp.value='';
   log.insertAdjacentHTML('beforeend','<div style="font-size:12.5px;color:var(--text);margin-bottom:6px"><b style="color:var(--accent)">You:</b> '+q.replace(/</g,"&lt;")+'</div>');
   var t=document.createElement('div'); t.style.cssText='font-size:12.5px;color:var(--text3);margin-bottom:8px'; t.textContent='SiegeIQ is thinking\u2026'; log.appendChild(t);
   try{
@@ -2620,10 +2633,12 @@ function doSaveCard(card) {
 // ─── Stripe checkout ──────────────────────────
 // Direct Stripe payment links — instant, no backend required
 const STRIPE_DIRECT = {
-  'pro_monthly':  'https://buy.stripe.com/4gMeVd1Xngov3pf5Nx93y05',
-  'pro_annual':   'https://buy.stripe.com/14AaEX59za07f7Xb7R93y01',
-  'team_monthly': 'https://buy.stripe.com/7sYbJ19pP5JRaRH6RB93y02',
-  'team_annual':  'https://buy.stripe.com/28E28rbxX8W3e3T0td93y03',
+  // Active, live payment links (verified in Stripe acct "Zerotohero", Jun 2026).
+  // Pro links carry the 7-day trial + accept the FOUNDING promo code.
+  'pro_monthly':  'https://buy.stripe.com/4gM4gzcC17RZe3Ta3N93y06', // SiegeIQ Pro $9.99/mo · 7-day trial · promo OK
+  'pro_annual':   'https://buy.stripe.com/00w6oHfOd6NVf7XdfZ93y07', // Siege IQ Pro $95.88/yr · 7-day trial
+  'team_monthly': 'https://buy.stripe.com/9B6dR91Xn1tBaRH1xh93y08', // SiegeIQ Squad $29.99/mo
+  'team_annual':  'https://buy.stripe.com/9B65kD7hH3BJ2lb7VF93y09', // SiegeIQ Squad $287.88/yr
 };
 function normalizePlan(p) {
   return {'pro':'pro_monthly','diamond':'pro_monthly','squad':'team_monthly','team':'team_monthly'}[p] || p;
@@ -2650,6 +2665,27 @@ async function startCheckout(plan, code) {
   window.location.href = code ? base + '?prefilled_promo_code=' + encodeURIComponent(code) : base;
 }
 function startCheckoutWithCode(plan, code) { return startCheckout(plan, code); }
+
+// ─── Manage subscription (Stripe customer portal) ───────────────
+// Tries the backend portal endpoint; falls back to emailing support
+// until the Stripe Customer Portal + /billing/portal route are enabled.
+async function openBillingPortal() {
+  try {
+    if (window.siegeAuth && siegeAuth.requireSignIn && !(await siegeAuth.requireSignIn())) return;
+    var tok = (window.siegeAuth && siegeAuth.token) ? await siegeAuth.token() : null;
+    var resp = await fetch(API_URL + '/billing/portal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', ...(tok ? { 'Authorization': 'Bearer ' + tok } : {}) }
+    });
+    if (resp.ok) {
+      var d = await resp.json();
+      if (d.portal_url) { window.location.href = d.portal_url; return; }
+    }
+  } catch (e) { /* fall through to email fallback */ }
+  window.location.href = 'mailto:support@siegeiq.gg?subject=' +
+    encodeURIComponent('Manage my SiegeIQ subscription') +
+    '&body=' + encodeURIComponent('Hi SiegeIQ — I\'d like to update or cancel my subscription. My account email is: ');
+}
 
 // ─── Pricing toggle ───────────────────────────
 let annualOn=false;
@@ -3047,8 +3083,32 @@ function getMapContext(mapName) {
 
 function _optVal(id){ var el=document.getElementById(id); return el ? el.value.trim() : ''; }
 
+// \u2500\u2500\u2500 Lab button progress bar (0\u2192100%) \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+// Animates a button's inner progress bar toward ~92% while waiting,
+// then .finish() snaps it to 100% and .reset() clears it.
+function _labProgressStart(barId){
+  var bar=document.getElementById(barId); if(!bar) return null;
+  var pct=0, stopped=false, timer=null;
+  bar.style.transition='width .12s linear'; bar.style.width='0%';
+  function tick(){
+    if(stopped) return;
+    pct += Math.max(0.4,(92-pct)*0.05);
+    if(pct>92) pct=92;
+    bar.style.width=pct.toFixed(1)+'%';
+    timer=setTimeout(function(){ requestAnimationFrame(tick); },55);
+  }
+  requestAnimationFrame(tick);
+  return {
+    finish:function(){ stopped=true; if(timer)clearTimeout(timer); bar.style.width='100%'; },
+    reset:function(){ stopped=true; if(timer)clearTimeout(timer);
+      setTimeout(function(){ bar.style.transition='width .35s ease'; bar.style.width='0%'; },650); }
+  };
+}
+
 async function runSettingsAdvisor(){
   var box=document.getElementById('set-result');
+  playAnalyzeSound();                              // click sound (same as Analyze Clip)
+  var prog=_labProgressStart('set-progress');      // start 0\u2192100% bar
   box.style.display='block'; box.textContent='Optimizing your setup\u2026';
   var dpi=parseFloat(_optVal('set-dpi')), sens=parseFloat(_optVal('set-sens'));
   var payload={
@@ -3060,18 +3120,24 @@ async function runSettingsAdvisor(){
   try{
     var r=await fetch(API_URL+'/settings/advise',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     var d=await r.json(); box.textContent=d.text||'No recommendation returned.';
-  }catch(e){ box.textContent='Could not reach the coach. Try again in a moment.'; }
+    if(prog) prog.finish(); playCompleteSound();    // finish chime at 100%
+  }catch(e){ box.textContent='Could not reach the coach. Try again in a moment.'; if(prog) prog.finish(); playErrorSound(); }
+  finally{ if(prog) prog.reset(); }
 }
 
 async function runTricksAsk(){
   var box=document.getElementById('trick-result');
+  playAnalyzeSound();                              // click sound (same as Analyze Clip)
   var q=_optVal('trick-q');
   if(!q){ box.style.display='block'; box.textContent='Type a question first.'; return; }
+  var prog=_labProgressStart('trick-progress');    // start 0\u2192100% bar
   box.style.display='block'; box.textContent='Thinking\u2026';
   try{
     var r=await fetch(API_URL+'/tricks/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,operator:_optVal('trick-op'),map:_optVal('trick-map')})});
     var d=await r.json(); box.textContent=d.text||'No answer returned.';
-  }catch(e){ box.textContent='Could not reach the coach. Try again in a moment.'; }
+    if(prog) prog.finish(); playCompleteSound();    // finish chime at 100%
+  }catch(e){ box.textContent='Could not reach the coach. Try again in a moment.'; if(prog) prog.finish(); playErrorSound(); }
+  finally{ if(prog) prog.reset(); }
 }
 
 // ─── Counter Tool ─────────────────────────────
@@ -3605,9 +3671,13 @@ function attachNavListeners() {
 document.addEventListener('DOMContentLoaded', attachNavListeners);
 // Also run immediately in case DOM already loaded
 if (document.readyState !== 'loading') attachNavListeners();
-// ── Developer bypass — Shift+D resets review count silently ─────
+// ── Developer review reset — gated behind dev mode (open the dev panel: Ctrl+Shift+D) ─────
+// Previously this fired for ANY visitor on Shift+D, letting anyone refill their free
+// reviews. It now only works once dev mode is active, and never while typing in a field.
 document.addEventListener('keydown', function(e) {
-  if (e.shiftKey && e.key === 'D') {
+  var _devOn = false; try { _devOn = !!localStorage.getItem('siegeiq_dev_plan'); } catch(_e){}
+  var _tag = (e.target && e.target.tagName) || '';
+  if (e.shiftKey && (e.key === 'D' || e.key === 'd') && _devOn && _tag!=='INPUT' && _tag!=='TEXTAREA' && _tag!=='SELECT') {
     try {
       // Clear the actual review counter object
       localStorage.removeItem('siegeiq_reviews');
@@ -3683,8 +3753,15 @@ function showUpgradeWall() {
   if (wall) wall.style.display = 'flex';
 }
 function checkUpgradeWall() {
-  var used = getReviewsUsedThisMonth();
+  // Paid plans (Pro / Squad / demo) get unlimited reviews — never locked.
+  var _m = (window.siegeAuth && siegeAuth.me) ? siegeAuth.me() : null;
+  var paid = !!(_m && (_m.plan === 'pro' || _m.plan === 'team' || _m.is_demo));
   var ct = document.getElementById('review-count-text');
+  if (paid) {
+    if (ct) ct.textContent = 'Unlimited reviews — ' + (_m.plan === 'team' ? 'Squad' : 'Pro') + ' plan.';
+    return;
+  }
+  var used = getReviewsUsedThisMonth();
   var remaining = Math.max(0, 3 - used);
   if (ct) ct.textContent = remaining + ' free review' + (remaining !== 1 ? 's' : '') + ' remaining this month.';
   if (used >= 3) {
@@ -4012,7 +4089,16 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
   }
 
   window.siegeAuth = {
-    me: function () { return me; },
+    me: function () {
+      // ── Dev-mode plan override (see dev panel: Ctrl+Shift+D) ──
+      try {
+        var dp = localStorage.getItem('siegeiq_dev_plan');
+        if (dp === 'pro')  return Object.assign({}, me || {}, { plan: 'pro',  is_demo: true,  _dev: true });
+        if (dp === 'team') return Object.assign({}, me || {}, { plan: 'team', is_demo: true,  _dev: true });
+        if (dp === 'free') return Object.assign({}, me || {}, { plan: 'free', is_demo: false, _dev: true });
+      } catch (e) {}
+      return me;
+    },
     ready: function () { return ready; },
     isSignedIn: function () { return !!(window.Clerk && window.Clerk.user); },
     userId: function () { return (window.Clerk && window.Clerk.user && window.Clerk.user.id) || 'demo-user'; },
@@ -4044,15 +4130,19 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
   function renderNav() {
     var slot = document.getElementById('auth-slot');
     if (!slot) return;
-    if (window.siegeAuth.isSignedIn()) {
-      var plan = me ? (me.is_demo ? 'DEMO PRO' : (me.plan || 'free').toUpperCase()) : '...';
-      var hot = plan && plan !== 'FREE' && plan !== '...';
+    var _dev = null; try { _dev = localStorage.getItem('siegeiq_dev_plan'); } catch (e) {}
+    if (window.siegeAuth.isSignedIn() || _dev) {
+      var _m = window.siegeAuth.me();
+      var planRaw = _m ? (_m.plan || 'free') : 'free';
+      var plan = planRaw === 'team' ? 'SQUAD' : (_m && _m.is_demo && !_dev ? 'DEMO PRO' : planRaw.toUpperCase());
+      if (_dev) plan = plan + ' · DEV';
+      var hot = plan && plan.indexOf('FREE') !== 0 && plan !== '...';
       slot.innerHTML =
         '<span style="font-family:var(--fh);font-size:10px;font-weight:700;letter-spacing:.06em;color:' +
         (hot ? '#fff' : 'var(--text2)') + ';background:' + (hot ? 'var(--accent)' : 'var(--bg3)') +
         ';border:1px solid var(--border2);border-radius:20px;padding:3px 10px">' + plan + '</span>' +
         '<span id="clerk-userbtn"></span>';
-      try { window.Clerk.mountUserButton(document.getElementById('clerk-userbtn'), { afterSignOutUrl: location.origin }); } catch (e) {}
+      if (window.siegeAuth.isSignedIn()) { try { window.Clerk.mountUserButton(document.getElementById('clerk-userbtn'), { afterSignOutUrl: location.origin }); } catch (e) {} }
     } else {
       slot.innerHTML =
         '<button onclick="window.Clerk&&window.Clerk.openSignIn({})" class="nav-btn" style="font-weight:600">Sign in</button>' +
@@ -4084,6 +4174,55 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
 </script>
 <script>
 (function(){ try{ fetch(`${API_URL}/meta`).then(function(r){return r.ok?r.json():null;}).then(function(m){ if(m&&m.season){ var b=document.getElementById('meta-badge'); if(b) b.textContent='\uD83D\uDEE1 Coaching tuned for '+m.season; } }).catch(function(){}); }catch(e){} })();
+</script>
+<script>
+/* \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+   SiegeIQ DEV MODE \u2014 plan & review simulator (front-end only)
+   Open:  Ctrl+Shift+D   (Mac: Cmd+Shift+D)   \u00B7  or add ?dev=1 to URL
+   Preview the site as Free / Pro / Squad and set the free-review
+   counter. Switching reloads so every gate re-evaluates cleanly.
+   This changes only what THIS browser shows \u2014 it does NOT touch real
+   billing, your Stripe account, or the backend.
+   \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500 */
+(function(){
+  var KEY='siegeiq_dev_plan';
+  function cur(){ try{return localStorage.getItem(KEY);}catch(e){return null;} }
+  function reviewsUsed(){ try{var o=JSON.parse(localStorage.getItem('siegeiq_reviews')||'{}');return o[new Date().toISOString().slice(0,7)]||0;}catch(e){return 0;} }
+  function setPlan(p){ try{ if(p){localStorage.setItem(KEY,p);} else {localStorage.removeItem(KEY);} }catch(e){} location.reload(); }
+  function setReviews(n){ try{var m=new Date().toISOString().slice(0,7);var o={};o[m]=n;localStorage.setItem('siegeiq_reviews',JSON.stringify(o));}catch(e){} location.reload(); }
+  var panel;
+  function build(){
+    if(panel) return panel;
+    panel=document.createElement('div'); panel.id='dev-panel';
+    panel.style.cssText='position:fixed;left:16px;bottom:16px;z-index:99999;width:232px;background:#11151b;border:1px solid #2a3340;border-radius:12px;padding:14px;font-family:system-ui,Arial,sans-serif;color:#e6edf3;box-shadow:0 10px 40px rgba(0,0,0,.5);display:none';
+    panel.innerHTML=''+
+      '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><span style="font-size:11px;font-weight:700;letter-spacing:.08em;color:#ff7a2f">\uD83D\uDEE0 DEV MODE</span><span id="dev-close" style="cursor:pointer;color:#7d8794;font-size:16px;line-height:1">\u00D7</span></div>'+
+      '<div id="dev-status" style="font-size:11px;color:#9aa4b2;margin-bottom:10px;line-height:1.6"></div>'+
+      '<div style="font-size:10px;color:#7d8794;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">View site as</div>'+
+      '<div style="display:flex;gap:6px;margin-bottom:12px"><button data-plan="free" class="dev-b">Free</button><button data-plan="pro" class="dev-b">Pro</button><button data-plan="team" class="dev-b">Squad</button></div>'+
+      '<div style="font-size:10px;color:#7d8794;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Free reviews used</div>'+
+      '<div style="display:flex;gap:6px;margin-bottom:12px"><button data-rev="0" class="dev-b">0</button><button data-rev="1" class="dev-b">1</button><button data-rev="2" class="dev-b">2</button><button data-rev="3" class="dev-b">3</button></div>'+
+      '<button id="dev-exit" style="width:100%;background:#2a3340;border:none;color:#e6edf3;border-radius:8px;padding:8px;font-size:11px;font-weight:700;cursor:pointer">Exit dev mode (use real account)</button>';
+    document.body.appendChild(panel);
+    var st=document.createElement('style');
+    st.textContent='#dev-panel .dev-b{flex:1;background:#1c2430;border:1px solid #2a3340;color:#e6edf3;border-radius:8px;padding:7px 0;font-size:11px;font-weight:700;cursor:pointer}#dev-panel .dev-b:hover{border-color:#ff7a2f;color:#ff7a2f}#dev-panel .dev-b.on{background:#ff7a2f;border-color:#ff7a2f;color:#fff}';
+    document.head.appendChild(st);
+    panel.querySelector('#dev-close').onclick=function(){toggle(false);};
+    panel.querySelectorAll('[data-plan]').forEach(function(b){b.onclick=function(){setPlan(b.getAttribute('data-plan'));};});
+    panel.querySelectorAll('[data-rev]').forEach(function(b){b.onclick=function(){setReviews(parseInt(b.getAttribute('data-rev'),10));};});
+    panel.querySelector('#dev-exit').onclick=function(){setPlan(null);};
+    return panel;
+  }
+  function refresh(){
+    var p=cur(); var label=p?(p==='team'?'SQUAD':p.toUpperCase()):'Real account (no override)';
+    panel.querySelector('#dev-status').innerHTML='Now simulating: <b style="color:#ff7a2f">'+label+'</b><br>Free reviews used: <b>'+reviewsUsed()+'</b> / 3';
+    panel.querySelectorAll('[data-plan]').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-plan')===p);});
+    panel.querySelectorAll('[data-rev]').forEach(function(b){b.classList.toggle('on',parseInt(b.getAttribute('data-rev'),10)===reviewsUsed());});
+  }
+  function toggle(show){ build(); panel.style.display=(show===false)?'none':(panel.style.display==='none'?'block':'none'); if(panel.style.display==='block') refresh(); }
+  document.addEventListener('keydown',function(e){ if((e.ctrlKey||e.metaKey)&&e.shiftKey&&(e.key==='D'||e.key==='d')){ e.preventDefault(); toggle(); } });
+  try{ if(/[?&]dev=1/.test(location.search)||location.hash==='#dev'){ if(document.readyState!=='loading'){toggle(true);} else {document.addEventListener('DOMContentLoaded',function(){toggle(true);});} } }catch(e){}
+})();
 </script>
 </body>
 </html>
