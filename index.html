@@ -1563,6 +1563,14 @@ document.addEventListener('click', function(e){
 });
 
 function show(p) {
+  // Email-first only: gate the dashboard behind a full account for anon visitors.
+  // Exception: the single result they just earned, and dev-mode plan previews.
+  if (typeof EMAIL_FIRST_ON === 'function' && EMAIL_FIRST_ON() && p === 'dashboard' &&
+      window.siegeAuth && !siegeAuth.isSignedIn() && !window._anonResultActive && !devPlanSet()) {
+    showSignupWall();
+    return;
+  }
+  if (p !== 'dashboard' && typeof hideAnonSaveCTA === 'function') hideAnonSaveCTA();
   // 1. Switch page
   PAGES.forEach(function(id) {
     var pg = document.getElementById('page-'+id);
@@ -1651,7 +1659,7 @@ function handleFile(f) {
 }
 function handleDrop(e){e.preventDefault();document.getElementById('drop-zone').style.borderColor='var(--border2)';handleFile(e.dataTransfer.files[0]);}
 function checkUrl(v){hasClip=v.length>8;hasClip?enableAnalyze():disableAnalyze();}
-function enableAnalyze(){const b=document.getElementById('analyze-btn');b.textContent='ANALYZE CLIP →';b.style.background='var(--accent)';b.style.opacity='1';b.style.cursor='pointer';}
+function enableAnalyze(){const b=document.getElementById('analyze-btn');b.textContent='ANALYZE CLIP →';b.style.background='var(--accent)';b.style.opacity='1';b.style.cursor='pointer';try{checkUpgradeWall();}catch(e){}}
 function disableAnalyze(){const b=document.getElementById('analyze-btn');b.textContent='ADD A CLIP ABOVE';b.style.background='var(--bg3)';b.style.opacity='.4';b.style.cursor='not-allowed';}
 function showError(msg){
   const b=document.getElementById('error-box');
@@ -1676,10 +1684,40 @@ function retryAnalysis(){
   }
 }
 
+// Email-first flow is OFF by default. Flip on with window.SIEGEIQ_EMAIL_FIRST = true
+// (before the page scripts run) or by adding ?emailfirst=1 to the URL for testing.
+// Enable only once the backend accepts anonymous review submissions.
+function EMAIL_FIRST_ON() {
+  try {
+    if (window.SIEGEIQ_EMAIL_FIRST === true) return true;
+    if (/[?&]emailfirst=1\b/.test(location.search)) return true;
+    if (localStorage.getItem('siegeiq_emailfirst') === '1') return true;
+  } catch (e) {}
+  return false;
+}
+
+// ── Gatekeeper: when email-first is ON, a brand-new visitor gets their FIRST
+// review with just an email; any further clip needs a full (free) account.
+// When OFF, behaviour is exactly as before (require sign-in up front).
 async function startAnalysis() {
   if(!hasClip) return;
-  if (!(await siegeAuth.requireSignIn())) return;
-  const _tok = await siegeAuth.token();
+  if (!EMAIL_FIRST_ON()) {                                    // flag off → original flow
+    if (!(await siegeAuth.requireSignIn())) return;
+    return runAnalysis();
+  }
+  if (siegeAuth.isSignedIn()) return runAnalysis();          // full account → normal flow
+  if (anonReviewUsed()) { showSignupWall(); return; }        // 2nd clip → require sign-up
+  openEmailGate();                                            // 1st clip → capture email, then runAnalysis()
+}
+// Canonical "run the analysis" entry used by retry + dev reset — routes through the gate.
+function submitClip() { return startAnalysis(); }
+
+async function runAnalysis() {
+  if(!hasClip) return;
+  const _id = reviewIdentity();              // { user_id, email, device_id, anon }
+  window._anonRun = _id.anon;
+  window._reviewUserId = _id.user_id;        // poll uses this same identity
+  const _tok = _id.anon ? null : await siegeAuth.token();
   const _auth = _tok ? { 'Authorization': 'Bearer ' + _tok } : {};
   hideError();
   const operator=document.getElementById('sel-operator').value || 'auto-detect';
@@ -1701,7 +1739,7 @@ async function startAnalysis() {
       let resp, lastErr;
       for (let attempt = 1; attempt <= 3; attempt++) {
         try {
-          resp = await fetch(`${API_URL}/review/submit`,{method:'POST',headers:{'Content-Type':'application/json', ..._auth},body:JSON.stringify({user_id:siegeAuth.userId(),source:url,operator,map_name:map,rank,description,round_num:1})});
+          resp = await fetch(`${API_URL}/review/submit`,{method:'POST',headers:{'Content-Type':'application/json', ..._auth},body:JSON.stringify({user_id:_id.user_id,email:_id.email,device_id:_id.device_id,anon:_id.anon,source:url,operator,map_name:map,rank,description,round_num:1})});
           lastErr = null;
           break;
         } catch(e) {
@@ -1720,7 +1758,10 @@ async function startAnalysis() {
       setProgress(15,'Uploading video...');
       const formData=new FormData();
       formData.append('file',selectedFile);
-      formData.append('user_id',siegeAuth.userId());
+      formData.append('user_id',_id.user_id);
+      formData.append('email',_id.email);
+      formData.append('device_id',_id.device_id);
+      formData.append('anon',_id.anon?'1':'0');
       formData.append('operator',operator);
       formData.append('map_name',map);
       formData.append('rank',rank);
@@ -1840,7 +1881,7 @@ function pollForResult(reviewId,operator,map,rank) {
     if(pct>70 && stepPhase===2){ completeStep(2); activateStep(3); stepPhase=3; }
     setProgress(pct, pct<50?'Extracting frames & analyzing footage...':pct<75?'Claude evaluating tactics & positioning...':'Building your coaching report...');
     try {
-      const resp=await fetch(`${API_URL}/review/${reviewId}?user_id=`+encodeURIComponent(siegeAuth.userId()));
+      const resp=await fetch(`${API_URL}/review/${reviewId}?user_id=`+encodeURIComponent(window._reviewUserId||siegeAuth.userId()));
       if(!resp.ok) return;
       const data=await resp.json();
       if(data.status==='complete'){
@@ -1848,13 +1889,14 @@ function pollForResult(reviewId,operator,map,rank) {
         completeStep(2); completeStep(3);
         setProgress(100,'Analysis complete!');
         playCompleteSound();
-        incrementReviewCount();
+        if (window._anonRun) { markAnonReviewUsed(); } else { incrementReviewCount(); }
         setTimeout(checkUpgradeWall,100);
         stopLoadingTips();
         setTimeout(()=>{
           document.getElementById('analyzing').style.display='none';
           resetSteps();
           (function(){ var _r; try{_r=typeof data.report==='string'?JSON.parse(data.report):data.report;}catch(e){_r=null;} if(_r&&_r.type==='team'){renderTeamResults(data);}else{renderResults(data,operator,map,rank);} })();
+          if (window._anonRun) { window._anonResultActive = true; showAnonSaveCTA(); }  // let them view this one result; gate the rest
           show('dashboard');
         },800);
       } else if(data.status==='failed'){
@@ -2667,8 +2709,16 @@ async function startCheckout(plan, code) {
 function startCheckoutWithCode(plan, code) { return startCheckout(plan, code); }
 
 // ─── Manage subscription (Stripe customer portal) ───────────────
-// Tries the backend portal endpoint; falls back to emailing support
-// until the Stripe Customer Portal + /billing/portal route are enabled.
+// No-code Customer Portal login link. Activate the portal in the Stripe Dashboard
+// (Settings → Billing → Customer portal), turn on the login link, and paste its URL
+// here (looks like https://billing.stripe.com/p/login/XXXXXXXX). Customers enter their
+// email and Stripe emails them a secure link into the portal — no backend required.
+const STRIPE_PORTAL_LOGIN_URL = '';
+
+// Tiered fallback so the button always does something useful:
+//   1) backend /billing/portal  → seamless, drops the logged-in customer straight in
+//   2) STRIPE_PORTAL_LOGIN_URL  → no-code login link (customer self-identifies by email)
+//   3) email support            → last resort
 async function openBillingPortal() {
   try {
     if (window.siegeAuth && siegeAuth.requireSignIn && !(await siegeAuth.requireSignIn())) return;
@@ -2681,7 +2731,8 @@ async function openBillingPortal() {
       var d = await resp.json();
       if (d.portal_url) { window.location.href = d.portal_url; return; }
     }
-  } catch (e) { /* fall through to email fallback */ }
+  } catch (e) { /* fall through */ }
+  if (STRIPE_PORTAL_LOGIN_URL) { window.location.href = STRIPE_PORTAL_LOGIN_URL; return; }
   window.location.href = 'mailto:support@siegeiq.gg?subject=' +
     encodeURIComponent('Manage my SiegeIQ subscription') +
     '&body=' + encodeURIComponent('Hi SiegeIQ — I\'d like to update or cancel my subscription. My account email is: ');
@@ -3781,6 +3832,70 @@ function incrementReviewCount() {
     return data[month];
   } catch(e) { return 0; }
 }
+
+// ─── Email-first anonymous review (1 free review, then full sign-up) ───
+function getDeviceId() {
+  try {
+    var d = localStorage.getItem('siegeiq_device_id');
+    if (!d) {
+      d = (window.crypto && crypto.randomUUID) ? crypto.randomUUID()
+        : ('dev-' + Date.now() + '-' + Math.random().toString(36).slice(2));
+      localStorage.setItem('siegeiq_device_id', d);
+    }
+    return d;
+  } catch(e) { return 'dev-unknown'; }
+}
+function getAnonEmail()    { try { return localStorage.getItem('siegeiq_anon_email') || ''; } catch(e) { return ''; } }
+function anonReviewUsed()  { try { return localStorage.getItem('siegeiq_anon_used') === '1'; } catch(e) { return false; } }
+function markAnonReviewUsed() { try { localStorage.setItem('siegeiq_anon_used', '1'); } catch(e) {} }
+function devPlanSet()      { try { return !!localStorage.getItem('siegeiq_dev_plan'); } catch(e) { return false; } }
+// Identity attached to a review submission so the backend can throttle anon use.
+function reviewIdentity() {
+  if (window.siegeAuth && siegeAuth.isSignedIn()) {
+    return { user_id: siegeAuth.userId(), email: (siegeAuth.email && siegeAuth.email()) || '', device_id: getDeviceId(), anon: false };
+  }
+  var em = getAnonEmail();
+  return { user_id: em ? ('anon:' + em) : 'anon', email: em, device_id: getDeviceId(), anon: true };
+}
+
+// Email-capture modal
+function openEmailGate() {
+  var w = document.getElementById('email-gate');
+  if (!w) return;
+  var i = document.getElementById('email-gate-input');
+  var err = document.getElementById('email-gate-err');
+  if (err) err.style.display = 'none';
+  if (i) i.value = getAnonEmail();
+  w.style.display = 'flex';
+  if (i) setTimeout(function(){ i.focus(); }, 60);
+}
+function closeEmailGate() { var w = document.getElementById('email-gate'); if (w) w.style.display = 'none'; }
+function submitEmailGate() {
+  var i = document.getElementById('email-gate-input');
+  var err = document.getElementById('email-gate-err');
+  var v = ((i && i.value) || '').trim();
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v)) {
+    if (err) { err.textContent = 'Please enter a valid email address.'; err.style.display = 'block'; }
+    return;
+  }
+  try { localStorage.setItem('siegeiq_anon_email', v); } catch(e) {}
+  closeEmailGate();
+  runAnalysis();
+}
+
+// Free-account sign-up wall (gates the 2nd clip + dashboard)
+function showSignupWall() { var w = document.getElementById('signup-wall'); if (w) w.style.display = 'flex'; }
+function closeSignupWall() { var w = document.getElementById('signup-wall'); if (w) w.style.display = 'none'; }
+function anonSignUp() {
+  closeSignupWall();
+  try {
+    if (window.Clerk && window.Clerk.openSignUp) window.Clerk.openSignUp({});
+    else alert('Sign-up is still loading — give it a second and try again.');
+  } catch(e) {}
+}
+function showAnonSaveCTA() { var c = document.getElementById('anon-save-cta'); if (c) c.style.display = 'flex'; }
+function hideAnonSaveCTA() { var c = document.getElementById('anon-save-cta'); if (c) c.style.display = 'none'; }
+
 function showUpgradeWall() {
   var wall = document.getElementById('upgrade-wall');
   if (wall) wall.style.display = 'flex';
@@ -3792,6 +3907,18 @@ function checkUpgradeWall() {
   var ct = document.getElementById('review-count-text');
   if (paid) {
     if (ct) ct.textContent = 'Unlimited reviews — ' + (_m.plan === 'team' ? 'Squad' : 'Pro') + ' plan.';
+    return;
+  }
+  // Email-first only: anonymous visitor (not signed in, not a dev-mode preview).
+  if (EMAIL_FIRST_ON() && window.siegeAuth && !siegeAuth.isSignedIn() && !devPlanSet()) {
+    var abtn = document.getElementById('analyze-btn');
+    if (anonReviewUsed()) {
+      if (ct) ct.textContent = 'Create a free account to analyze more clips.';
+      if (abtn && hasClip) { abtn.textContent = 'SIGN UP TO CONTINUE →'; abtn.style.background = 'var(--bg3)'; abtn.style.border = '1px solid var(--accent)'; abtn.style.color = 'var(--accent)'; abtn.onclick = function(){ showSignupWall(); }; }
+    } else {
+      if (ct) ct.textContent = 'Your first review is free — just enter your email.';
+      if (abtn && hasClip) { abtn.textContent = 'ANALYZE CLIP →'; abtn.style.background = 'var(--accent)'; abtn.style.border = 'none'; abtn.style.color = '#fff'; abtn.onclick = function(){ if (typeof playAnalyzeSound === 'function') playAnalyzeSound(); startAnalysis(); }; }
+    }
     return;
   }
   var used = getReviewsUsedThisMonth();
@@ -4103,6 +4230,48 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
     </div>
     <p style="font-size:11px;color:var(--text3);margin-top:16px">Resets monthly · Cancel anytime · No credit card for free tier</p>
   </div>
+</div>
+
+<!-- Email gate — first anonymous review needs only an email (email-first flow) -->
+<div id="email-gate" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99998;align-items:center;justify-content:center;padding:24px">
+  <div style="background:var(--bg2);border:1px solid rgba(255,107,53,0.3);border-radius:16px;max-width:440px;width:100%;padding:34px;text-align:center">
+    <div style="font-size:38px;margin-bottom:10px">🎯</div>
+    <div style="font-family:var(--fh);font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Your first review is free</div>
+    <h2 style="font-family:var(--fh);font-size:24px;font-weight:800;color:var(--text);margin-bottom:10px">Where should we send your results?</h2>
+    <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:20px">Drop your email and we'll analyze this clip right now — no account, no card. You'll see your full coaching report in about a minute.</p>
+    <input id="email-gate-input" type="email" inputmode="email" autocomplete="email" placeholder="you@email.com"
+      onkeydown="if(event.key==='Enter'){event.preventDefault();submitEmailGate();}"
+      style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:10px;padding:13px 14px;color:var(--text);font-size:15px;outline:none;text-align:center;margin-bottom:8px">
+    <div id="email-gate-err" style="display:none;font-size:12px;color:#FF4444;margin-bottom:8px"></div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+      <button onclick="submitEmailGate()" style="font-family:var(--fh);font-size:15px;font-weight:700;color:#fff;background:var(--accent);border:none;padding:14px 24px;border-radius:10px;cursor:pointer">ANALYZE MY CLIP →</button>
+      <button onclick="closeEmailGate()" style="font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;padding:6px">Cancel</button>
+    </div>
+    <p style="font-size:11px;color:var(--text3);margin-top:14px;line-height:1.6">We'll only use this to send your report and occasional coaching tips. No spam — unsubscribe anytime. See our <a href="#privacy" onclick="document.getElementById('email-gate').style.display='none';goTo('privacy')" style="color:var(--text2);text-decoration:underline">privacy policy</a>.</p>
+  </div>
+</div>
+
+<!-- Sign-up wall — gates the 2nd clip + dashboard behind a free account -->
+<div id="signup-wall" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:99998;align-items:center;justify-content:center;padding:24px">
+  <div style="background:var(--bg2);border:1px solid rgba(255,107,53,0.3);border-radius:16px;max-width:460px;width:100%;padding:36px;text-align:center">
+    <div style="font-size:40px;margin-bottom:12px">🚀</div>
+    <div style="font-family:var(--fh);font-size:11px;color:var(--accent);letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">You've used your free review</div>
+    <h2 style="font-family:var(--fh);font-size:26px;font-weight:800;color:var(--text);margin-bottom:10px">Create a free account to keep going</h2>
+    <p style="font-size:13px;color:var(--text2);line-height:1.7;margin-bottom:24px">Sign up free to analyze more clips, save your coaching history, and track your progress over time. <strong style="color:var(--text)">3 free reviews every month</strong> — no card required.</p>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button onclick="playNavSound&&playNavSound();anonSignUp()" style="font-family:var(--fh);font-size:15px;font-weight:700;color:#fff;background:var(--accent);border:none;padding:14px 24px;border-radius:10px;cursor:pointer">CREATE FREE ACCOUNT →</button>
+      <button onclick="window.Clerk&&window.Clerk.openSignIn?(closeSignupWall(),window.Clerk.openSignIn({})):closeSignupWall()" style="font-family:var(--fh);font-size:13px;font-weight:600;color:var(--text2);background:var(--bg3);border:1px solid var(--border);padding:11px 24px;border-radius:10px;cursor:pointer">Already have an account? Sign in</button>
+      <button onclick="closeSignupWall()" style="font-size:12px;color:var(--text3);background:none;border:none;cursor:pointer;padding:6px">Maybe later</button>
+    </div>
+  </div>
+</div>
+
+<!-- Post-result save CTA — non-blocking banner shown to anon after their free review -->
+<div id="anon-save-cta" style="display:none;position:fixed;left:50%;transform:translateX(-50%);bottom:18px;z-index:99000;align-items:center;gap:14px;background:var(--bg2);border:1px solid rgba(255,107,53,0.35);border-radius:12px;padding:12px 16px;max-width:min(560px,92vw);box-shadow:0 8px 30px rgba(0,0,0,0.4)">
+  <span style="font-size:20px;flex-shrink:0">💾</span>
+  <span style="font-size:12.5px;color:var(--text2);line-height:1.5;flex:1">Your free review is ready below. <strong style="color:var(--text)">Create a free account</strong> to save it and analyze more clips.</span>
+  <button onclick="playNavSound&&playNavSound();anonSignUp()" style="flex-shrink:0;font-family:var(--fh);font-size:12px;font-weight:700;color:#fff;background:var(--accent);border:none;padding:9px 14px;border-radius:8px;cursor:pointer">Save it →</button>
+  <button onclick="hideAnonSaveCTA()" aria-label="Dismiss" style="flex-shrink:0;font-size:16px;color:var(--text3);background:none;border:none;cursor:pointer;padding:2px 4px">✕</button>
 </div>
 <script>
 // ════════════════ SiegeIQ Auth (Clerk) ════════════════
