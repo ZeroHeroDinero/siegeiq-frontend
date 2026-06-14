@@ -5327,6 +5327,171 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
 <!-- END PERFORMANCE GUIDE -->
 
 
+<!-- ── DEV PANEL (always visible floating widget) ──────────────────────────── -->
+<script>
+(function() {
+  var DEV_TOKEN = 'dev-siegeiq-local-9x7k'; // must match SIEGEIQ_DEV_TOKEN in Railway
+
+  var PLAN_DATA = {
+    free: { plan:'free',  reviews_used:1, reviews_limit:3,    user_id:'dev_user_siegeiq', email:'dev@siegeiq.gg', firstName:'Dev', is_demo:false },
+    pro:  { plan:'pro',   reviews_used:0, reviews_limit:9999, user_id:'dev_user_siegeiq', email:'dev@siegeiq.gg', firstName:'Dev', is_demo:false },
+    team: { plan:'team',  reviews_used:0, reviews_limit:9999, user_id:'dev_user_siegeiq', email:'dev@siegeiq.gg', firstName:'Dev', is_demo:false }
+  };
+
+  var _saved = JSON.parse(localStorage.getItem('siegeiq_dev') || '{}');
+  var _on   = !!_saved.on;
+  var _plan = _saved.plan || 'pro';
+
+  function _save() {
+    localStorage.setItem('siegeiq_dev', JSON.stringify({ on: _on, plan: _plan }));
+  }
+
+  function _apply() {
+    if (!_on) {
+      delete window._devModeActive;
+      delete window._devToken;
+      if (window.siegeAuth && window.siegeAuth._origIsSignedIn) {
+        window.siegeAuth.isSignedIn    = window.siegeAuth._origIsSignedIn;
+        window.siegeAuth.token         = window.siegeAuth._origToken;
+        window.siegeAuth.requireSignIn = window.siegeAuth._origRequireSignIn;
+      }
+      window._meCache = null;
+      if (window.loadPlanStatus) loadPlanStatus();
+      _updatePanel();
+      return;
+    }
+    window._devModeActive = true;
+    window._devToken = DEV_TOKEN;
+    window._meCache = Object.assign({}, PLAN_DATA[_plan]);
+    if (window.siegeAuth && !window.siegeAuth._origIsSignedIn) {
+      window.siegeAuth._origIsSignedIn    = window.siegeAuth.isSignedIn;
+      window.siegeAuth._origToken         = window.siegeAuth.token;
+      window.siegeAuth._origRequireSignIn = window.siegeAuth.requireSignIn;
+    }
+    if (window.siegeAuth) {
+      window.siegeAuth.isSignedIn    = function() { return true; };
+      window.siegeAuth.token         = async function() { return DEV_TOKEN; };
+      window.siegeAuth.requireSignIn = async function() { return true; };
+    }
+    if (window.loadPlanStatus) loadPlanStatus();
+    _updatePanel();
+  }
+
+  var PLAN_COLORS = { free: '#4b5563', pro: '#ff6b35', team: '#7c3aed' };
+  var PLAN_LABELS = { free: 'FREE', pro: 'PRO', team: 'TEAM' };
+
+  function _updatePanel() {
+    // Status bar
+    var bar = document.getElementById('_devBar');
+    if (!bar) return;
+    if (_on) {
+      bar.style.background = PLAN_COLORS[_plan];
+      bar.style.borderColor = PLAN_COLORS[_plan];
+      document.getElementById('_devStatus').textContent = '⚡ DEV — ' + PLAN_LABELS[_plan];
+    } else {
+      bar.style.background = '#1f2937';
+      bar.style.borderColor = '#374151';
+      document.getElementById('_devStatus').textContent = '⚡ DEV — OFF';
+    }
+    // Toggle
+    var chk = document.getElementById('_devToggle');
+    if (chk) chk.checked = _on;
+    // Plan buttons
+    ['free','pro','team'].forEach(function(p) {
+      var btn = document.getElementById('_devBtn_' + p);
+      if (!btn) return;
+      var active = _on && _plan === p;
+      btn.style.background  = active ? PLAN_COLORS[p] : '#374151';
+      btn.style.color       = active ? '#fff' : '#9ca3af';
+      btn.style.fontWeight  = active ? '700' : '400';
+      btn.style.transform   = active ? 'scale(1.05)' : 'scale(1)';
+      btn.style.boxShadow   = active ? ('0 0 8px ' + PLAN_COLORS[p] + '66') : 'none';
+    });
+  }
+
+  function _buildPanel() {
+    if (document.getElementById('_devBar')) return;
+
+    var wrap = document.createElement('div');
+    wrap.id = '_devWrap';
+    wrap.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none';
+
+    // Status bar (pill across the bottom)
+    var bar = document.createElement('div');
+    bar.id = '_devBar';
+    bar.style.cssText = [
+      'pointer-events:auto',
+      'display:flex','align-items:center','gap:10px',
+      'padding:7px 14px','border-radius:30px',
+      'border:1px solid #374151',
+      'background:#1f2937',
+      'box-shadow:0 4px 20px rgba(0,0,0,0.7)',
+      'font-family:monospace','font-size:11px','font-weight:700',
+      'letter-spacing:.08em','user-select:none',
+      'transition:background .2s,border-color .2s'
+    ].join(';');
+
+    bar.innerHTML = [
+      '<span id="_devStatus" style="color:#fff;min-width:110px;text-align:center">⚡ DEV — OFF</span>',
+      '<div style="width:1px;height:14px;background:rgba(255,255,255,0.15)"></div>',
+      // Plan buttons
+      '<button id="_devBtn_free" onclick="window._devSetPlan(\'free\')" style="padding:4px 10px;border:none;border-radius:20px;cursor:pointer;font-family:monospace;font-size:10px;transition:all .15s">FREE</button>',
+      '<button id="_devBtn_pro"  onclick="window._devSetPlan(\'pro\')"  style="padding:4px 10px;border:none;border-radius:20px;cursor:pointer;font-family:monospace;font-size:10px;transition:all .15s">PRO</button>',
+      '<button id="_devBtn_team" onclick="window._devSetPlan(\'team\')" style="padding:4px 10px;border:none;border-radius:20px;cursor:pointer;font-family:monospace;font-size:10px;transition:all .15s">TEAM</button>',
+      '<div style="width:1px;height:14px;background:rgba(255,255,255,0.15)"></div>',
+      // On/off toggle
+      '<label style="display:flex;align-items:center;gap:5px;cursor:pointer;color:#9ca3af;font-size:10px;font-weight:400">',
+        '<input type="checkbox" id="_devToggle" onchange="window._devToggleChange(this.checked)" style="cursor:pointer">',
+        'ON',
+      '</label>',
+    ].join('');
+
+    wrap.appendChild(bar);
+    document.body.appendChild(wrap);
+    _updatePanel();
+  }
+
+  window._devSetPlan = function(p) {
+    _plan = p;
+    _save();
+    if (_on) _apply(); else _updatePanel();
+  };
+
+  window._devToggleChange = function(on) {
+    _on = on;
+    _save();
+    // Re-patch siegeAuth if it loaded after the initial apply
+    if (_on && window.siegeAuth && !window.siegeAuth._origIsSignedIn) {
+      window.siegeAuth._origIsSignedIn    = window.siegeAuth.isSignedIn;
+      window.siegeAuth._origToken         = window.siegeAuth.token;
+      window.siegeAuth._origRequireSignIn = window.siegeAuth.requireSignIn;
+    }
+    _apply();
+  };
+
+  // Build panel immediately on DOM ready
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _buildPanel);
+  } else {
+    _buildPanel();
+  }
+
+  // Re-apply after Clerk loads (it may overwrite siegeAuth patches)
+  window.addEventListener('siegeauth:ready', function() {
+    if (_on) _apply();
+  });
+
+  window.addEventListener('load', function() {
+    _buildPanel();
+    if (_on) {
+      setTimeout(function() { _apply(); }, 600);
+    }
+  });
+})();
+</script>
+<!-- END DEV PANEL -->
+
+
 <!-- ── Clerk Auth ─────────────────────────────────────────────────────────── -->
 <script
   async
