@@ -288,7 +288,7 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
   <div id="desk-nav" style="display:flex;align-items:center;gap:6px">
     <button class="nav-btn" id="nb-counter" data-show="counter" onclick="playNavSound();show('counter')">Counter Tool</button>
     <button class="nav-btn" id="nb-optimize" data-show="optimize" onclick="playNavSound();show('optimize')">Optimize</button>
-    <button class="nav-btn" id="nb-perf" data-show="perf" onclick="playNavSound();show('perf')">PC Guide</button>
+    <button class="nav-btn" id="nb-perf" data-show="perf" onclick="playNavSound();show('perf')">Optimize Setup</button>
     <button class="nav-btn" id="nb-pricing" data-show="pricing" onclick="playNavSound();show('pricing');loadFoundingSlots()">Pricing</button>
     <button class="nav-btn" id="nb-upload" data-show="upload" onclick="playNavSound();show('upload')">Upload</button>
     <button class="nav-btn" id="nb-dashboard" data-show="dashboard" onclick="playNavSound();show('dashboard')">Dashboard</button>
@@ -302,7 +302,7 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
 <div id="mob-nav">
   <button onclick="playNavSound();show('counter');toggleMobNav()">Counter Tool</button>
   <button onclick="playNavSound();show('optimize');toggleMobNav()">Optimize</button>
-  <button onclick="playNavSound();show('perf');toggleMobNav()">PC Guide</button>
+  <button onclick="playNavSound();show('perf');toggleMobNav()">Optimize Setup</button>
   <button onclick="playNavSound();show('pricing');loadFoundingSlots();toggleMobNav()">Pricing</button>
   <button onclick="playNavSound();show('upload');toggleMobNav()">Upload</button>
   <button onclick="playNavSound();show('dashboard');toggleMobNav()">Dashboard</button>
@@ -4879,7 +4879,7 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
             <a onclick="show('counter')" style="font-size:13px;color:var(--text2);text-decoration:none;cursor:pointer;transition:color .15s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Counter Tool</a>
             <a onclick="show('dashboard')" style="font-size:13px;color:var(--text2);text-decoration:none;cursor:pointer;transition:color .15s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Dashboard</a>
             <a onclick="show('pricing')" style="font-size:13px;color:var(--text2);text-decoration:none;cursor:pointer;transition:color .15s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Pricing</a>
-            <a onclick="show('perf')" style="font-size:13px;color:var(--text2);text-decoration:none;cursor:pointer;transition:color .15s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">PC Guide</a>
+            <a onclick="show('perf')" style="font-size:13px;color:var(--text2);text-decoration:none;cursor:pointer;transition:color .15s" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Optimize Setup</a>
           </div>
         </div>
 
@@ -5019,6 +5019,7 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
           <option value="165">165 Hz</option>
           <option value="240">240 Hz</option>
           <option value="360">360 Hz</option>
+          <option value="600">600 Hz</option>
         </select>
       </div>
 
@@ -5028,6 +5029,8 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
           <option value="1080p" selected>1080p (1920×1080)</option>
           <option value="1440p">1440p (2560×1440)</option>
           <option value="4K">4K (3840×2160)</option>
+          <option value="1280x1024">1280×1024 (Stretched)</option>
+          <option value="1024x768">1024×768 (Stretched)</option>
         </select>
       </div>
 
