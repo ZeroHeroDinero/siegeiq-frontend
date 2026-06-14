@@ -4704,10 +4704,18 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
         <input id="set-deadzone" placeholder="Dead zone (if applicable)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none">
       </div>
       <textarea id="set-issues" placeholder="What feels off? e.g. 'my aim feels floaty', 'flicks overshoot', 'can't find a comfy lean bind'..." style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:11px 12px;color:var(--text);font-size:13px;outline:none;resize:vertical;min-height:64px;font-family:var(--fb);line-height:1.6;margin-bottom:10px"></textarea>
-      <button id="set-btn" onclick="runSettingsAdvisor()" style="position:relative;width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:12px;cursor:pointer;overflow:hidden;z-index:1">
+      <button id="set-btn" onclick="runSettingsAdvisor()" style="width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:12px;cursor:pointer">
         <span id="set-btn-text">GET MY OPTIMIZED SETUP →</span>
-        <div id="set-progress" style="position:absolute;top:0;left:0;height:100%;background:rgba(0,0,0,0.2);width:0%;transition:width .15s linear;pointer-events:none;border-radius:var(--r);z-index:1"></div>
       </button>
+      <div id="set-progress-wrap" style="display:none;margin-top:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.05em">ANALYZING YOUR SETTINGS…</span>
+          <span id="set-progress-pct" style="font-size:11px;color:var(--accent);font-weight:700">0%</span>
+        </div>
+        <div style="width:100%;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
+          <div id="set-progress" style="height:100%;width:0%;background:var(--accent);border-radius:2px;transition:width .15s linear"></div>
+        </div>
+      </div>
       <div id="set-result" style="display:none;margin-top:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;font-size:12.5px;color:var(--text2);line-height:1.7"></div>
     </div>
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:18px">
@@ -4718,10 +4726,18 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
         <input id="trick-map" placeholder="Map (optional)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none">
       </div>
       <textarea id="trick-q" placeholder="e.g. 'How do I run-out on Oregon basement?' or 'Best vault tech to deny a claymore on Ace'..." style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:11px 12px;color:var(--text);font-size:13px;outline:none;resize:vertical;min-height:64px;font-family:var(--fb);line-height:1.6;margin-bottom:10px"></textarea>
-      <button id="trick-btn" onclick="runTricksAsk()" style="position:relative;width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:12px;cursor:pointer;overflow:hidden;z-index:1">
+      <button id="trick-btn" onclick="runTricksAsk()" style="width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:12px;cursor:pointer">
         <span id="trick-btn-text">ASK SIEGEIQ →</span>
-        <div id="trick-progress" style="position:absolute;top:0;left:0;height:100%;background:rgba(0,0,0,0.2);width:0%;transition:width .15s linear;pointer-events:none;border-radius:var(--r);z-index:1"></div>
       </button>
+      <div id="trick-progress-wrap" style="display:none;margin-top:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <span style="font-size:11px;color:var(--text3);font-weight:600;letter-spacing:.05em">ASKING SIEGEIQ…</span>
+          <span id="trick-progress-pct" style="font-size:11px;color:var(--accent);font-weight:700">0%</span>
+        </div>
+        <div style="width:100%;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
+          <div id="trick-progress" style="height:100%;width:0%;background:var(--accent);border-radius:2px;transition:width .15s linear"></div>
+        </div>
+      </div>
       <div id="trick-result" style="display:none;margin-top:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;font-size:12.5px;color:var(--text2);line-height:1.7"></div>
     </div>
   </div>
@@ -4729,6 +4745,53 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
 
 <script>
 function formatResponse(text){if(!text)return'';text=text.replace(/\*\*(.+?)\*\*/g,'<strong style="color:var(--text)">$1</strong>');text=text.replace(/^#+\s*(.+?)$/gm,'<div style="font-weight:700;color:var(--text);margin:12px 0 6px;font-size:13px">$1</div>');text=text.replace(/`(.+?)`/g,'<code style="background:var(--bg);padding:2px 6px;border-radius:3px;font-family:monospace;font-size:11px">$1</code>');const sections=text.split(/\n\n+/);let html='';sections.forEach(section=>{const lines=section.split('\n').filter(l=>l.trim());lines.forEach(line=>{line=line.trim();if(!line)return;line=line.replace(/^[-•*]\s+/,'');if(line.startsWith('<div')||line.startsWith('<strong')){html+=line}else{html+=`<div style="margin-bottom:8px;line-height:1.6">${line}</div>`}})});return html||text}function animateProgress(progressBar,duration=3000){let startTime=Date.now();function frame(){const elapsed=Date.now()-startTime;const ratio=Math.min(elapsed/duration,1);const progress=ratio<0.7?ratio*100:70+(ratio-0.7)*100;progressBar.style.width=progress+'%';if(ratio<1){requestAnimationFrame(frame)}else{progressBar.style.width='100%'}}requestAnimationFrame(frame)}function playProgressSound(){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.type='sine';osc.frequency.setValueAtTime(440,ctx.currentTime);gain.gain.setValueAtTime(0.1,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.12);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.12)}catch(e){}}function playDoneSound(){try{const ctx=new(window.AudioContext||window.webkitAudioContext)();function playTone(freq,delay){setTimeout(()=>{const osc=ctx.createOscillator();const gain=ctx.createGain();osc.connect(gain);gain.connect(ctx.destination);osc.frequency.setValueAtTime(freq,ctx.currentTime);gain.gain.setValueAtTime(0.15,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.18);osc.start(ctx.currentTime);osc.stop(ctx.currentTime+0.18)},delay)}playTone(523,0);playTone(659,150);playTone(784,300)}catch(e){}}async function runSettingsAdvisor(){const btn=document.getElementById('set-btn');const btnText=document.getElementById('set-btn-text');const resultDiv=document.getElementById('set-result');const progressBar=document.getElementById('set-progress');const platform=document.getElementById('set-platform').value||'';const input=document.getElementById('set-input').value||'';const rank=document.getElementById('set-rank').value||'';const dpi=document.getElementById('set-dpi').value||'';const sens=document.getElementById('set-sens').value||'';const fov=document.getElementById('set-fov').value||'';const ctrlsens=document.getElementById('set-ctrlsens').value||'';const deadzone=document.getElementById('set-deadzone').value||'';const issues=document.getElementById('set-issues').value||'';if(!issues.trim()){alert('Please describe what feels off about your settings.');return}playProgressSound();btn.disabled=true;btnText.textContent='Analyzing...';resultDiv.style.display='none';progressBar.style.width='0%';animateProgress(progressBar,3500);try{const token=window.siegeAuth?await window.siegeAuth.token():null;const response=await fetch(`${API_URL}/settings/advise`,{method:'POST',headers:{'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{})},body:JSON.stringify({platform,input,rank,dpi,sens,fov,ctrlsens,deadzone,issues})});if(!response.ok)throw new Error('Failed to get advice');const data=await response.json();progressBar.style.width='100%';playDoneSound();const rawText=data.advice||data.text||JSON.stringify(data);const formattedResult=formatResponse(rawText);resultDiv.innerHTML=formattedResult;resultDiv.style.display='block';btnText.textContent='GET MY OPTIMIZED SETUP →';btn.disabled=false}catch(error){console.error('Settings advisor error:',error);resultDiv.innerHTML='<div style="color:var(--danger)">Could not get advice. Please try again.</div>';resultDiv.style.display='block';btnText.textContent='GET MY OPTIMIZED SETUP →';btn.disabled=false}}async function runTricksAsk(){const btn=document.getElementById('trick-btn');const btnText=document.getElementById('trick-btn-text');const resultDiv=document.getElementById('trick-result');const progressBar=document.getElementById('trick-progress');const operator=document.getElementById('trick-op').value||'';const map=document.getElementById('trick-map').value||'';const question=document.getElementById('trick-q').value||'';if(!question.trim()){alert('Please ask a question about Siege tech or tricks.');return}playProgressSound();btn.disabled=true;btnText.textContent='Thinking...';resultDiv.style.display='none';progressBar.style.width='0%';animateProgress(progressBar,3500);try{const token=window.siegeAuth?await window.siegeAuth.token():null;const response=await fetch(`${API_URL}/tricks/ask`,{method:'POST',headers:{'Content-Type':'application/json',...(token?{'Authorization':'Bearer '+token}:{})},body:JSON.stringify({operator,map,query:question})});if(!response.ok)throw new Error('Failed to get answer');const data=await response.json();progressBar.style.width='100%';playDoneSound();const rawText=data.answer||data.text||JSON.stringify(data);const formattedResult=formatResponse(rawText);resultDiv.innerHTML=formattedResult;resultDiv.style.display='block';btnText.textContent='ASK SIEGEIQ →';btn.disabled=false}catch(error){console.error('Tricks advisor error:',error);resultDiv.innerHTML='<div style="color:var(--danger)">Could not get an answer. Please try again.</div>';resultDiv.style.display='block';btnText.textContent='ASK SIEGEIQ →';btn.disabled=false}}
+// ── Progress bar visibility patches ──────────────
+(function() {
+  var _origAP = animateProgress;
+  animateProgress = function(progressBar, duration) {
+    // Find sibling pct label by id convention
+    var pctEl = null;
+    if (progressBar && progressBar.id === 'set-progress')  pctEl = document.getElementById('set-progress-pct');
+    if (progressBar && progressBar.id === 'trick-progress') pctEl = document.getElementById('trick-progress-pct');
+    var startTime = Date.now();
+    function frame() {
+      var elapsed = Date.now() - startTime;
+      var ratio = Math.min(elapsed / (duration||3000), 1);
+      var progress = ratio < 0.7 ? ratio * 100 : 70 + (ratio - 0.7) * 100;
+      if (progressBar) progressBar.style.width = progress + '%';
+      if (pctEl) pctEl.textContent = Math.min(Math.round(progress), 99) + '%';
+      if (ratio < 1) requestAnimationFrame(frame);
+      else { if (progressBar) progressBar.style.width = '100%'; if (pctEl) pctEl.textContent = '100%'; }
+    }
+    requestAnimationFrame(frame);
+  };
+
+  var _origRS = runSettingsAdvisor;
+  runSettingsAdvisor = async function() {
+    var wrap = document.getElementById('set-progress-wrap');
+    var bar  = document.getElementById('set-progress');
+    var pct  = document.getElementById('set-progress-pct');
+    if (wrap) { wrap.style.display = 'block'; }
+    if (bar)  { bar.style.width = '0%'; }
+    if (pct)  { pct.textContent = '0%'; }
+    await _origRS();
+    if (wrap) wrap.style.display = 'none';
+  };
+
+  var _origRT = runTricksAsk;
+  runTricksAsk = async function() {
+    var wrap = document.getElementById('trick-progress-wrap');
+    var bar  = document.getElementById('trick-progress');
+    var pct  = document.getElementById('trick-progress-pct');
+    if (wrap) { wrap.style.display = 'block'; }
+    if (bar)  { bar.style.width = '0%'; }
+    if (pct)  { pct.textContent = '0%'; }
+    await _origRT();
+    if (wrap) wrap.style.display = 'none';
+  };
+})();
+// ─────────────────────────────────────────────────
+
 function playTone(freq, duration, type, volume) {
   const audioContext = new (window.AudioContext || window.webkitAudioContext)();
   const osc = audioContext.createOscillator();
