@@ -123,6 +123,9 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 .ticker-item{display:inline-flex;align-items:center;gap:8px;padding:0 32px;font-size:12px;color:var(--text2)}
 .ticker-dot{width:5px;height:5px;border-radius:50%;background:var(--accent);flex-shrink:0}
 
+/* Disabled button state */
+button:disabled{opacity:0.6;cursor:not-allowed}
+
 /* Float CTA */
 #float-cta{position:fixed;bottom:80px;right:20px;z-index:998;opacity:0;transform:translateY(20px);transition:opacity .4s,transform .4s;pointer-events:none}
 #float-cta.show{opacity:1;transform:translateY(0);pointer-events:all}
@@ -1341,7 +1344,12 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
         <input id="set-deadzone" placeholder="Dead zone (if applicable)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none">
       </div>
       <textarea id="set-issues" placeholder="What feels off? e.g. 'my aim feels floaty', 'flicks overshoot', 'can't find a comfy lean bind'..." style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:11px 12px;color:var(--text);font-size:13px;outline:none;resize:vertical;min-height:64px;font-family:var(--fb);line-height:1.6;margin-bottom:10px"></textarea>
-      <button onclick="runSettingsAdvisor()" style="width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:12px;cursor:pointer">GET MY OPTIMIZED SETUP &rarr;</button>
+      <button id="set-btn" onclick="runSettingsAdvisor()" style="width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:12px;cursor:pointer"><span id="set-btn-text">GET MY OPTIMIZED SETUP &rarr;</span></button>
+      <div style="margin-top:8px">
+        <div style="width:100%;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
+          <div id="set-progress" style="height:100%;width:0%;background:var(--accent);border-radius:2px;transition:width .15s linear"></div>
+        </div>
+      </div>
       <div id="set-result" style="display:none;margin-top:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;font-size:12.5px;color:var(--text2);line-height:1.7;white-space:pre-wrap"></div>
     </div>
 
@@ -1353,7 +1361,12 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
         <input id="trick-map" placeholder="Map (optional)" style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:9px 10px;color:var(--text);font-size:12px;outline:none">
       </div>
       <textarea id="trick-q" placeholder="e.g. 'How do I run-out on Oregon basement?' or 'Best vault tech to deny a claymore on Ace'..." style="width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:11px 12px;color:var(--text);font-size:13px;outline:none;resize:vertical;min-height:64px;font-family:var(--fb);line-height:1.6;margin-bottom:10px"></textarea>
-      <button onclick="runTricksAsk()" style="width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:12px;cursor:pointer">ASK SIEGEIQ &rarr;</button>
+      <button id="trick-btn" onclick="runTricksAsk()" style="width:100%;font-family:var(--fh);font-size:14px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:12px;cursor:pointer"><span id="trick-btn-text">ASK SIEGEIQ &rarr;</span></button>
+      <div style="margin-top:8px">
+        <div style="width:100%;height:4px;background:var(--bg3);border-radius:2px;overflow:hidden">
+          <div id="trick-progress" style="height:100%;width:0%;background:var(--accent);border-radius:2px;transition:width .15s linear"></div>
+        </div>
+      </div>
       <div id="trick-result" style="display:none;margin-top:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;font-size:12.5px;color:var(--text2);line-height:1.7;white-space:pre-wrap"></div>
     </div>
   </div>
