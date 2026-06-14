@@ -5324,13 +5324,18 @@ window.addEventListener('load', async function() {
     if (clerk.user) {
       clerk.mountUserButton(slot);
     } else {
-      var btn = document.createElement('button');
-      btn.textContent = 'Sign In';
-      btn.style.cssText = 'font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:transparent;border:1px solid rgba(255,255,255,0.25);border-radius:var(--r);padding:7px 16px;cursor:pointer;transition:border-color .15s';
-      btn.onmouseover = function(){ this.style.borderColor='rgba(255,255,255,0.6)'; };
-      btn.onmouseout  = function(){ this.style.borderColor='rgba(255,255,255,0.25)'; };
-      btn.onclick = function(){ clerk.openSignIn({}); };
-      slot.appendChild(btn);
+      var signIn = document.createElement('button');
+      signIn.textContent = 'Sign In';
+      signIn.style.cssText = 'font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:transparent;border:1px solid rgba(255,255,255,0.25);border-radius:var(--r);padding:7px 16px;cursor:pointer;transition:border-color .15s';
+      signIn.onmouseover = function(){ this.style.borderColor='rgba(255,255,255,0.6)'; };
+      signIn.onmouseout  = function(){ this.style.borderColor='rgba(255,255,255,0.25)'; };
+      signIn.onclick = function(){ clerk.openSignIn({}); };
+      slot.appendChild(signIn);
+      var signUp = document.createElement('button');
+      signUp.textContent = 'Sign Up';
+      signUp.style.cssText = 'font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:7px 16px;cursor:pointer;margin-left:4px';
+      signUp.onclick = function(){ clerk.openSignUp({}); };
+      slot.appendChild(signUp);
     }
   }
 
