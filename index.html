@@ -5234,6 +5234,14 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
   }
 
   window.generatePerfGuide = function() {
+    // Gate: must be signed in before hitting the backend
+    if (!window.siegeAuth || !window.siegeAuth.isSignedIn()) {
+      if (window.siegeAuth && window.siegeAuth.requireSignIn) {
+        window.siegeAuth.requireSignIn();
+      }
+      return;
+    }
+
     var btn = document.getElementById('perf-generate-btn');
     var btnText = document.getElementById('perf-btn-text');
     var progress = document.getElementById('perf-progress');
