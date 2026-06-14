@@ -1610,22 +1610,201 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
 
     </div>
   
-    <div style="margin-top:40px;padding-top:32px;border-top:1px solid var(--border)">
-      <div style="font-size:11px;color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:8px">Cookie Policy</div>
-      <h2 style="font-family:var(--fh);font-size:28px;font-weight:700;color:var(--text);margin-bottom:16px">COOKIE <span style="color:var(--accent)">POLICY</span></h2>
-      <p style="font-size:12px;color:var(--text3);font-family:monospace;margin-bottom:24px">Last updated: June 1, 2026 · privacy@siegeiq.gg</p>
-      <h2 style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--text);margin:0 0 8px">What Are Cookies</h2>
-      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:12px;font-weight:300">Cookies are small text files placed on your device. SiegeIQ uses cookies and localStorage to operate the service and remember your preferences.</p>
-      <h2 style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--text);margin:20px 0 8px">Cookies We Use</h2>
-      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:8px;font-weight:300"><strong style="color:var(--text)">Authentication session cookie</strong> — Set by Clerk when you log in. Expires after 7 days of inactivity.</p>
-      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:8px;font-weight:300"><strong style="color:var(--text)">Stripe fraud prevention</strong> — Set by Stripe during payment processing. Stripe is PCI DSS Level 1 certified.</p>
-      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:8px;font-weight:300"><strong style="color:var(--text)">Theme preference (localStorage)</strong> — Stores your colour theme locally. No personal data, never leaves your device.</p>
-      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:12px;font-weight:300"><strong style="color:var(--text)">Review count (localStorage)</strong> — Tracks free reviews used this month. Resets monthly. Never leaves your browser.</p>
-      <h2 style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--text);margin:20px 0 8px">Cookies We Do NOT Use</h2>
-      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:12px;font-weight:300">No advertising cookies, no Google Analytics, no Mixpanel, no social media tracking pixels, no cross-site tracking of any kind.</p>
-      <h2 style="font-family:var(--fh);font-size:20px;font-weight:700;color:var(--text);margin:20px 0 8px">Managing Cookies</h2>
-      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:8px;font-weight:300">SiegeIQ only uses strictly necessary cookies so there are no optional cookies to configure. Blocking all cookies will prevent login. Clear localStorage via DevTools — Application — Storage — Clear Site Data.</p>
-      <p style="font-size:13px;color:var(--text2);line-height:1.8;font-weight:300">Questions: <a href="mailto:privacy@siegeiq.gg" style="color:var(--accent);text-decoration:none">privacy@siegeiq.gg</a></p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════ -->
+<!-- COOKIE POLICY PAGE                         -->
+<!-- ═══════════════════════════════════════════ -->
+<div id="page-cookie" class="page" style="padding-top:0;background:var(--bg)">
+  <div style="max-width:760px;margin:0 auto;padding:0 24px 80px">
+    <div style="margin-bottom:32px">
+      <div style="font-size:11px;color:var(--accent);font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;padding-top:48px">Legal</div>
+      <h1 style="font-family:var(--fh);font-size:42px;font-weight:700;line-height:1;margin-bottom:10px">COOKIE <span style="color:var(--accent)">POLICY</span></h1>
+      <p style="font-size:12px;color:var(--text3);font-family:monospace;margin-bottom:24px">Last updated: June 1, 2026 &nbsp;·&nbsp; <a href="mailto:privacy@siegeiq.gg" style="color:var(--accent);text-decoration:none">privacy@siegeiq.gg</a></p>
+
+      <div style="background:rgba(255,107,53,0.06);border:1px solid rgba(255,107,53,0.2);border-radius:var(--r);padding:16px 20px;margin-bottom:32px;font-size:13px;color:var(--text2);line-height:1.7">
+        SiegeIQ is committed to minimal data collection and full transparency. This Cookie Policy explains exactly what cookies and browser storage technologies we use, why, and how you can control them. We do not use advertising cookies, analytics trackers, or any form of cross-site tracking.
+      </div>
+
+      <!-- Section 1 -->
+      <h2 style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--text);margin:0 0 10px">1. What Are Cookies?</h2>
+      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:14px;font-weight:300">Cookies are small text files that a website stores on your device when you visit. They are sent back to the originating website on each subsequent visit, or to another website that recognises that cookie. Cookies are useful because they allow a website to recognise a user's device and remember login sessions or preferences.</p>
+      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:14px;font-weight:300">SiegeIQ also uses <strong style="color:var(--text)">localStorage</strong> — a browser-based key/value store that holds data locally on your device only. Unlike cookies, localStorage data is never transmitted to a server; it exists purely within your browser.</p>
+      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:20px;font-weight:300">There are different types of cookies:</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px">
+          <div style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--accent);margin-bottom:6px">Session Cookies</div>
+          <p style="font-size:12px;color:var(--text2);line-height:1.7;margin:0;font-weight:300">Temporary cookies that are deleted when you close your browser. Used to maintain your login state during a browsing session.</p>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px">
+          <div style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--accent);margin-bottom:6px">Persistent Cookies</div>
+          <p style="font-size:12px;color:var(--text2);line-height:1.7;margin:0;font-weight:300">Cookies that remain on your device for a set period of time, or until you delete them manually. Used to remember login state across sessions.</p>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px">
+          <div style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--accent);margin-bottom:6px">First-Party Cookies</div>
+          <p style="font-size:12px;color:var(--text2);line-height:1.7;margin:0;font-weight:300">Set by siegeiq.gg directly. These are essential for the site to function and cannot be disabled without breaking login and payment features.</p>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px">
+          <div style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--accent);margin-bottom:6px">Third-Party Cookies</div>
+          <p style="font-size:12px;color:var(--text2);line-height:1.7;margin:0;font-weight:300">Set by external services (Clerk for auth, Stripe for payments). Each is strictly necessary and subject to that provider's own privacy policy.</p>
+        </div>
+      </div>
+
+      <!-- Section 2 -->
+      <h2 style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--text);margin:0 0 14px">2. Cookies We Use</h2>
+      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:16px;font-weight:300">SiegeIQ uses only <strong style="color:var(--text)">strictly necessary</strong> cookies. We do not operate a cookie consent banner because we have no optional or marketing cookies to consent to. The cookies below are required for core functionality.</p>
+
+      <div style="border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:28px">
+        <!-- Header -->
+        <div style="display:grid;grid-template-columns:1.4fr 1fr 2fr 1fr 1fr;gap:0;background:var(--bg3);padding:10px 14px;border-bottom:1px solid var(--border)">
+          <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.08em">Name</span>
+          <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.08em">Provider</span>
+          <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.08em">Purpose</span>
+          <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.08em">Duration</span>
+          <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.08em">Type</span>
+        </div>
+        <!-- Row 1 -->
+        <div style="display:grid;grid-template-columns:1.4fr 1fr 2fr 1fr 1fr;gap:0;padding:12px 14px;border-bottom:1px solid var(--border);align-items:start">
+          <span style="font-size:12px;color:var(--text);font-weight:600;font-family:monospace">__session</span>
+          <span style="font-size:12px;color:var(--text2)">Clerk</span>
+          <span style="font-size:12px;color:var(--text2);line-height:1.6">Authenticates your login session. Required to access your dashboard and saved coaching reports.</span>
+          <span style="font-size:12px;color:var(--text2)">7 days</span>
+          <span style="font-size:11px;color:var(--accent);font-weight:600">Essential</span>
+        </div>
+        <!-- Row 2 -->
+        <div style="display:grid;grid-template-columns:1.4fr 1fr 2fr 1fr 1fr;gap:0;padding:12px 14px;border-bottom:1px solid var(--border);align-items:start;background:rgba(255,255,255,0.02)">
+          <span style="font-size:12px;color:var(--text);font-weight:600;font-family:monospace">__client_uat</span>
+          <span style="font-size:12px;color:var(--text2)">Clerk</span>
+          <span style="font-size:12px;color:var(--text2);line-height:1.6">Tracks the last time the Clerk client was updated. Helps detect and invalidate stale sessions.</span>
+          <span style="font-size:12px;color:var(--text2)">Session</span>
+          <span style="font-size:11px;color:var(--accent);font-weight:600">Essential</span>
+        </div>
+        <!-- Row 3 -->
+        <div style="display:grid;grid-template-columns:1.4fr 1fr 2fr 1fr 1fr;gap:0;padding:12px 14px;border-bottom:1px solid var(--border);align-items:start">
+          <span style="font-size:12px;color:var(--text);font-weight:600;font-family:monospace">__stripe_mid</span>
+          <span style="font-size:12px;color:var(--text2)">Stripe</span>
+          <span style="font-size:12px;color:var(--text2);line-height:1.6">Fraud detection and prevention during payment processing. Required for Pro subscription checkout.</span>
+          <span style="font-size:12px;color:var(--text2)">1 year</span>
+          <span style="font-size:11px;color:var(--accent);font-weight:600">Essential</span>
+        </div>
+        <!-- Row 4 -->
+        <div style="display:grid;grid-template-columns:1.4fr 1fr 2fr 1fr 1fr;gap:0;padding:12px 14px;align-items:start;background:rgba(255,255,255,0.02)">
+          <span style="font-size:12px;color:var(--text);font-weight:600;font-family:monospace">__stripe_sid</span>
+          <span style="font-size:12px;color:var(--text2)">Stripe</span>
+          <span style="font-size:12px;color:var(--text2);line-height:1.6">Maintains Stripe checkout session integrity. Prevents double-charges and ensures payment security.</span>
+          <span style="font-size:12px;color:var(--text2)">30 min</span>
+          <span style="font-size:11px;color:var(--accent);font-weight:600">Essential</span>
+        </div>
+      </div>
+
+      <!-- Section 3 -->
+      <h2 style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--text);margin:0 0 14px">3. Browser localStorage</h2>
+      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:16px;font-weight:300">In addition to cookies, SiegeIQ stores small amounts of data in your browser's <strong style="color:var(--text)">localStorage</strong>. This data <em>never leaves your device</em> and is never transmitted to our servers. It is used solely to improve your experience.</p>
+
+      <div style="border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:28px">
+        <div style="display:grid;grid-template-columns:1.8fr 2.5fr 1fr;gap:0;background:var(--bg3);padding:10px 14px;border-bottom:1px solid var(--border)">
+          <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.08em">Key</span>
+          <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.08em">Purpose</span>
+          <span style="font-size:10px;font-weight:700;color:var(--text);text-transform:uppercase;letter-spacing:.08em">Persists</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1.8fr 2.5fr 1fr;gap:0;padding:12px 14px;border-bottom:1px solid var(--border);align-items:start">
+          <span style="font-size:12px;color:var(--text);font-weight:600;font-family:monospace">siegeiq_theme</span>
+          <span style="font-size:12px;color:var(--text2);line-height:1.6">Remembers your chosen colour theme (dark/light). No personal data.</span>
+          <span style="font-size:12px;color:var(--text2)">Until cleared</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1.8fr 2.5fr 1fr;gap:0;padding:12px 14px;align-items:start;background:rgba(255,255,255,0.02)">
+          <span style="font-size:12px;color:var(--text);font-weight:600;font-family:monospace">siegeiq_reviews</span>
+          <span style="font-size:12px;color:var(--text2);line-height:1.6">Tracks how many free VOD analyses you have used in the current calendar month. Resets automatically on the 1st of each month.</span>
+          <span style="font-size:12px;color:var(--text2)">Monthly reset</span>
+        </div>
+      </div>
+
+      <!-- Section 4 -->
+      <h2 style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--text);margin:0 0 14px">4. Cookies We Do NOT Use</h2>
+      <div style="background:rgba(62,207,142,0.06);border:1px solid rgba(62,207,142,0.2);border-radius:var(--r);padding:16px 20px;margin-bottom:28px">
+        <p style="font-size:13px;color:var(--text2);line-height:1.8;margin:0;font-weight:300">SiegeIQ explicitly does <strong style="color:var(--text)">not</strong> use any of the following:</p>
+        <ul style="margin:10px 0 0 18px;padding:0;font-size:13px;color:var(--text2);line-height:2;font-weight:300">
+          <li>Advertising or retargeting cookies (Google Ads, Meta Pixel, etc.)</li>
+          <li>Analytics cookies (Google Analytics, Mixpanel, Hotjar, Amplitude, etc.)</li>
+          <li>Social media tracking pixels (Facebook, Twitter/X, TikTok, etc.)</li>
+          <li>Cross-site tracking or behavioural profiling of any kind</li>
+          <li>A/B testing or feature flag cookies from third-party services</li>
+          <li>Any cookie that is not strictly necessary for authentication or payment security</li>
+        </ul>
+      </div>
+
+      <!-- Section 5 -->
+      <h2 style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--text);margin:0 0 14px">5. Third-Party Services & Their Cookies</h2>
+      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:16px;font-weight:300">The two third-party services that set cookies on SiegeIQ are Clerk and Stripe. Both are strictly necessary for login and payment processing respectively. Links to their cookie and privacy policies are provided below.</p>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:28px">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-family:var(--fh);font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px">Clerk</div>
+            <div style="font-size:12px;color:var(--text2)">Authentication provider — handles login, session management, and account security.</div>
+          </div>
+          <a href="https://clerk.com/privacy" target="_blank" style="font-size:12px;color:var(--accent);text-decoration:none;white-space:nowrap;font-weight:600">Privacy Policy ↗</a>
+        </div>
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <div>
+            <div style="font-family:var(--fh);font-size:14px;font-weight:700;color:var(--text);margin-bottom:3px">Stripe</div>
+            <div style="font-size:12px;color:var(--text2)">Payment processor — handles Pro subscription checkout. PCI DSS Level 1 certified.</div>
+          </div>
+          <a href="https://stripe.com/privacy" target="_blank" style="font-size:12px;color:var(--accent);text-decoration:none;white-space:nowrap;font-weight:600">Privacy Policy ↗</a>
+        </div>
+      </div>
+
+      <!-- Section 6 -->
+      <h2 style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--text);margin:0 0 14px">6. Managing Cookies in Your Browser</h2>
+      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:14px;font-weight:300">You can control and delete cookies through your browser settings. Note that blocking all cookies will prevent you from logging in to SiegeIQ, as the authentication session cookie is strictly necessary. Below are links to cookie management instructions for the most common browsers:</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:28px">
+        <a href="https://support.google.com/chrome/answer/95647" target="_blank" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;text-decoration:none;display:block;transition:border-color .15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Google Chrome</div>
+          <div style="font-size:11px;color:var(--text3)">Settings → Privacy and security → Cookies ↗</div>
+        </a>
+        <a href="https://support.mozilla.org/en-US/kb/clear-cookies-and-site-data-firefox" target="_blank" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;text-decoration:none;display:block;transition:border-color .15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Mozilla Firefox</div>
+          <div style="font-size:11px;color:var(--text3)">Preferences → Privacy & Security → Cookies ↗</div>
+        </a>
+        <a href="https://support.apple.com/en-gb/guide/safari/sfri11471/mac" target="_blank" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;text-decoration:none;display:block;transition:border-color .15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Safari</div>
+          <div style="font-size:11px;color:var(--text3)">Preferences → Privacy → Manage Website Data ↗</div>
+        </a>
+        <a href="https://support.microsoft.com/en-us/microsoft-edge/delete-cookies-in-microsoft-edge-63947406-40ac-c3b8-57b9-2a946a29ae09" target="_blank" style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;text-decoration:none;display:block;transition:border-color .15s" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+          <div style="font-size:13px;font-weight:600;color:var(--text);margin-bottom:2px">Microsoft Edge</div>
+          <div style="font-size:11px;color:var(--text3)">Settings → Cookies and site permissions ↗</div>
+        </a>
+      </div>
+      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:28px;font-weight:300">To clear localStorage specifically: open your browser's DevTools (F12) → Application tab → Storage → Local Storage → right-click <code style="background:var(--bg3);padding:1px 5px;border-radius:3px;font-size:11px">https://siegeiq.gg</code> → Clear.</p>
+
+      <!-- Section 7 -->
+      <h2 style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--text);margin:0 0 14px">7. Your Rights</h2>
+      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:14px;font-weight:300">Depending on your location, you may have rights relating to the data stored about you, including rights under the GDPR (EU/UK) and the CCPA (California). Because SiegeIQ uses only strictly necessary cookies, we do not require separate cookie consent under most regulations. However, you retain the right to:</p>
+      <ul style="margin:0 0 20px 18px;padding:0;font-size:13px;color:var(--text2);line-height:2;font-weight:300">
+        <li>Access the data we hold about you</li>
+        <li>Request deletion of your account and associated data</li>
+        <li>Withdraw from the service at any time</li>
+        <li>Lodge a complaint with your local data protection authority</li>
+      </ul>
+      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:28px;font-weight:300">To exercise any of these rights, email <a href="mailto:privacy@siegeiq.gg" style="color:var(--accent);text-decoration:none">privacy@siegeiq.gg</a> and we will respond within 30 days.</p>
+
+      <!-- Section 8 -->
+      <h2 style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--text);margin:0 0 14px">8. Changes to This Policy</h2>
+      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:28px;font-weight:300">We may update this Cookie Policy to reflect changes in technology, legislation, or our services. When we make material changes, we will update the "Last updated" date at the top of this page and, where appropriate, notify registered users by email. Continued use of SiegeIQ after a policy update constitutes your acceptance of the revised policy.</p>
+
+      <!-- Section 9 -->
+      <h2 style="font-family:var(--fh);font-size:22px;font-weight:700;color:var(--text);margin:0 0 14px">9. Contact</h2>
+      <p style="font-size:13px;color:var(--text2);line-height:1.8;margin-bottom:10px;font-weight:300">If you have any questions about this Cookie Policy or how SiegeIQ handles your data, please contact us:</p>
+      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:16px 20px;font-size:13px;color:var(--text2);line-height:1.9">
+        <strong style="color:var(--text)">Email:</strong> <a href="mailto:privacy@siegeiq.gg" style="color:var(--accent);text-decoration:none">privacy@siegeiq.gg</a><br>
+        <strong style="color:var(--text)">Website:</strong> <a href="https://siegeiq.gg" style="color:var(--accent);text-decoration:none">siegeiq.gg</a><br>
+        <strong style="color:var(--text)">Discord:</strong> <a href="https://discord.gg/dfanABdM" target="_blank" style="color:var(--accent);text-decoration:none">discord.gg/dfanABdM</a>
+      </div>
+
+      <div style="margin-top:32px;padding-top:24px;border-top:1px solid var(--border);display:flex;gap:16px;flex-wrap:wrap">
+        <button onclick="goTo('privacy')" style="font-size:13px;color:var(--accent);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;font-weight:600">← Privacy Policy</button>
+        <button onclick="goTo('terms')" style="font-size:13px;color:var(--accent);background:none;border:none;cursor:pointer;padding:0;font-family:inherit;font-weight:600">Terms of Service →</button>
+      </div>
     </div>
   </div>
 </div>
@@ -1648,7 +1827,7 @@ function updateOperators() {
 }
 
 // ─── Navigation ───────────────────────────────
-const PAGES = ['landing','upload','dashboard','pricing','counter','optimize','privacy','terms','contact','partnerships','bug'];
+const PAGES = ['landing','upload','dashboard','pricing','counter','optimize','privacy','cookie','terms','contact','partnerships','bug'];
 function switchMobTab(tab) {
   ['video','coaching','score'].forEach(t => {
     const sec = document.getElementById('mob-section-' + t);
@@ -4610,7 +4789,8 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
         <div>
           <div style="font-size:11px;font-weight:600;color:var(--text);text-transform:uppercase;letter-spacing:.08em;margin-bottom:14px">Legal</div>
           <div style="display:flex;flex-direction:column;gap:10px">
-            <button onclick="goTo('privacy')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Privacy &amp; Cookie Policy</button>
+            <button onclick="goTo('privacy')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Privacy Policy</button>
+            <button onclick="goTo('cookie')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Cookie Policy</button>
             <button onclick="goTo('terms')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Terms of Service</button>
             
           </div>
