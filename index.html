@@ -5281,70 +5281,70 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
 
 
 <!-- ── Clerk Auth ─────────────────────────────────────────────────────────── -->
+<script
+  async
+  crossorigin="anonymous"
+  data-clerk-publishable-key="pk_test_ZW5hYmxlZC1kaW5vc2F1ci03MS5jbGVyay5hY2NvdW50cy5kZXYk"
+  src="https://enabled-dinosaur-71.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+  type="text/javascript"
+></script>
 <script>
-(function() {
+window.addEventListener('load', async function() {
+  if (!window.Clerk) return;
   var CLERK_PK = 'pk_test_ZW5hYmxlZC1kaW5vc2F1ci03MS5jbGVyay5hY2NvdW50cy5kZXYk';
-  var s = document.createElement('script');
-  s.setAttribute('data-clerk-publishable-key', CLERK_PK);
-  s.src = 'https://enabled-dinosaur-71.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js';
-  s.crossOrigin = 'anonymous';
-  s.async = true;
-  s.onload = async function() {
-    var clerk = new window.Clerk(CLERK_PK);
-    await clerk.load();
+  await window.Clerk.load({ publishableKey: CLERK_PK });
+  var clerk = window.Clerk;
 
-    function renderSlot() {
-      var slot = document.getElementById('auth-slot');
-      if (!slot) return;
-      slot.innerHTML = '';
-      if (clerk.user) {
-        clerk.mountUserButton(slot);
-      } else {
-        var btn = document.createElement('button');
-        btn.textContent = 'Sign In';
-        btn.style.cssText = 'font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:transparent;border:1px solid rgba(255,255,255,0.25);border-radius:var(--r);padding:7px 16px;cursor:pointer;transition:border-color .15s';
-        btn.onmouseover = function(){ this.style.borderColor='rgba(255,255,255,0.6)'; };
-        btn.onmouseout  = function(){ this.style.borderColor='rgba(255,255,255,0.25)'; };
-        btn.onclick = function(){ clerk.openSignIn({}); };
-        slot.appendChild(btn);
-      }
+  function renderSlot() {
+    var slot = document.getElementById('auth-slot');
+    if (!slot) return;
+    slot.innerHTML = '';
+    if (clerk.user) {
+      clerk.mountUserButton(slot);
+    } else {
+      var btn = document.createElement('button');
+      btn.textContent = 'Sign In';
+      btn.style.cssText = 'font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:transparent;border:1px solid rgba(255,255,255,0.25);border-radius:var(--r);padding:7px 16px;cursor:pointer;transition:border-color .15s';
+      btn.onmouseover = function(){ this.style.borderColor='rgba(255,255,255,0.6)'; };
+      btn.onmouseout  = function(){ this.style.borderColor='rgba(255,255,255,0.25)'; };
+      btn.onclick = function(){ clerk.openSignIn({}); };
+      slot.appendChild(btn);
     }
+  }
 
-    renderSlot();
-    clerk.addListener(function(){ renderSlot(); });
+  renderSlot();
+  clerk.addListener(function(){ renderSlot(); });
 
-    window.siegeAuth = {
-      isSignedIn:    function() { return !!clerk.user; },
-      userId:        function() { return clerk.user ? clerk.user.id : null; },
-      token:         async function() {
-        if (!clerk.session) return null;
-        return await clerk.session.getToken();
-      },
-      requireSignIn: async function() {
-        if (!clerk.user) {
-          clerk.openSignIn({});
-          return await new Promise(function(resolve) {
-            var unsub = clerk.addListener(function() {
-              if (clerk.user) { unsub(); resolve(true); }
-            });
+  window.siegeAuth = {
+    isSignedIn:    function() { return !!clerk.user; },
+    userId:        function() { return clerk.user ? clerk.user.id : null; },
+    token:         async function() {
+      if (!clerk.session) return null;
+      return await clerk.session.getToken();
+    },
+    requireSignIn: async function() {
+      if (!clerk.user) {
+        clerk.openSignIn({});
+        return await new Promise(function(resolve) {
+          var unsub = clerk.addListener(function() {
+            if (clerk.user) { unsub(); resolve(true); }
           });
-        }
-        return true;
-      },
-      me: function() {
-        if (!clerk.user) return null;
-        return {
-          id:        clerk.user.id,
-          email:     (clerk.user.primaryEmailAddress && clerk.user.primaryEmailAddress.emailAddress) || '',
-          firstName: clerk.user.firstName || ''
-        };
+        });
       }
-    };
-
-    window.dispatchEvent(new Event('siegeauth:ready'));
+      return true;
+    },
+    me: function() {
+      if (!clerk.user) return null;
+      return {
+        id:        clerk.user.id,
+        email:     (clerk.user.primaryEmailAddress && clerk.user.primaryEmailAddress.emailAddress) || '',
+        firstName: clerk.user.firstName || ''
+      };
+    }
   };
-  document.head.appendChild(s);
-})();
+
+  window.dispatchEvent(new Event('siegeauth:ready'));
+});
 </script>
 
 </body>
