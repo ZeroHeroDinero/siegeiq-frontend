@@ -100,6 +100,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--fb);min-height:100
 @keyframes progressFill{from{width:0}to{width:var(--target-w)}}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
 @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes dotPulse{0%,80%,100%{opacity:.15;transform:scale(.8)}40%{opacity:1;transform:scale(1)}}
 
 .reveal{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease}
 .reveal.visible{opacity:1;transform:translateY(0)}
@@ -1368,7 +1369,7 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
           <div id="set-progress" style="height:100%;width:0%;background:var(--accent);border-radius:2px;transition:width .15s linear"></div>
         </div>
       </div>
-      <div id="set-result" style="display:none;margin-top:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;font-size:12.5px;color:var(--text2);line-height:1.7;white-space:pre-wrap"></div>
+      <div id="set-result" style="display:none;margin-top:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px"></div>
     </div>
 
     <div style="background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:18px">
@@ -1385,7 +1386,7 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
           <div id="trick-progress" style="height:100%;width:0%;background:var(--accent);border-radius:2px;transition:width .15s linear"></div>
         </div>
       </div>
-      <div id="trick-result" style="display:none;margin-top:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px;font-size:12.5px;color:var(--text2);line-height:1.7;white-space:pre-wrap"></div>
+      <div id="trick-result" style="display:none;margin-top:14px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px 16px"></div>
     </div>
   </div>
 </div>
@@ -2302,9 +2303,21 @@ function getObsHeadline(o) {
 
 async function getDrillPlan(){
   var out=document.getElementById('drill-out'); if(!out) return;
-  out.style.display='block'; out.textContent='Building your 7-day plan\u2026';
-  try{ var r=await fetch(API_URL+'/drills/plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({report:window.lastReport||{}})}); var d=await r.json(); out.textContent=d.text||'No plan returned.'; }
-  catch(e){ out.textContent='Could not build plan. Try again.'; }
+  var btn=out.previousElementSibling; // the drill plan button sits just above
+  playAnalyzeSound();
+  showAILoading(out,'Building your 7-day plan');
+  if(btn && btn.tagName==='BUTTON'){ btn.disabled=true; }
+  try{
+    var r=await fetch(API_URL+'/drills/plan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({report:window.lastReport||{}})});
+    var d=await r.json();
+    playCompleteSound();
+    out.innerHTML=renderAIText(d.text||'No plan returned.');
+  }catch(e){
+    playErrorSound();
+    out.innerHTML='<div style="font-size:12.5px;color:var(--danger)">Could not build plan. Try again.</div>';
+  }finally{
+    if(btn && btn.tagName==='BUTTON'){ btn.disabled=false; }
+  }
 }
 window._chatHist=[];
 async function askClip(){
@@ -2750,7 +2763,7 @@ function renderResults(data,operator,map,rank,isGuest) {
     list.insertAdjacentHTML('beforeend',
       '<div style="margin-top:18px;border-top:1px solid var(--border);padding-top:16px">'
       + drillBtn
-      + '<div id="drill-out" style="display:none;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px;font-size:12.5px;color:var(--text2);line-height:1.7;white-space:pre-wrap;margin-bottom:14px"></div>'
+      + '<div id="drill-out" style="display:none;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);padding:14px;margin-bottom:14px"></div>'
       + chatSection
       + '</div>'
     );
@@ -3627,7 +3640,14 @@ function _optVal(id){ var el=document.getElementById(id); return el ? el.value.t
 
 async function runSettingsAdvisor(){
   var box=document.getElementById('set-result');
-  box.style.display='block'; box.textContent='Optimizing your setup\u2026';
+  var prog=document.getElementById('set-progress');
+  var btn=document.getElementById('set-btn');
+  var btnTxt=document.getElementById('set-btn-text');
+  playAnalyzeSound();
+  showAILoading(box,'Optimizing your setup');
+  var stopProg = animProgressBar(prog, 12000);
+  if(btn){ btn.disabled=true; }
+  if(btnTxt){ btnTxt.textContent='Analyzing\u2026'; }
   var dpi=parseFloat(_optVal('set-dpi')), sens=parseFloat(_optVal('set-sens'));
   var payload={
     platform:_optVal('set-platform'), input:_optVal('set-input'), rank:_optVal('set-rank'),
@@ -3637,19 +3657,50 @@ async function runSettingsAdvisor(){
   };
   try{
     var r=await fetch(API_URL+'/settings/advise',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-    var d=await r.json(); box.textContent=d.text||'No recommendation returned.';
-  }catch(e){ box.textContent='Could not reach the coach. Try again in a moment.'; }
+    var d=await r.json();
+    if(stopProg) stopProg(true);
+    playCompleteSound();
+    box.innerHTML=renderAIText(d.text||'No recommendation returned.');
+  }catch(e){
+    if(stopProg) stopProg(false);
+    playErrorSound();
+    box.innerHTML='<div style="font-size:12.5px;color:var(--danger)">Could not reach the coach. Try again in a moment.</div>';
+  }finally{
+    if(btn){ btn.disabled=false; }
+    if(btnTxt){ btnTxt.textContent='GET MY OPTIMIZED SETUP \u2192'; }
+  }
 }
 
 async function runTricksAsk(){
   var box=document.getElementById('trick-result');
+  var prog=document.getElementById('trick-progress');
+  var btn=document.getElementById('trick-btn');
+  var btnTxt=document.getElementById('trick-btn-text');
   var q=_optVal('trick-q');
-  if(!q){ box.style.display='block'; box.textContent='Type a question first.'; return; }
-  box.style.display='block'; box.textContent='Thinking\u2026';
+  if(!q){
+    box.style.display='block';
+    box.innerHTML='<div style="font-size:12.5px;color:var(--warn)">Type a question first.</div>';
+    return;
+  }
+  playAnalyzeSound();
+  showAILoading(box,'Looking up tech');
+  var stopProg = animProgressBar(prog, 10000);
+  if(btn){ btn.disabled=true; }
+  if(btnTxt){ btnTxt.textContent='Asking\u2026'; }
   try{
     var r=await fetch(API_URL+'/tricks/ask',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({query:q,operator:_optVal('trick-op'),map:_optVal('trick-map')})});
-    var d=await r.json(); box.textContent=d.text||'No answer returned.';
-  }catch(e){ box.textContent='Could not reach the coach. Try again in a moment.'; }
+    var d=await r.json();
+    if(stopProg) stopProg(true);
+    playCompleteSound();
+    box.innerHTML=renderAIText(d.text||'No answer returned.');
+  }catch(e){
+    if(stopProg) stopProg(false);
+    playErrorSound();
+    box.innerHTML='<div style="font-size:12.5px;color:var(--danger)">Could not reach the coach. Try again in a moment.</div>';
+  }finally{
+    if(btn){ btn.disabled=false; }
+    if(btnTxt){ btnTxt.textContent='ASK SIEGEIQ \u2192'; }
+  }
 }
 
 // ─── Counter Tool ─────────────────────────────
@@ -4507,6 +4558,99 @@ function playErrorSound() {
   setTimeout(function() { playTone(220, 0.3, 'sawtooth', 0.08); }, 150);
 }
 
+// ─── AI Output Helpers ────────────────────────────────────────────────────────
+// Converts markdown-flavoured text from the AI into clean styled HTML
+function fmtInline(text) {
+  text = text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  text = text.replace(/\*\*([^*\n]+)\*\*/g,'<strong style="color:var(--text)">$1</strong>');
+  text = text.replace(/\*([^*\n]+)\*/g,'<em style="color:var(--text2)">$1</em>');
+  text = text.replace(/`([^`\n]+)`/g,'<code style="background:var(--bg4);padding:1px 5px;border-radius:3px;font-size:11px;font-family:monospace;color:var(--accent)">$1</code>');
+  return text;
+}
+function renderAIText(text) {
+  if (!text) return '';
+  var html = '';
+  var lines = text.split('\n');
+  var inList = false;
+  for (var i = 0; i < lines.length; i++) {
+    var line = lines[i];
+    var tr = line.trim();
+    // Horizontal rule
+    if (/^-{3,}$/.test(tr)) {
+      if (inList) { html += '</div>'; inList = false; }
+      html += '<div style="border-top:1px solid var(--border2);margin:14px 0"></div>';
+      continue;
+    }
+    // H1 — treat as section title
+    if (tr.startsWith('# ') && !tr.startsWith('## ')) {
+      if (inList) { html += '</div>'; inList = false; }
+      html += '<div style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--text);margin:14px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--border)">' + fmtInline(tr.slice(2)) + '</div>';
+      continue;
+    }
+    // H2
+    if (tr.startsWith('## ') && !tr.startsWith('### ')) {
+      if (inList) { html += '</div>'; inList = false; }
+      html += '<div style="font-family:var(--fh);font-size:14px;font-weight:700;color:var(--text);margin:14px 0 5px;letter-spacing:.02em">' + fmtInline(tr.slice(3)) + '</div>';
+      continue;
+    }
+    // H3
+    if (tr.startsWith('### ')) {
+      if (inList) { html += '</div>'; inList = false; }
+      html += '<div style="font-family:var(--fh);font-size:13px;font-weight:700;color:var(--accent);margin:10px 0 4px">' + fmtInline(tr.slice(4)) + '</div>';
+      continue;
+    }
+    // Bullet list item
+    if (/^[\-\*] /.test(tr)) {
+      if (!inList) { html += '<div style="margin:6px 0 8px">'; inList = true; }
+      html += '<div style="display:flex;gap:8px;font-size:12.5px;color:var(--text2);line-height:1.65;margin-bottom:5px"><span style="color:var(--accent);flex-shrink:0;margin-top:3px;font-size:9px">▸</span><span>' + fmtInline(tr.slice(2)) + '</span></div>';
+      continue;
+    }
+    // Empty line
+    if (tr === '') {
+      if (inList) { html += '</div>'; inList = false; }
+      if (html) html += '<div style="height:6px"></div>';
+      continue;
+    }
+    // Regular paragraph
+    if (inList) { html += '</div>'; inList = false; }
+    html += '<div style="font-size:12.5px;color:var(--text2);line-height:1.68;margin-bottom:6px">' + fmtInline(tr) + '</div>';
+  }
+  if (inList) html += '</div>';
+  return html || ('<div style="font-size:12.5px;color:var(--text2);white-space:pre-wrap">' + text + '</div>');
+}
+// Animated loading indicator for AI result boxes
+function showAILoading(box, message) {
+  box.style.display = 'block';
+  box.innerHTML = '<div style="display:flex;align-items:center;gap:10px;padding:6px 0;color:var(--text3);font-size:13px">'
+    + '<div style="display:flex;gap:5px;align-items:center">'
+    + '<span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;animation:dotPulse 1.2s ease infinite"></span>'
+    + '<span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;animation:dotPulse 1.2s ease .2s infinite"></span>'
+    + '<span style="width:6px;height:6px;border-radius:50%;background:var(--accent);display:inline-block;animation:dotPulse 1.2s ease .4s infinite"></span>'
+    + '</div>'
+    + '<span>' + (message || 'Analyzing') + '</span></div>';
+}
+// Animated progress bar for AI requests (fills over ~duration ms, stops at 90%)
+function animProgressBar(barEl, duration) {
+  if (!barEl) return;
+  barEl.style.width = '0%';
+  var start = Date.now();
+  var cap = 90;
+  var raf;
+  function tick() {
+    var elapsed = Date.now() - start;
+    var pct = Math.min(cap, (elapsed / duration) * cap);
+    barEl.style.width = pct + '%';
+    if (pct < cap) raf = requestAnimationFrame(tick);
+  }
+  raf = requestAnimationFrame(tick);
+  return function done(success) {
+    cancelAnimationFrame(raf);
+    barEl.style.transition = 'width .3s ease';
+    barEl.style.width = success ? '100%' : '0%';
+    setTimeout(function(){ barEl.style.width = '0%'; barEl.style.transition = 'width .15s linear'; }, 600);
+  };
+}
+
 var PAGE_SCROLL_TARGETS = {
   'upload':       null,
   'pricing':      null,
@@ -4939,7 +5083,7 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
           <div style="display:flex;flex-direction:column;gap:10px">
             <button onclick="goTo('privacy')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Privacy Policy</button>
             <button onclick="goTo('cookie')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Cookie Policy</button>
-            <button onclick="goTo('terms')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Terms of Service</button>
+            <button onclick="goTo('terms')" style="font-size:13px;color:var(--text2);background:none;border:none;cursor:pointer;transition:color .15s;padding:0;font-family:inherit;pointer-events:all;display:block;text-align:left" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text2)'">Terms of Service</button>
           </div>
         </div>
 
