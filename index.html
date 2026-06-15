@@ -249,9 +249,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:99999;pointer-events:all;backgro
   #analyze-float{bottom:16px!important;right:16px!important}
 }
 .tag{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;letter-spacing:.05em;text-transform:uppercase;border:1px solid}
-.tag.critical{background:rgba(255,68,68,.12);color:#FF4444;border-color:rgba(255,68,68,.35)}
-.tag.warning{background:rgba(245,158,11,.12);color:#F59E0B;border-color:rgba(245,158,11,.35)}
-.tag.tip{background:rgba(62,207,142,.12);color:#3ECF8E;border-color:rgba(62,207,142,.35)}
+.tag.critical{background:rgba(255,107,53,.1);color:var(--accent);border-color:rgba(255,107,53,.25)}
+.tag.warning{background:rgba(255,107,53,.07);color:var(--accent);border-color:rgba(255,107,53,.2)}
+.tag.tip{background:rgba(255,107,53,.05);color:var(--text2);border-color:rgba(255,107,53,.15)}
 .bar-fill{height:4px;border-radius:2px;width:0%;transition:width 1.2s ease}
 .video-container{position:relative;width:100%;max-width:860px;margin:0 auto 0;border-radius:12px;overflow:hidden;border:1px solid var(--border2);box-shadow:0 0 80px rgba(255,107,53,0.15)}
 .video-container iframe{width:100%;aspect-ratio:16/9;display:block}
@@ -1239,9 +1239,9 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
     <div id="founding-slots-bar" style="background:rgba(255,184,0,0.06);border:1px solid rgba(255,184,0,0.2);border-radius:8px;padding:8px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:8px">
         <span style="font-size:14px">⭐</span>
-        <span id="slots-label" style="font-size:12px;color:var(--text2)">Founding members locked in:</span>
-        <span id="slots-count" style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--success)">...</span>
-        <span id="slots-suffix" style="font-size:12px;color:var(--text3)">/ 100</span>
+        <span style="font-size:12px;color:var(--text2)">Founding Member slots remaining:</span>
+        <span id="slots-count" style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--warn)">...</span>
+        <span style="font-size:12px;color:var(--text3)">of 100</span>
       </div>
       <div style="width:120px;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
         <div id="slots-bar" style="height:100%;background:var(--warn);border-radius:3px;width:100%;transition:width .5s"></div>
@@ -2209,61 +2209,45 @@ function formatTimestamp(ts) {
 
 const SEV_COL={critical:'#FF4444',warning:'#F59E0B',tip:'#3ECF8E'};
 
-function _ytCmd(func, args) {
-  var f = document.getElementById('yt-player');
-  if (f && f.contentWindow) f.contentWindow.postMessage(JSON.stringify({event:'command',func:func,args:args||[]}), '*');
-}
-
 function replayMoment(i, e) {
   if (e) e.stopPropagation();
   var obs = currentObservations && currentObservations[i];
   if (!obs || !obs.timestamp) return;
+  var lp = document.getElementById('local-player');
+  if (!lp || !lp.src) return;
 
-  // Parse timestamp → seconds
+  // Parse timestamp e.g. "1:24" or "~0:45-1:00" → take first time
   var ts = obs.timestamp.replace('~','').split('-')[0].trim();
   var parts = ts.split(':');
   var secs = parts.length === 2 ? parseInt(parts[0])*60 + parseInt(parts[1]) : parseInt(parts[0]);
   if (isNaN(secs)) return;
 
-  var lp = document.getElementById('local-player');
-  var hasLocal = !!(lp && lp.src);
-  var hasYT = !!window.currentYouTubeId;
-  if (!hasLocal && !hasYT) return;
+  // Cap to video duration — never seek past end
+  var duration = lp.duration || 0;
+  var start = duration > 0 ? Math.min(Math.max(0, secs), Math.max(0, duration - 10)) : Math.max(0, secs);
 
+  // Clear any existing timer
   if (window._replayTimer) { clearTimeout(window._replayTimer); window._replayTimer = null; }
 
-  if (hasLocal) {
-    // Local file — cap to duration and seek
-    var dur = lp.duration || 0;
-    var start = dur > 0 ? Math.min(Math.max(0, secs), Math.max(0, dur - 10)) : Math.max(0, secs);
-    lp.currentTime = start;
-    lp.play();
-    window._replayTimer = setTimeout(function() {
-      lp.pause();
-      window._replayTimer = null;
-      var btn = document.getElementById('replay-btn-'+i);
-      if (btn) { btn.textContent = '▶ REPLAY'; btn.onclick = function(ev){ev.stopPropagation();replayMoment(i,ev);}; }
-    }, 10000);
-  } else {
-    // YouTube — postMessage seek + play, pause after 10s
-    _ytCmd('seekTo', [secs, true]);
-    _ytCmd('playVideo');
-    window._replayTimer = setTimeout(function() {
-      _ytCmd('pauseVideo');
-      window._replayTimer = null;
-      var btn = document.getElementById('replay-btn-'+i);
-      if (btn) { btn.textContent = '▶ REPLAY'; btn.onclick = function(ev){ev.stopPropagation();replayMoment(i,ev);}; }
-    }, 10000);
-  }
+  lp.currentTime = start;
+  lp.play();
 
-  // Update button to STOP
+  // Stop after exactly 10 seconds
+  window._replayTimer = setTimeout(function() {
+    lp.pause();
+    window._replayTimer = null;
+    var btn = document.getElementById('replay-btn-'+i);
+    if (btn) { btn.textContent = '▶ REPLAY'; btn.onclick = function(ev){ev.stopPropagation();replayMoment(i,ev);}; }
+  }, 10000);
+
+  // Update button to show STOP
   var btn = document.getElementById('replay-btn-'+i);
   if (btn) {
     btn.textContent = '⏹ STOP';
     btn.onclick = function(ev) {
       ev.stopPropagation();
       if (window._replayTimer) { clearTimeout(window._replayTimer); window._replayTimer = null; }
-      if (hasLocal) { lp.pause(); } else { _ytCmd('pauseVideo'); }
+      lp.pause();
       btn.textContent = '▶ REPLAY';
       btn.onclick = function(ev2){ev2.stopPropagation();replayMoment(i,ev2);};
     };
@@ -2718,32 +2702,23 @@ function renderResults(data,operator,map,rank,isGuest) {
         + '<div style="font-size:11.5px;color:var(--text2)">Create a free account to see everything</div>'
         + '<button onclick="siegeAuth.requireSignIn()" style="font-family:var(--fh);font-size:12px;font-weight:700;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:8px 20px;cursor:pointer">Sign up free — 3 reviews/month</button></div></div>')
     : '';
-  const CAT_COLORS={'game sense':'#A78BFA','positioning':'#60A5FA','utility':'#34D399','decision making':'#F97316','rotation':'#FBBF24'};
-  const _lp=document.getElementById('local-player');
-  const _vidDur=_lp&&_lp.duration&&!isNaN(_lp.duration)?_lp.duration:Infinity;
   list.innerHTML=guestBanner+summaryHtml+deathsHtml+aimHtml+obsToRender.map((o,i)=>{
     const phase=getPhaseLabel(o.timestamp);
     const headline=getObsHeadline(o);
     const catLabel=(o.category||'').replace(/_/g,' ');
-    const catCol=CAT_COLORS[catLabel.toLowerCase()]||null;
-    const _tsParts=(o.timestamp||'').replace(/~/g,'').split('-')[0].trim().split(':');
-    const _tsSecs=_tsParts.length===2?parseInt(_tsParts[0])*60+parseInt(_tsParts[1]):parseInt(_tsParts[0]);
-    const tsInRange=!isNaN(_tsSecs)&&_tsSecs<=_vidDur+5;
     const sevIcon=o.severity==='critical'?'⚠':o.severity==='warning'?'◆':'→';
     const hasSeek=!!(document.getElementById('local-player')&&document.getElementById('local-player').src)||!!window.currentYouTubeId;
-    const tsLabel=tsInRange?`▶ ${o.timestamp}`:'▶ REPLAY';
-    const tsBtn=o.timestamp&&hasSeek?`<button onclick="event.stopPropagation();jumpToTimestamp('${o.timestamp}',${i})" title="Jump to this moment in your clip" style="display:inline-flex;align-items:center;gap:3px;font-family:var(--fh);font-size:10px;font-weight:700;color:var(--accent);background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.3);border-radius:5px;padding:3px 8px;cursor:pointer;white-space:nowrap;flex-shrink:0;letter-spacing:.04em">${tsLabel}</button>`:(o.timestamp?`<span style="font-size:10px;color:var(--text3);font-weight:600;flex-shrink:0">${o.timestamp}</span>`:'');
+    const tsBtn=o.timestamp&&hasSeek?`<button onclick="event.stopPropagation();jumpToTimestamp('${o.timestamp}',${i})" title="Jump to this moment in your clip" style="display:inline-flex;align-items:center;gap:3px;font-family:var(--fh);font-size:10px;font-weight:700;color:var(--accent);background:rgba(255,107,53,0.12);border:1px solid rgba(255,107,53,0.3);border-radius:5px;padding:3px 8px;cursor:pointer;white-space:nowrap;flex-shrink:0;letter-spacing:.04em">▶ ${o.timestamp}</button>`:(o.timestamp?`<span style="font-size:10px;color:var(--text3);font-weight:600;flex-shrink:0">${o.timestamp}</span>`:'');
     return `<div class="obs-card" id="obs-${i}" onclick="toggleObs(${i},'${o.severity}')" style="animation-delay:${i*.06}s;cursor:pointer">
       <div style="display:flex;align-items:flex-start;gap:8px">
         <div style="flex:1;min-width:0">
           <div style="display:flex;align-items:center;gap:5px;margin-bottom:8px;flex-wrap:nowrap">
             <span class="tag ${o.severity}" style="display:inline-flex;align-items:center;gap:3px;flex-shrink:0">${sevIcon} ${o.severity}</span>
-            ${catLabel?`<span style="font-size:10px;color:${catCol||'var(--text3)'};background:${catCol?catCol+'1a':'var(--bg)'};border:1px solid ${catCol?catCol+'55':'var(--border)'};padding:1px 7px;border-radius:10px;flex-shrink:0;white-space:nowrap">${catLabel}</span>`:''}
+            ${catLabel?`<span style="font-size:10px;color:var(--text3);background:var(--bg);border:1px solid var(--border);padding:1px 7px;border-radius:10px;flex-shrink:0;white-space:nowrap">${catLabel}</span>`:''}
             <span style="flex:1"></span>
             ${tsBtn}
-            <span style="font-size:9px;color:var(--text3);flex-shrink:0;letter-spacing:.04em;text-transform:uppercase">Rate:</span>
-            <button onclick="event.stopPropagation();rateFeedback(${i},1)" id="thumb-up-${i}" title="Accurate — this feedback helped improve my game" style="background:rgba(62,207,142,0.1);border:1px solid rgba(62,207,142,0.2);border-radius:5px;cursor:pointer;font-size:13px;padding:2px 7px;transition:all .15s;flex-shrink:0;line-height:1.4">👍</button>
-            <button onclick="event.stopPropagation();rateFeedback(${i},-1)" id="thumb-dn-${i}" title="Inaccurate — this feedback was wrong or unhelpful" style="background:rgba(255,68,68,0.1);border:1px solid rgba(255,68,68,0.2);border-radius:5px;cursor:pointer;font-size:13px;padding:2px 7px;transition:all .15s;flex-shrink:0;line-height:1.4">👎</button>
+            <button onclick="event.stopPropagation();rateFeedback(${i},1)" id="thumb-up-${i}" title="Accurate" style="background:rgba(62,207,142,0.1);border:1px solid rgba(62,207,142,0.2);border-radius:5px;cursor:pointer;font-size:13px;padding:2px 7px;transition:all .15s;flex-shrink:0;line-height:1.4">👍</button>
+            <button onclick="event.stopPropagation();rateFeedback(${i},-1)" id="thumb-dn-${i}" title="Inaccurate" style="background:rgba(255,68,68,0.1);border:1px solid rgba(255,68,68,0.2);border-radius:5px;cursor:pointer;font-size:13px;padding:2px 7px;transition:all .15s;flex-shrink:0;line-height:1.4">👎</button>
             <span id="chev-${i}" style="font-size:16px;color:var(--text3);transition:transform .2s;flex-shrink:0">›</span>
           </div>
           <div style="font-family:var(--fh);font-size:14px;font-weight:700;color:var(--text);margin-bottom:5px;line-height:1.3">${headline}</div>
@@ -3128,12 +3103,13 @@ function jumpToTimestamp(timeStr, obsIndex) {
     localPlayer.play();
   }
 
-  // Seek YouTube player via postMessage — no iframe reload, instant seek
-  if (window.currentYouTubeId) {
-    var ytf = document.getElementById('yt-player');
-    if (ytf && ytf.contentWindow) {
-      ytf.contentWindow.postMessage(JSON.stringify({event:'command',func:'seekTo',args:[secs,true]}), '*');
-      ytf.contentWindow.postMessage(JSON.stringify({event:'command',func:'playVideo',args:[]}), '*');
+  // Seek YouTube player if YouTube link was used
+  const videoId = window.currentYouTubeId;
+  if (videoId) {
+    const iframe = document.getElementById('yt-player');
+    if (iframe) {
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId
+        + '?enablejsapi=1&controls=1&rel=0&modestbranding=1&start=' + secs + '&autoplay=1';
     }
   }
 
@@ -4751,30 +4727,13 @@ function loadFoundingSlots() {
     .then(function(d) {
       var remaining = d.slots_remaining !== undefined ? d.slots_remaining : (d.remaining !== undefined ? d.remaining : 87);
       var taken = 100 - remaining;
+      sc.textContent = remaining;
       if (sb) sb.style.width = Math.min(100, taken) + '%';
-      var lbl = document.getElementById('slots-label');
-      var sfx = document.getElementById('slots-suffix');
-      if (remaining >= 30) {
-        // Social proof — show momentum (how many claimed)
-        sc.textContent = taken;
-        sc.style.color = 'var(--success)';
-        if (lbl) lbl.textContent = 'Founding members locked in:';
-        if (sfx) sfx.textContent = '/ 100';
-      } else if (remaining >= 10) {
-        // Scarcity — switch to showing remaining
-        sc.textContent = remaining;
-        sc.style.color = 'var(--warn)';
-        if (lbl) lbl.textContent = 'Spots remaining — act fast:';
-        if (sfx) sfx.textContent = 'left';
-      } else {
-        // Urgency — almost gone
-        sc.textContent = remaining;
-        sc.style.color = 'var(--danger)';
-        if (lbl) lbl.textContent = '⚠ LAST CHANCE — spots left:';
-        if (sfx) sfx.textContent = '';
-      }
+      if (remaining <= 20) { sc.style.color = 'var(--danger)'; }
+      else if (remaining <= 50) { sc.style.color = 'var(--warn)'; }
+      else { sc.style.color = 'var(--warn)'; }
     })
-    .catch(function() { if (sc) sc.textContent = '13'; });  // fallback: ~13 claimed
+    .catch(function() { if (sc) sc.textContent = '87'; });
 }
 // Call on page load too so it's always populated
 document.addEventListener('DOMContentLoaded', function() { loadFoundingSlots(); });
