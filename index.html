@@ -2298,6 +2298,11 @@ function formatTimestamp(ts) {
 
 const SEV_COL={critical:'#FF4444',warning:'#F59E0B',tip:'#3ECF8E'};
 
+function _ytCmd(func, args) {
+  var f = document.getElementById('yt-player');
+  if (f && f.contentWindow) f.contentWindow.postMessage(JSON.stringify({event:'command',func:func,args:args||[]}), '*');
+}
+
 function replayMoment(i, e) {
   if (e) e.stopPropagation();
   var obs = currentObservations && currentObservations[i];
@@ -2420,6 +2425,16 @@ async function askClip(){
     log.insertAdjacentHTML('beforeend','<div style="font-size:12.5px;color:var(--text2);line-height:1.6;margin-bottom:10px;white-space:pre-wrap"><b style="color:var(--text)">Coach:</b> '+ans.replace(/</g,"&lt;")+'</div>');
     window._chatHist.push({role:'user',text:q}); window._chatHist.push({role:'coach',text:ans});
   }catch(e){ t.remove(); log.insertAdjacentHTML('beforeend','<div style="font-size:12px;color:var(--danger);margin-bottom:8px">Could not reach the coach.</div>'); }
+}
+async function manageBilling(){
+  if(!window.siegeAuth||!siegeAuth.isSignedIn()){show('pricing');return;}
+  try{
+    var tk=await siegeAuth.token();
+    var r=await fetch(API_URL+'/billing/portal',{method:'POST',headers:{'Authorization':'Bearer '+tk}});
+    if(r.ok){var d=await r.json();if(d.url){window.location.href=d.url;return;}}
+  }catch(e){}
+  // Fallback: open Stripe customer portal directly
+  window.open('https://billing.stripe.com/p/login/test_siegeiq','_blank');
 }
 async function emailDigest(btn){
   if(btn){ btn.textContent='Sending\u2026'; btn.disabled=true; }
@@ -3196,9 +3211,10 @@ function jumpToTimestamp(timeStr, obsIndex) {
   const videoId = window.currentYouTubeId;
   if (videoId) {
     const iframe = document.getElementById('yt-player');
-    if (iframe) {
-      iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId
-        + '?enablejsapi=1&controls=1&rel=0&modestbranding=1&start=' + secs + '&autoplay=1';
+    if (iframe && iframe.contentWindow) {
+      // postMessage seek — no iframe reload, instant
+      iframe.contentWindow.postMessage(JSON.stringify({event:'command',func:'seekTo',args:[secs,true]}), '*');
+      iframe.contentWindow.postMessage(JSON.stringify({event:'command',func:'playVideo',args:[]}), '*');
     }
   }
 
