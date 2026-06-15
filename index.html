@@ -1829,6 +1829,95 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
 </div>
 
 <script>
+// ════════════════ SiegeIQ Auth (Clerk) ════════════════
+(function () {
+  // ── Clerk publishable key ────────────────────────────────────────────────
+  // TEST instance below. For PRODUCTION: create a prod Clerk instance, then either
+  //   (a) replace this string with your pk_live_... key, OR
+  //   (b) set window.SIEGEIQ_CLERK_PK = 'pk_live_...'; before this script runs.
+  // Also update CLERK_PUBLISHABLE_KEY + CLERK_SECRET_KEY on Railway. The Clerk JS URL
+  // and token-verification endpoint are derived automatically from whichever key is used.
+  var PK = (typeof window !== 'undefined' && window.SIEGEIQ_CLERK_PK) || 'pk_test_ZW5hYmxlZC1kaW5vc2F1ci03MS5jbGVyay5hY2NvdW50cy5kZXYk';
+  var ready = false, me = null;
+
+  function frontendApi(pk) {
+    try { return atob(pk.split('_')[2]).replace(/\$+$/, ''); }
+    catch (e) { return 'enabled-dinosaur-71.clerk.accounts.dev'; }
+  }
+
+  window.siegeAuth = {
+    me: function () { return me; },
+    ready: function () { return ready; },
+    isSignedIn: function () { return !!(window.Clerk && window.Clerk.user); },
+    userId: function () { return (window.Clerk && window.Clerk.user && window.Clerk.user.id) || 'demo-user'; },
+    email: function () { try { return window.Clerk.user.primaryEmailAddress.emailAddress; } catch (e) { return ''; } },
+    token: async function () {
+      try { return (window.Clerk && window.Clerk.session) ? await window.Clerk.session.getToken() : null; }
+      catch (e) { return null; }
+    },
+    requireSignIn: async function () {
+      if (this.isSignedIn()) return true;
+      if (!window.Clerk || !ready) { alert('Sign-in is still loading - give it a second and try again.'); return false; }
+      window.Clerk.openSignIn({});
+      return false;
+    },
+    signOut: function () { if (window.Clerk) window.Clerk.signOut(); }
+  };
+
+  async function refreshMe() {
+    try {
+      var t = await window.siegeAuth.token();
+      if (!t) { me = null; renderNav(); return; }
+      var r = await fetch(`${API_URL}/me`, { headers: { 'Authorization': 'Bearer ' + t } });
+      me = r.ok ? await r.json() : null;
+    } catch (e) { me = null; }
+    renderNav();
+  }
+  window.siegeAuthRefresh = refreshMe;
+
+  function renderNav() {
+    var slot = document.getElementById('auth-slot');
+    if (!slot) return;
+    if (window.siegeAuth.isSignedIn()) {
+      var plan = me ? (me.is_demo ? 'DEMO PRO' : (me.plan || 'free').toUpperCase()) : '...';
+      var hot = plan && plan !== 'FREE' && plan !== '...';
+      slot.innerHTML =
+        '<span style="font-family:var(--fh);font-size:10px;font-weight:700;letter-spacing:.06em;color:' +
+        (hot ? '#fff' : 'var(--text2)') + ';background:' + (hot ? 'var(--accent)' : 'var(--bg3)') +
+        ';border:1px solid var(--border2);border-radius:20px;padding:3px 10px">' + plan + '</span>' +
+        '<span id="clerk-userbtn"></span>';
+      try { window.Clerk.mountUserButton(document.getElementById('clerk-userbtn'), { afterSignOutUrl: location.origin }); } catch (e) {}
+    } else {
+      slot.innerHTML =
+        '<button onclick="window.Clerk&&window.Clerk.openSignIn({})" class="nav-btn" style="font-weight:600">Sign in</button>' +
+        '<button onclick="window.Clerk&&window.Clerk.openSignUp({})" style="font-family:var(--fh);font-size:12px;font-weight:700;letter-spacing:.05em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:6px 14px;cursor:pointer">Sign up</button>';
+    }
+  }
+
+  function loadClerk() {
+    var host = frontendApi(PK);
+    var s = document.createElement('script');
+    s.setAttribute('data-clerk-publishable-key', PK);
+    s.async = true; s.crossOrigin = 'anonymous';
+    s.src = 'https://' + host + '/npm/@clerk/clerk-js@5/dist/clerk.browser.js';
+    s.addEventListener('load', async function () {
+      try {
+        if (window.Clerk && !window.Clerk.loaded) { await window.Clerk.load({}); }
+        ready = true;
+        if (window.Clerk && window.Clerk.addListener) window.Clerk.addListener(function () { refreshMe(); });
+        refreshMe();
+      } catch (e) { console.error('Clerk load failed', e); }
+    });
+    document.head.appendChild(s);
+    renderNav();
+  }
+
+  if (document.readyState !== 'loading') loadClerk();
+  else document.addEventListener('DOMContentLoaded', loadClerk);
+})();
+</script>
+
+<script>
 // ─── Operator data ────────────────────────────
 const ATTACKERS = ['Ace','Ash','Blitz','Brava','Buck','Capitão','Deimos','Dokkaebi','Flores','Finka','Grim','Hibana','Iana','Jackal','Kali','Lion','Maverick','Montagne','Nøkk','Nomad','Rauora','Ram','Sens','Sledge','Solid Snake','Thermite','Thatcher','Twitch','Ying','Zero','Zofia'];
 const DEFENDERS = ['Aruni','Azami','Bandit','Caveira','Clash','Denari','Doc','Echo','Ela','Fenrir','Frost','Goyo','Jäger','Kaid','Kapkan','Lesion','Maestro','Melusi','Mira','Mozzie','Mute','Oryx','Pulse','Rook','Smoke','Solis','Thorn','Thunderbird','Valkyrie','Vigil','Warden'];
