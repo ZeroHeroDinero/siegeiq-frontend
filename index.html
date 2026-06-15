@@ -1239,9 +1239,9 @@ const ELEVENLABS_KEY = ''; // Voice uses free browser TTS. Add ElevenLabs via Ra
     <div id="founding-slots-bar" style="background:rgba(255,184,0,0.06);border:1px solid rgba(255,184,0,0.2);border-radius:8px;padding:8px 16px;margin-bottom:12px;display:flex;align-items:center;justify-content:space-between">
       <div style="display:flex;align-items:center;gap:8px">
         <span style="font-size:14px">⭐</span>
-        <span style="font-size:12px;color:var(--text2)">Founding members locked in:</span>
-        <span id="slots-count" style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--warn)">...</span>
-        <span style="font-size:12px;color:var(--text3)">/ 100</span>
+        <span id="slots-label" style="font-size:12px;color:var(--text2)">Founding members locked in:</span>
+        <span id="slots-count" style="font-family:var(--fh);font-size:16px;font-weight:700;color:var(--success)">...</span>
+        <span id="slots-suffix" style="font-size:12px;color:var(--text3)">/ 100</span>
       </div>
       <div style="width:120px;height:6px;background:var(--bg3);border-radius:3px;overflow:hidden">
         <div id="slots-bar" style="height:100%;background:var(--warn);border-radius:3px;width:100%;transition:width .5s"></div>
@@ -2209,45 +2209,61 @@ function formatTimestamp(ts) {
 
 const SEV_COL={critical:'#FF4444',warning:'#F59E0B',tip:'#3ECF8E'};
 
+function _ytCmd(func, args) {
+  var f = document.getElementById('yt-player');
+  if (f && f.contentWindow) f.contentWindow.postMessage(JSON.stringify({event:'command',func:func,args:args||[]}), '*');
+}
+
 function replayMoment(i, e) {
   if (e) e.stopPropagation();
   var obs = currentObservations && currentObservations[i];
   if (!obs || !obs.timestamp) return;
-  var lp = document.getElementById('local-player');
-  if (!lp || !lp.src) return;
 
-  // Parse timestamp e.g. "1:24" or "~0:45-1:00" → take first time
+  // Parse timestamp → seconds
   var ts = obs.timestamp.replace('~','').split('-')[0].trim();
   var parts = ts.split(':');
   var secs = parts.length === 2 ? parseInt(parts[0])*60 + parseInt(parts[1]) : parseInt(parts[0]);
   if (isNaN(secs)) return;
 
-  // Cap to video duration — never seek past end
-  var duration = lp.duration || 0;
-  var start = duration > 0 ? Math.min(Math.max(0, secs), Math.max(0, duration - 10)) : Math.max(0, secs);
+  var lp = document.getElementById('local-player');
+  var hasLocal = !!(lp && lp.src);
+  var hasYT = !!window.currentYouTubeId;
+  if (!hasLocal && !hasYT) return;
 
-  // Clear any existing timer
   if (window._replayTimer) { clearTimeout(window._replayTimer); window._replayTimer = null; }
 
-  lp.currentTime = start;
-  lp.play();
+  if (hasLocal) {
+    // Local file — cap to duration and seek
+    var dur = lp.duration || 0;
+    var start = dur > 0 ? Math.min(Math.max(0, secs), Math.max(0, dur - 10)) : Math.max(0, secs);
+    lp.currentTime = start;
+    lp.play();
+    window._replayTimer = setTimeout(function() {
+      lp.pause();
+      window._replayTimer = null;
+      var btn = document.getElementById('replay-btn-'+i);
+      if (btn) { btn.textContent = '▶ REPLAY'; btn.onclick = function(ev){ev.stopPropagation();replayMoment(i,ev);}; }
+    }, 10000);
+  } else {
+    // YouTube — postMessage seek + play, pause after 10s
+    _ytCmd('seekTo', [secs, true]);
+    _ytCmd('playVideo');
+    window._replayTimer = setTimeout(function() {
+      _ytCmd('pauseVideo');
+      window._replayTimer = null;
+      var btn = document.getElementById('replay-btn-'+i);
+      if (btn) { btn.textContent = '▶ REPLAY'; btn.onclick = function(ev){ev.stopPropagation();replayMoment(i,ev);}; }
+    }, 10000);
+  }
 
-  // Stop after exactly 10 seconds
-  window._replayTimer = setTimeout(function() {
-    lp.pause();
-    window._replayTimer = null;
-    var btn = document.getElementById('replay-btn-'+i);
-    if (btn) { btn.textContent = '▶ REPLAY'; btn.onclick = function(ev){ev.stopPropagation();replayMoment(i,ev);}; }
-  }, 10000);
-
-  // Update button to show STOP
+  // Update button to STOP
   var btn = document.getElementById('replay-btn-'+i);
   if (btn) {
     btn.textContent = '⏹ STOP';
     btn.onclick = function(ev) {
       ev.stopPropagation();
       if (window._replayTimer) { clearTimeout(window._replayTimer); window._replayTimer = null; }
-      lp.pause();
+      if (hasLocal) { lp.pause(); } else { _ytCmd('pauseVideo'); }
       btn.textContent = '▶ REPLAY';
       btn.onclick = function(ev2){ev2.stopPropagation();replayMoment(i,ev2);};
     };
@@ -3112,13 +3128,12 @@ function jumpToTimestamp(timeStr, obsIndex) {
     localPlayer.play();
   }
 
-  // Seek YouTube player if YouTube link was used
-  const videoId = window.currentYouTubeId;
-  if (videoId) {
-    const iframe = document.getElementById('yt-player');
-    if (iframe) {
-      iframe.src = 'https://www.youtube-nocookie.com/embed/' + videoId
-        + '?enablejsapi=1&controls=1&rel=0&modestbranding=1&start=' + secs + '&autoplay=1';
+  // Seek YouTube player via postMessage — no iframe reload, instant seek
+  if (window.currentYouTubeId) {
+    var ytf = document.getElementById('yt-player');
+    if (ytf && ytf.contentWindow) {
+      ytf.contentWindow.postMessage(JSON.stringify({event:'command',func:'seekTo',args:[secs,true]}), '*');
+      ytf.contentWindow.postMessage(JSON.stringify({event:'command',func:'playVideo',args:[]}), '*');
     }
   }
 
@@ -4736,11 +4751,28 @@ function loadFoundingSlots() {
     .then(function(d) {
       var remaining = d.slots_remaining !== undefined ? d.slots_remaining : (d.remaining !== undefined ? d.remaining : 87);
       var taken = 100 - remaining;
-      sc.textContent = taken;  // show claimed count for momentum
       if (sb) sb.style.width = Math.min(100, taken) + '%';
-      if (remaining <= 10) { sc.style.color = 'var(--danger)'; }  // danger when almost gone
-      else if (remaining <= 30) { sc.style.color = 'var(--warn)'; }
-      else { sc.style.color = 'var(--success)'; }  // green when plenty left — momentum framing
+      var lbl = document.getElementById('slots-label');
+      var sfx = document.getElementById('slots-suffix');
+      if (remaining >= 30) {
+        // Social proof — show momentum (how many claimed)
+        sc.textContent = taken;
+        sc.style.color = 'var(--success)';
+        if (lbl) lbl.textContent = 'Founding members locked in:';
+        if (sfx) sfx.textContent = '/ 100';
+      } else if (remaining >= 10) {
+        // Scarcity — switch to showing remaining
+        sc.textContent = remaining;
+        sc.style.color = 'var(--warn)';
+        if (lbl) lbl.textContent = 'Spots remaining — act fast:';
+        if (sfx) sfx.textContent = 'left';
+      } else {
+        // Urgency — almost gone
+        sc.textContent = remaining;
+        sc.style.color = 'var(--danger)';
+        if (lbl) lbl.textContent = '⚠ LAST CHANCE — spots left:';
+        if (sfx) sfx.textContent = '';
+      }
     })
     .catch(function() { if (sc) sc.textContent = '13'; });  // fallback: ~13 claimed
 }
