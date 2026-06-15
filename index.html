@@ -5647,4 +5647,149 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
 
     var wrap = document.createElement('div');
     wrap.id = '_devWrap';
-    wrap.style.cssText = 'positi
+    wrap.style.cssText = 'position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:99999;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none';
+
+    // Status bar (pill across the bottom)
+    var bar = document.createElement('div');
+    bar.id = '_devBar';
+    bar.style.cssText = [
+      'pointer-events:auto',
+      'display:flex','align-items:center','gap:10px',
+      'padding:7px 14px','border-radius:30px',
+      'border:1px solid #374151',
+      'background:#1f2937',
+      'box-shadow:0 4px 20px rgba(0,0,0,0.7)',
+      'font-family:monospace','font-size:11px','font-weight:700',
+      'letter-spacing:.08em','user-select:none',
+      'transition:background .2s,border-color .2s'
+    ].join(';');
+
+    bar.innerHTML = [
+      '<span id="_devStatus" style="color:#fff;min-width:110px;text-align:center">⚡ DEV — OFF</span>',
+      '<div style="width:1px;height:14px;background:rgba(255,255,255,0.15)"></div>',
+      '<button id="_devBtn_free" onclick="window._devSetPlan(\'free\')" style="padding:4px 10px;border:none;border-radius:20px;cursor:pointer;font-family:monospace;font-size:10px;transition:all .15s">FREE</button>',
+      '<button id="_devBtn_pro"  onclick="window._devSetPlan(\'pro\')"  style="padding:4px 10px;border:none;border-radius:20px;cursor:pointer;font-family:monospace;font-size:10px;transition:all .15s">PRO</button>',
+      '<button id="_devBtn_team" onclick="window._devSetPlan(\'team\')" style="padding:4px 10px;border:none;border-radius:20px;cursor:pointer;font-family:monospace;font-size:10px;transition:all .15s">TEAM</button>',
+      '<div style="width:1px;height:14px;background:rgba(255,255,255,0.15)"></div>',
+      '<label style="display:flex;align-items:center;gap:5px;cursor:pointer;color:#9ca3af;font-size:10px;font-weight:400">',
+        '<input type="checkbox" id="_devToggle" onchange="window._devToggleChange(this.checked)" style="cursor:pointer">',
+        'ON',
+      '</label>',
+    ].join('');
+
+    wrap.appendChild(bar);
+    document.body.appendChild(wrap);
+    _updatePanel();
+  }
+
+  window._devSetPlan = function(p) {
+    _plan = p;
+    _save();
+    if (_on) _apply(); else _updatePanel();
+  };
+
+  window._devToggleChange = function(on) {
+    _on = on;
+    _save();
+    if (_on && window.siegeAuth && !window.siegeAuth._origIsSignedIn) {
+      window.siegeAuth._origIsSignedIn    = window.siegeAuth.isSignedIn;
+      window.siegeAuth._origToken         = window.siegeAuth.token;
+      window.siegeAuth._origRequireSignIn = window.siegeAuth.requireSignIn;
+    }
+    _apply();
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _buildPanel);
+  } else {
+    _buildPanel();
+  }
+
+  window.addEventListener('siegeauth:ready', function() {
+    if (_on) _apply();
+  });
+
+  window.addEventListener('load', function() {
+    _buildPanel();
+    if (_on) {
+      setTimeout(function() { _apply(); }, 600);
+    }
+  });
+})();
+</script>
+<!-- END DEV PANEL -->
+
+
+<!-- Clerk Auth -->
+<script
+  async
+  crossorigin="anonymous"
+  data-clerk-publishable-key="pk_test_ZW5hYmxlZC1kaW5vc2F1ci03MS5jbGVyay5hY2NvdW50cy5kZXYk"
+  src="https://enabled-dinosaur-71.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+  type="text/javascript"
+></script>
+<script>
+window.addEventListener('load', async function() {
+  if (!window.Clerk) return;
+  await window.Clerk.load({ publishableKey: 'pk_test_ZW5hYmxlZC1kaW5vc2F1ci03MS5jbGVyay5hY2NvdW50cy5kZXYk' });
+  var clerk = window.Clerk;
+
+  function renderSlot() {
+    var slot = document.getElementById('auth-slot');
+    if (!slot) return;
+    slot.innerHTML = '';
+    if (clerk.user) {
+      clerk.mountUserButton(slot);
+    } else {
+      var signIn = document.createElement('button');
+      signIn.textContent = 'Sign In';
+      signIn.style.cssText = 'font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:transparent;border:1px solid rgba(255,255,255,0.25);border-radius:var(--r);padding:7px 16px;cursor:pointer;transition:border-color .15s';
+      signIn.onmouseover = function(){ this.style.borderColor='rgba(255,255,255,0.6)'; };
+      signIn.onmouseout  = function(){ this.style.borderColor='rgba(255,255,255,0.25)'; };
+      signIn.onclick = function(){ clerk.openSignIn({}); };
+      slot.appendChild(signIn);
+      var signUp = document.createElement('button');
+      signUp.textContent = 'Sign Up';
+      signUp.style.cssText = 'font-family:var(--fh);font-size:13px;font-weight:700;letter-spacing:.06em;color:#fff;background:var(--accent);border:none;border-radius:var(--r);padding:7px 16px;cursor:pointer;margin-left:4px';
+      signUp.onclick = function(){ clerk.openSignUp({}); };
+      slot.appendChild(signUp);
+    }
+  }
+
+  renderSlot();
+  clerk.addListener(function(){ renderSlot(); });
+
+  window.siegeAuth = {
+    isSignedIn:    function() { return !!clerk.user; },
+    userId:        function() { return clerk.user ? clerk.user.id : null; },
+    token:         async function() {
+      if (!clerk.session) return null;
+      return await clerk.session.getToken();
+    },
+    requireSignIn: async function() {
+      if (!clerk.user) {
+        clerk.openSignIn({});
+        return await new Promise(function(resolve) {
+          var unsub = clerk.addListener(function() {
+            if (clerk.user) { unsub(); resolve(true); }
+          });
+        });
+      }
+      return true;
+    },
+    me: function() {
+      if (!clerk.user) return null;
+      return {
+        id:        clerk.user.id,
+        email:     (clerk.user.primaryEmailAddress && clerk.user.primaryEmailAddress.emailAddress) || '',
+        firstName: clerk.user.firstName || ''
+      };
+    }
+  };
+
+  window.dispatchEvent(new Event('siegeauth:ready'));
+});
+</script>
+
+</body>
+</html>
