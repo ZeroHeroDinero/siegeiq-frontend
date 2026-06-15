@@ -5699,10 +5699,33 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
     _apply();
   };
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', _buildPanel);
-  } else {
+  // ── Secret key sequence: type "siegeiq" anywhere to show/hide panel ─────────
+  var _seq = '', _target = 'siegeiq';
+  document.addEventListener('keydown', function(e) {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+    _seq += e.key.toLowerCase();
+    if (_seq.length > _target.length) _seq = _seq.slice(-_target.length);
+    if (_seq === _target) {
+      var w = document.getElementById('_devWrap');
+      if (!w) { _buildPanel(); }
+      else { w.style.display = w.style.display === 'none' ? 'flex' : 'none'; }
+      _seq = '';
+    }
+  });
+
+  // Panel hidden by default — only shown after secret sequence
+  function _buildAndHide() {
     _buildPanel();
+    var w = document.getElementById('_devWrap');
+    if (w) w.style.display = 'none';
+    // If dev mode was already ON from a previous session, keep it active but panel stays hidden
+    if (_on) _apply();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', _buildAndHide);
+  } else {
+    _buildAndHide();
   }
 
   window.addEventListener('siegeauth:ready', function() {
@@ -5710,10 +5733,8 @@ document.querySelectorAll('.stat-num-land').forEach(el => {
   });
 
   window.addEventListener('load', function() {
-    _buildPanel();
-    if (_on) {
-      setTimeout(function() { _apply(); }, 600);
-    }
+    if (!document.getElementById('_devBar')) _buildAndHide();
+    else if (_on) setTimeout(function() { _apply(); }, 600);
   });
 })();
 </script>
@@ -5757,36 +5778,7 @@ window.addEventListener('load', async function() {
   }
 
   renderSlot();
-  clerk.addListener(function(){ renderSlot(); });
-
-  window.siegeAuth = {
-    isSignedIn:    function() { return !!clerk.user; },
-    userId:        function() { return clerk.user ? clerk.user.id : null; },
-    token:         async function() {
-      if (!clerk.session) return null;
-      return await clerk.session.getToken();
-    },
-    requireSignIn: async function() {
-      if (!clerk.user) {
-        clerk.openSignIn({});
-        return await new Promise(function(resolve) {
-          var unsub = clerk.addListener(function() {
-            if (clerk.user) { unsub(); resolve(true); }
-          });
-        });
-      }
-      return true;
-    },
-    me: function() {
-      if (!clerk.user) return null;
-      return {
-        id:        clerk.user.id,
-        email:     (clerk.user.primaryEmailAddress && clerk.user.primaryEmailAddress.emailAddress) || '',
-        firstName: clerk.user.firstName || ''
-      };
-    }
-  };
-
+  clerk.addListener(function(){ renderSlot(); })
   window.dispatchEvent(new Event('siegeauth:ready'));
 });
 </script>
